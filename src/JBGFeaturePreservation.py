@@ -10,9 +10,15 @@ def validate_investigation_feature_preservation(rows, column_names, config, conv
     deterministically, and SQL/CSV both use its existing conversion path.
     A genuinely empty source column may be dropped by DatasetHandler as before.
     """
-    if not rows:
+    # 299i2: the SQL data layer returns a NumPy array (the CSV layer a list);
+    # "not rows" is ambiguous for an array and stopped every SQL investigation.
+    if rows is None or len(rows) == 0:
         return
-    raw = pd.DataFrame.from_records(rows, columns=list(column_names))
+    if isinstance(rows, pd.DataFrame):
+        raw = rows.copy()
+        raw.columns = list(column_names)
+    else:
+        raw = pd.DataFrame.from_records(list(rows), columns=list(column_names))
     numerical = set(config.get_numerical_column_names())
     losses = []
     for name in numerical:

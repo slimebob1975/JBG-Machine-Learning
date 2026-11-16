@@ -1,3 +1,15 @@
+## Revision 299i2 - SQL feature investigations (2026-11-13)
+
+- Gate 2026-11-13 (manual try): a feature investigation in an SQL project
+  stopped at once with "The truth value of an array with more than one
+  element is ambiguous". The SQL data layer returns the fetched rows as a
+  NumPy array (the CSV layer as a list), and the data check before the search
+  (`validate_investigation_feature_preservation`) tested them with
+  `not rows`. It now accepts a list, an array or a DataFrame and still
+  rejects values lost in numeric conversion. The same check runs in Voilà's
+  SQL investigation, which had the same fault.
+- Tests: `tests/test_revision_299i2_sql_investigation_rows.py`.
+
 ## Revision 299i - The feature investigation as a run (2026-11-13)
 
 - Voilà retirement item (agreed 2026-11-13): Voilà's feature investigation

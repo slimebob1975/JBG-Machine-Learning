@@ -388,6 +388,8 @@ full SQL regression acceptance remain separately unverified.
     its settings (used only by Voila) are not shown or read by the web form
     and stay stored; the section and the pipeline picture say the column
     roles choose the variables.
+  - [x] 299i2 (gate 2026-11-13): SQL investigations stopped at the data check
+    (NumPy rows); fixed.
   - [x] 299i: the feature investigation as a run of its own, started on the
     Training tab with the chosen dataset and configuration (its settings in
     the configuration's feature selection section again). More than two
