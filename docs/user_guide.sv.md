@@ -151,6 +151,11 @@ avsnitt är stängda när sidan öppnas; klicka på ett avsnitts rubrik för att
 efter sparandet. Ovanligare inställningar finns under **Avancerade
 inställningar** i respektive avsnitt.
 
+**Algoritmer**: algoritmerna visas i grupper (linjära, icke-linjära, grannar,
+naive Bayes, träd, ensembler, obalanserade data, robusta mot felmärkning,
+neurala nätverk, särskilda), sorterade efter namn inom varje grupp. **välj
+alla** och **rensa** gäller en grupp.
+
 **Variabelurval**: variablerna som en modell använder väljs med kolumnrollerna
 på fliken Dataset. En kolumn med rollen Ignoreras används inte. Inställningarna
 i avsnittet används av variabelundersökningen (se Träning). Quick, Standard

@@ -25,13 +25,13 @@ Målet är att vidareutveckla JBG:s mörkertalsanalys utan att ta bort den befin
 
 ## 2. Bakgrund: ursprungsproblemet
 
-Felsökningen utlöstes av en körning mot SQL-tabellen `[AIdata].[jbg_ai].[DatasetSanktioner]`, där beräkningen gav en extrem korrigeringsfaktor omkring **`c = 8237`**. Målklassen var **`Ja`**, vilket i detta fall är **majoritetsklassen**, till skillnad från tidigare användningsfall med en mindre målklass.
+Felsökningen utlöstes av en körning mot en SQL-tabell i produktion (namnet utelämnat), där beräkningen gav en extrem korrigeringsfaktor omkring **`c = 8237`**. Målklassen var **`Ja`**, vilket i detta fall är **majoritetsklassen**, till skillnad från tidigare användningsfall med en mindre målklass.
 
 ### 2.1 Datamaterial och körinställningar
 
 | Egenskap | Värde |
 |---|---|
-| SQL-tabell | `[AIdata].[jbg_ai].[DatasetSanktioner]` |
+| SQL-tabell | (namnet utelämnat) |
 | Antal rader i hela tabellen | 498 915 |
 | Antal kolumner | 71 |
 | Registrerade `Ja` | 427 508 (85,69 %) |
@@ -434,7 +434,7 @@ diagnostics: object
 | Sampling | NONE, SMOTE, CLEAN_SMOTE, UNDER |
 | Flip | 2 %, 5 %, 10 %, 20 % |
 | Upprepningar | Flera oberoende populationer, seeds och folds; antal fastställs före benchmark |
-| Referensdata | Bland annat en syntetisk analog till `DatasetSanktioner` med identifierarliknande features, konstanta fält och klassobalans |
+| Referensdata | Bland annat en syntetisk analog till produktionstabellen med identifierarliknande features, konstanta fält och klassobalans |
 
 ### 12.2 Mått som ska utvärderas
 
@@ -532,8 +532,8 @@ Detta dokument sammanfattar arbetsdiskussionen och de experiment som tidigare re
 
 - `JBGautoclass-jupyter-dev (15).zip` – kodbasen vid ursprungsfelsökningen.
 - `autoclassconfig_sanktioner_robert.granat_train(1).json` – körkonfiguration.
-- SQL-profil av `DatasetSanktioner` och klassuppdelade sammanfattningsmått.
-- `syntetisk_DatasetSanktioner_10000_v2.csv` – syntetiskt tabellunderlag.
+- SQL-profil av produktionstabellen och klassuppdelade sammanfattningsmått.
+- Ett syntetiskt tabellunderlag (10 000 rader, version 2).
 - `darknumber_lr_mlp_adaptive_results.csv` – LR/MLP och adaptiv perturbation.
 - `darknumber_known_truth_results.csv` – första facitscenarier.
 - `darknumber_probability_population_summary.csv` – hård och sannolikhetsbaserad recovery.

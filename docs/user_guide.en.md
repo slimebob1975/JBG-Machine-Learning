@@ -151,6 +151,11 @@ section's title to open or close it. Sections that were open when you saved
 stay open after saving. Less common settings are under **Advanced settings**
 in each section.
 
+**Algorithms**: the algorithms are listed in groups (linear, non-linear,
+neighbours, naive Bayes, trees, ensembles, imbalanced data, robust to
+mislabelling, neural networks, special), sorted by name within each group.
+**select all** and **clear** act on one group.
+
 **Feature selection**: the variables a model uses are chosen with the column
 roles on the Dataset tab. A column with the role Ignored is not used. The
 settings in this section are used by the feature investigation (see

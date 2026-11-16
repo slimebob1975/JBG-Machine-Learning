@@ -375,7 +375,7 @@ full SQL regression acceptance remain separately unverified.
       pause/resume); first make the Variabelurval section honest: it has no
       effect in web runs today.
     - [ ] Minor: rerun, run history (Körhistorik).
-  - [ ] Asked 2026-11-13: in the Algorithms section, group the available
+  - [x] 299l: Asked 2026-11-13: in the Algorithms section, group the available
     algorithms (for example Linear, Non-linear, Tree, Neural networks,
     Ensemble, Special), sorted alphabetically within each group. Propose the
     group of each algorithm and confirm it before coding.

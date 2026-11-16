@@ -1,3 +1,23 @@
+## Revision 299l - Algorithms in groups (2026-11-16)
+
+- Asked 2026-11-13, groups agreed 2026-11-16: the Configuration tab's
+  Algorithms section lists the algorithms in twelve groups (Linear,
+  Non-linear, Neighbours and centroids, Naive Bayes, Trees, Ensemble: bagging
+  and forests, Ensemble: boosting, Ensemble: voting and stacking, Imbalanced
+  data, Robust to mislabelling, Neural networks, Special), sorted by name
+  within each group (`ALGORITHM_GROUPS` in `JBGConfigSchema`; an algorithm
+  not listed goes to "Other"). Each group has "välj alla" and "rensa"; they
+  keep "Alla", the combination count and the save button in step. A group is
+  never split between the list's two columns. What is saved is unchanged.
+- Privacy (found by the documentation check once 299k was committed): the
+  Dark Number Analysis 2.0 plan named a production SQL table (catalog, schema
+  and table) and a file named after it; they are replaced by neutral words
+  ("en SQL-tabell i produktion (namnet utelämnat)", "produktionstabellen").
+  The name remains in the 299k commit's history.
+- User guides: the groups.
+- Tests: `tests/test_revision_299l_algorithm_groups.py` (every engine
+  algorithm in exactly one group).
+
 ## Revision 299k - The Overview as designed (2026-11-13)
 
 - Agreed 2026-11-13 (mockup): the Overview for the user, managers and

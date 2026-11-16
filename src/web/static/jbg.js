@@ -26,6 +26,22 @@
     });
   }
 
+  /* 299l: "select all" / "clear" for one group of choices (the algorithms);
+     a change event per box keeps "All" and the combination count in step. */
+  function wireChoiceGroup(group) {
+    group.querySelectorAll("[data-group-set]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var on = button.getAttribute("data-group-set") === "1";
+        group.querySelectorAll("input[type=checkbox]").forEach(function (box) {
+          if (box.checked !== on) {
+            box.checked = on;
+            box.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        });
+      });
+    });
+  }
+
   /* Combinations to spot-check: product over the "All" groups of the number
      of ticked options (a group with nothing ticked counts as one). */
   function updateCombinations() {
@@ -333,6 +349,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".scroll").forEach(addTopScrollbar);
     document.querySelectorAll("[data-all-group]").forEach(wireAllGroup);
+    document.querySelectorAll("[data-choice-group]").forEach(wireChoiceGroup);   /* 299l */
     document.querySelectorAll("[data-run-poll]").forEach(followRun);
     var configuration = document.getElementById("config-form");
     if (configuration) { keepOpenSections(configuration); }

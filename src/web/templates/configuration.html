@@ -15,9 +15,23 @@
       {% if f.allows_all %}
         <label class="check all"><input type="checkbox" name="f:{{ f.key }}" value="ALL" data-all {{ 'checked' if all_chosen }}> <b>{{ _("All") }}</b></label>
       {% endif %}
+      {% if f.option_groups %}
+        {# 299l: the algorithms in groups, each with "select all" and "clear". #}
+        {% for g in f.option_groups %}
+          <div class="choice-group" data-choice-group>
+            <p class="choice-group-head"><b>{{ g.label }}</b>
+              <button type="button" class="link-button" data-group-set="1">{{ _("select all") }}</button> ·
+              <button type="button" class="link-button" data-group-set="0">{{ _("clear") }}</button></p>
+            {% for option in g.options %}
+              <label class="check"><input type="checkbox" name="f:{{ f.key }}" value="{{ option.value }}" {{ 'checked' if all_chosen or (value and option.value in value) }}> {{ option.label }}</label>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      {% else %}
       {% for option in f.options %}
         <label class="check"><input type="checkbox" name="f:{{ f.key }}" value="{{ option.value }}" {{ 'checked' if all_chosen or (value and option.value in value) }}> {{ option.label }}</label>
       {% endfor %}
+      {% endif %}
     </fieldset>
   {% elif f.kind == "columns" and columns %}
     <fieldset class="choices"><legend>{{ f.label }}</legend>

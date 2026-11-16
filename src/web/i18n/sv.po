@@ -2274,3 +2274,46 @@ msgstr "Precision (makro)"
 
 msgid "Precision (weighted)"
 msgstr "Precision (viktat)"
+
+# 299l: algorithm groups
+msgid "Linear"
+msgstr "Linjära"
+
+msgid "Non-linear"
+msgstr "Icke-linjära"
+
+msgid "Neighbours and centroids"
+msgstr "Grannar och centroider"
+
+msgid "Naive Bayes"
+msgstr "Naive Bayes"
+
+msgid "Ensemble: bagging and forests"
+msgstr "Ensemble: bagging och skogar"
+
+msgid "Ensemble: boosting"
+msgstr "Ensemble: boosting"
+
+msgid "Ensemble: voting and stacking"
+msgstr "Ensemble: röstning och stapling"
+
+msgid "Imbalanced data"
+msgstr "Obalanserade data"
+
+msgid "Robust to mislabelling"
+msgstr "Robusta mot felmärkning"
+
+msgid "Neural networks"
+msgstr "Neurala nätverk"
+
+msgid "Special"
+msgstr "Särskilda"
+
+msgid "Other"
+msgstr "Övriga"
+
+msgid "select all"
+msgstr "välj alla"
+
+msgid "clear"
+msgstr "rensa"

@@ -48,6 +48,44 @@ SCHEMA_VERSION = 2
 # settings are used again. Only Voila's mode (manual, assisted, reuse) and its
 # saved profile stay inactive: in web runs the column roles choose the
 # variables, and a past investigation run takes the place of a saved profile.
+# 299l (agreed 2026-11-16): the Algorithms section lists the algorithms in
+# groups, sorted by name within each; what is saved is unchanged (the codes,
+# "ALL" expanded on load). An algorithm not listed here goes to "Other".
+ALGORITHM_GROUPS = (
+    ("Linear", ("LDA", "LSVC", "LRN", "PAC", "PCN", "REC", "SGDE")),
+    ("Non-linear", ("GPC", "QDA", "SVC")),
+    ("Neighbours and centroids", ("KNN", "NCT", "RADN")),
+    ("Naive Bayes", ("BNB", "CNB", "GNB", "MNB")),
+    ("Trees", ("DTC",)),
+    ("Ensemble: bagging and forests", ("BGC", "ETC", "RFCL", "SRF1")),
+    ("Ensemble: boosting", ("ABC", "CBST", "GBC", "HIST")),
+    ("Ensemble: voting and stacking", ("FUTS", "FUTV", "SLSV", "VOTG")),
+    ("Imbalanced data", ("BABC", "BARF", "EAEC", "RUBC")),
+    ("Robust to mislabelling", ("RCNT", "RLRN", "RTCL")),
+    ("Neural networks", ("FLAX", "KERA", "MLP2", "MLPC", "TORA", "TORS", "TOSA", "TOSS",
+                         "TOTA", "TOTS")),
+    ("Special", ("DUMY", "STCL")),
+)
+
+
+def option_groups(options: list, groups, translate) -> list:
+    """299l: options (value, label dicts) in their groups, by label within a
+    group; options in no group come last under "Other"."""
+    by_value = {option["value"]: option for option in options}
+    placed, result = set(), []
+    for label, values in groups:
+        members = sorted((by_value[v] for v in values if v in by_value),
+                         key=lambda option: option["label"].lower())
+        placed.update(option["value"] for option in members)
+        if members:
+            result.append({"label": translate(label), "options": members})
+    rest = sorted((o for o in options if o["value"] not in placed),
+                  key=lambda option: option["label"].lower())
+    if rest:
+        result.append({"label": translate("Other"), "options": rest})
+    return result
+
+
 INACTIVE_FIELDS = frozenset({"mode.feature_selection_mode", "mode.feature_selection_profile_id"})
 
 # Values declared here because Config (or the run) checks them inline.
@@ -239,6 +277,9 @@ def configuration_schema(source: str, translate: Callable[[str], str], defaults:
             field["subgroup"] = translate(entry["subgroup"])
         if "options" in entry:
             field["options"] = _translate_options(entry["options"](), translate)
+            if key == "mode.algorithm":
+                field["option_groups"] = option_groups(field["options"], ALGORITHM_GROUPS,
+                                                       translate)            # 299l
         fields.append(field)
     used = {field["group"] for field in fields}
     parameters = {
