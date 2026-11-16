@@ -279,3 +279,6 @@ form.copy-roles { margin-bottom: 10px; }
 .delete-list li { margin: 4px 0; }
 .delete-list.goes li::marker { color: var(--warning); }
 .model-runs { margin: 4px 0 12px; padding-left: 20px; }
+/* 299j: a feature investigation's recommendation */
+tr.changed td { background: #fdf3dc; }
+.investigation-columns ul { margin: 4px 0 0; padding-left: 18px; }

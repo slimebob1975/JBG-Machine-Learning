@@ -167,8 +167,19 @@ MESSAGES = {
 }
 
 
+# 299j: why a recommendation cannot be applied (shown on the red button).
+RECOMMENDATION_REASONS = {
+    "dataset_gone": "The investigated dataset no longer exists.",
+    "no_roles": "The investigated dataset has no column roles.",
+    "roles_changed": "The dataset's column roles have changed since the investigation, "
+                     "so the columns no longer match.",
+    "keeps_all": "The recommendation keeps every variable, so there is nothing to change.",
+    "unreadable": "The investigation's result cannot be read.",
+}
+
+
 def add_results_tab(app, *, principal_dependency, render, active_project, runs, results,
-                    reclassification=None, redirect=None) -> None:
+                    reclassification=None, redirect=None, recommendation=None) -> None:
     from fastapi import Form
     from JBGApplicationContracts import RunReference
     from JBGRunResults import RunResultsUnavailable
@@ -191,15 +202,32 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                    "correctable": False, "corrected": {}, "correction_log": [], "review": None,
                    "correction_source": "",
                    "dark_estimates": DARK_ESTIMATES, "dark_reasons": DARK_REASONS,
-                   "dark_columns": DARK_COLUMNS}
+                   "dark_columns": DARK_COLUMNS, "investigation": None, "apply": None}
         if project is not None:
             # 296a: results belong to training runs; prediction runs are on the
             # Prediction tab.
             context["finished"] = [r for r in runs.list_project_runs(owner, project["project_id"])
                                    if r["status"] == "succeeded"
-                                   and r.get("kind", "training") == "training"]   # 299i
+                                   and r.get("kind", "training") in ("training", "investigation")]
             chosen = run or (context["finished"][0]["run_id"] if context["finished"] else "")
-            if any(r["run_id"] == chosen for r in context["finished"]):
+            item = next((r for r in context["finished"] if r["run_id"] == chosen), None)
+            if item is not None and item.get("kind") == "investigation":
+                # 299j: a feature investigation has one view: its recommendation.
+                context["selected_run"] = chosen
+                context["is_investigation"] = True
+                context["overview"] = runs.overview(owner, RunReference(chosen))
+                found = recommendation(owner, project["project_id"], chosen) \
+                    if recommendation is not None else None
+                if found is not None:
+                    view_, plan, dataset_id = found
+                    context["investigation"] = view_ or None
+                    context["apply"] = {
+                        "dataset_id": dataset_id, "mismatch": plan.get("mismatch", []),
+                        "ignore": plan.get("ignore", []), "reason": plan.get("reason"),
+                        "reason_text": RECOMMENDATION_REASONS.get(plan.get("reason"), "")}
+                context["tab_messages"] = MESSAGES
+                return context
+            if item is not None:
                 context["selected_run"] = chosen
                 context["overview"] = runs.overview(owner, RunReference(chosen))
                 try:

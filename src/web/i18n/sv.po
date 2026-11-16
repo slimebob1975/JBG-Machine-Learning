@@ -2134,3 +2134,61 @@ msgstr "Variabelundersökningen kan ännu inte hålla isär grupper, och dataset
 
 msgid "Investigate features"
 msgstr "Undersök variabler"
+
+# 299j: the investigation on the Results tab
+msgid "The investigated dataset no longer exists."
+msgstr "Det undersökta datasetet finns inte längre."
+
+msgid "The investigated dataset has no column roles."
+msgstr "Det undersökta datasetet har inga kolumnroller."
+
+msgid "The dataset's column roles have changed since the investigation, so the columns no longer match."
+msgstr "Datasetets kolumnroller har ändrats sedan undersökningen, så kolumnerna stämmer inte längre."
+
+msgid "The recommendation keeps every variable, so there is nothing to change."
+msgstr "Rekommendationen behåller alla variabler, så det finns inget att ändra."
+
+msgid "The investigation's result cannot be read."
+msgstr "Undersökningens resultat kan inte läsas."
+
+msgid "MCC with every variable"
+msgstr "MCC med alla variabler"
+
+msgid "against the other classes"
+msgstr "mot de övriga klasserna"
+
+msgid "Search"
+msgstr "Sökning"
+
+msgid "subsets evaluated"
+msgstr "prövade delmängder"
+
+msgid "outer folds"
+msgstr "yttre veck"
+
+msgid "training rows"
+msgstr "träningsrader"
+
+msgid "The MCC values come from nested cross-validation on the training part: the whole search is repeated in each outer fold, so they are not optimistic about the search. The test part is not used."
+msgstr "MCC-värdena kommer från nästlad korsvalidering på träningsdelen. Hela sökningen upprepas i varje yttre veck, så värdena är inte för optimistiska om sökningen. Testdelen används inte."
+
+msgid "Recommended variables"
+msgstr "Rekommenderade variabler"
+
+msgid "Left out"
+msgstr "Utelämnade"
+
+msgid "Search score for the recommended set (exploratory, not an independent validation)"
+msgstr "Sökningens värde för den rekommenderade uppsättningen (utforskande, inte en oberoende validering)"
+
+msgid "The column roles have changed since the investigation. Columns that differ"
+msgstr "Kolumnrollerna har ändrats sedan undersökningen. Kolumner som skiljer sig"
+
+msgid "Use the recommendation"
+msgstr "Använd rekommendationen"
+
+msgid "Filled from the feature investigation's recommendation: the columns it left out are set to Ignored."
+msgstr "Ifyllt från variabelundersökningens rekommendation: kolumnerna den utelämnade är satta till Ignoreras."
+
+msgid "Changed"
+msgstr "Ändrade"

@@ -170,3 +170,84 @@ def run_investigation(record, config, observed, credentials, artifacts, folder: 
     (Path(folder) / RESULT_FILE).write_text(json.dumps(plain, ensure_ascii=False, indent=1),
                                             encoding="utf-8")
     return summary(plain)
+
+
+# --- 299j: the result, and applying it to the dataset's column roles ---------------------
+
+def _names(value) -> list:
+    return [str(v) for v in value] if isinstance(value, list) else []
+
+
+def _score(part) -> dict:
+    part = part if isinstance(part, dict) else {}
+    def number(name):
+        value = part.get(name)
+        return float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) \
+            and math.isfinite(value) else None
+    return {name: number(name) for name in ("mean_mcc", "std_mcc", "precision", "recall", "f1")}
+
+
+def result_view(saved: dict) -> dict:
+    """What the Results tab shows of a saved investigation."""
+    recommendation = saved.get("recommendation") if isinstance(saved.get("recommendation"),
+                                                              dict) else {}
+    nested = saved.get("nested_validation") if isinstance(saved.get("nested_validation"),
+                                                         dict) else {}
+    options = saved.get("options") if isinstance(saved.get("options"), dict) else {}
+    one_vs_rest = saved.get("one_vs_rest") if isinstance(saved.get("one_vs_rest"), dict) else None
+    search = {"mean_mcc": recommendation.get("search_mean_mcc"),
+              "std_mcc": recommendation.get("search_std_mcc")}
+    return {"selected": _names(recommendation.get("selected_columns")),
+            "excluded": _names(recommendation.get("excluded_columns")),
+            "original": _names(saved.get("original_columns")),
+            "target": str(saved["target"]) if saved.get("target") is not None else "",
+            "one_vs_rest": one_vs_rest is not None,
+            "model_type": str(recommendation.get("model_type") or options.get("model_type") or ""),
+            "selected_score": _score(nested.get("selected")),
+            "baseline_score": _score(nested.get("full_baseline")),
+            "search_score": _score(search),
+            "outer_folds": options.get("outer_folds"), "max_evaluations": options.get("max_evaluations"),
+            "evaluated_subsets": saved.get("evaluated_subsets"),
+            "rows": saved.get("development_rows")}
+
+
+def recommendation_plan(saved: dict, roles) -> dict:
+    """299j (agreed 2026-11-13): the column roles the recommendation would
+    change. A feature column the search excluded becomes Ignored. A date
+    column, investigated as its derived variables (<column>_year, ...), becomes
+    Ignored only when all of them were excluded. Refused when the roles have
+    changed since the investigation (the columns no longer match: listed), or
+    when the recommendation keeps every variable."""
+    from JBGDatasetRoles import FEATURE_ROLES
+    view = result_view(saved)
+    original, excluded = set(view["original"]), set(view["excluded"])
+    mapping = roles.as_mapping()
+    features = {column: role for column, role in mapping.items() if role in FEATURE_ROLES}
+    ignore, covered, mismatch = [], set(), []
+    for column, role in sorted(features.items()):
+        if column in original:
+            covered.add(column)
+            if column in excluded:
+                ignore.append(column)
+            continue
+        derived = [name for name in original if name.startswith(column + "_")] \
+            if role == "date" else []
+        if derived:
+            covered.update(derived)
+            if all(name in excluded for name in derived):
+                ignore.append(column)
+        else:
+            mismatch.append(column)                    # a feature now, not investigated
+    mismatch += sorted(original - covered)             # investigated, not a feature now
+    if not view["original"]:
+        reason = "unreadable"
+    elif mismatch:
+        reason = "roles_changed"
+    elif not ignore:
+        reason = "keeps_all"
+    else:
+        reason = None
+    applied = dict(mapping)
+    for column in ignore:
+        applied[column] = "ignored"
+    return {"reason": reason, "ignore": ignore, "mismatch": mismatch, "roles": applied}

@@ -83,6 +83,19 @@ class RunResultsService:
             raise RunResultsUnavailable("predictions unavailable")
         return path
 
+    def investigation(self, owner: str, run_id: str) -> dict:
+        """299j: a feature investigation's saved result (owner only)."""
+        path = self._folder(owner, run_id) / "investigation.json"
+        if not path.is_file():
+            raise RunResultsUnavailable("no investigation result")
+        try:
+            saved = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            raise RunResultsUnavailable("unreadable investigation result") from None
+        if not isinstance(saved, dict):
+            raise RunResultsUnavailable("unreadable investigation result")
+        return saved
+
     def has_folder(self, owner: str, run_id: str) -> bool:
         """False for runs from before 295a, which kept no details of their own."""
         return self._folder(owner, run_id).is_dir()

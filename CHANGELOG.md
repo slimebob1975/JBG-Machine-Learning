@@ -1,3 +1,27 @@
+## Revision 299j - The investigation's recommendation, and using it (2026-11-13)
+
+- Voilà retirement item (agreed 2026-11-13), last step of the feature
+  investigation:
+  - The Results tab lists finished feature investigations (marked) with the
+    training runs. An investigation has one view: the recommendation (N of M
+    variables), the MCC with it and with every variable (mean ± spread over the
+    outer folds of the nested cross-validation), the target class (and "against
+    the other classes" with more than two), the model type and the search size;
+    the recommended and left-out variables; the search score, described as
+    exploratory. Read from the run folder's `investigation.json`, owner only.
+  - "Använd rekommendationen" opens the dataset's column roles with the
+    left-out feature columns set to Ignored (changed rows highlighted). A date
+    column, investigated as its derived variables, becomes Ignored only when
+    all of them were left out (agreed). Nothing is saved until "Spara
+    kolumnroller", as with 298a's suggestions. Red with the reason when the
+    roles have changed since the investigation (the differing columns are
+    listed), when the recommendation keeps every variable, or when the result
+    cannot be read. A past investigation takes the place of Voilà's "reuse".
+- Fix (asked 2026-11-13): the status of the followed run in the Training and
+  Prediction run lists updates with the panel's polling (it stayed "Queued").
+- User guides: the recommendation on the Results tab.
+- Tests: `tests/test_revision_299j_investigation_results.py`.
+
 ## Revision 299i2 - SQL feature investigations (2026-11-13)
 
 - Gate 2026-11-13 (manual try): a feature investigation in an SQL project

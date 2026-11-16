@@ -60,7 +60,8 @@ class _QuietLogger:
 
 
 def add_dataset_tab(app, *, principal_dependency, render, redirect, active_project,
-                    datasets, inspection, configurations, sessions, sql_server) -> None:
+                    datasets, inspection, configurations, sessions, sql_server,
+                    recommendation=None) -> None:
     from JBGDatasetInspection import DatasetTooLarge, DatasetUnreadable
     from JBGDatasetRoles import IncompatibleDataset
     from JBGDatasetService import (DatasetConflict, DatasetUnavailable, UploadTooLarge,
@@ -90,7 +91,7 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
 
     def page(request, principal, *, dataset="", view="preview", column="", validation=None,
              status_code=200, incompatible=None, roles_error=None, roles_draft=None,
-             roles_from=""):
+             roles_from="", from_run=""):
         owner = principal.principal_key
         project = active_project(request, owner)
         context = {"no_project": project is None, "datasets": [], "selected": None,
@@ -199,6 +200,17 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
                             for key in ("roles_suggested_from", "roles_suggested",
                                         "roles_class_chosen"):
                                 context.pop(key, None)
+                        # 299j: a feature investigation's recommendation fills the
+                        # form (the columns it left out become Ignored); nothing
+                        # is saved until "Save column roles".
+                        if from_run and recommendation is not None and stored is not None \
+                                and not roles_draft:
+                            found = recommendation(owner, pid, from_run)
+                            if found is not None and found[2] == dataset \
+                                    and found[1].get("reason") is None:
+                                context["roles"] = found[1]["roles"]
+                                context["roles_recommended"] = found[1]["ignore"]
+                                context["roles_recommended_run"] = from_run
                 else:
                     columns, context["read_error"] = read(inspection.preview, principal, pid, dataset)
                     context["column_names"] = [c["name"] for c in columns["columns"]] if columns else []
@@ -218,9 +230,10 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
 
     @app.get("/ui/dataset", response_class=HTMLResponse, include_in_schema=False)
     def dataset_tab(request: Request, dataset: str = "", view: str = "preview", column: str = "",
-                    roles_from: str = "", principal=Depends(principal_dependency)):
+                    roles_from: str = "", recommendation: str = "",
+                    principal=Depends(principal_dependency)):
         return page(request, principal, dataset=dataset, view=view, column=column,
-                    roles_from=roles_from)
+                    roles_from=roles_from, from_run=recommendation)
 
     @app.post("/ui/dataset/csv", include_in_schema=False)
     def upload_csv(request: Request, file: UploadFile = File(...), name: str = Form(""),

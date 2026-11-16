@@ -200,6 +200,11 @@
               </form>
             {% endif %}
             {% if roles_error %}<p class="message error">{{ _(roles_error) }}</p>{% endif %}
+            {% if roles_recommended %}
+              {# 299j: filled from a feature investigation; nothing is saved yet. #}
+              <p class="message ok roles-recommended">{{ _("Filled from the feature investigation's recommendation: the columns it left out are set to Ignored.") }} {{ _("Review the roles and save to keep them.") }}</p>
+              <p class="hint">{{ _("Changed") }}: {{ roles_recommended | join(", ") }}</p>
+            {% endif %}
             {% if roles_copied_from %}
               <p class="message ok">{{ _("Copied from the dataset") }} “{{ roles_copied_from }}”. {{ _("Review the roles and save to keep them.") }}</p>
               {% if roles_missing %}<p class="message warn">{{ _("Not in this dataset, so their roles were not copied:") }}
@@ -221,7 +226,7 @@
                 <input id="categorical-limit" name="categorical_limit" value="{{ categorical_limit }}" inputmode="numeric">
                 <p class="hint">{{ _("Text columns with at most this many distinct values are categorised; other text columns are treated as free text. Categorical columns are always categorised.") }}</p>
               </div>
-              {% set roles_dirty = (not roles_stored) or roles_error %}
+              {% set roles_dirty = (not roles_stored) or roles_error or roles_recommended %}
               <button class="btn act ready" data-wait="change"{% if roles_dirty %} data-wait-dirty{% endif %}
                 data-wait-reason="{{ _('Nothing has been changed yet.') }}">{{ _("Save column roles") }}</button>
               <div class="scroll"><table class="grid">
@@ -229,7 +234,7 @@
                 <tbody>
                 {% for c in data.columns %}
                   {% set current = roles.get(c.name, "ignored") %}
-                  <tr><td>{{ c.name }}</td>
+                  <tr{% if roles_recommended and c.name in roles_recommended %} class="changed"{% endif %}><td>{{ c.name }}</td>
                     <td class="muted">{{ _(type_labels[c.type]) if c.type in type_labels else c.type }}</td>
                     <td class="num">{{ c.distinct if c.distinct is not none else "–" }}</td>
                     <td><select name="role:{{ c.name }}" aria-label="{{ _('Role') }} {{ c.name }}">

@@ -396,7 +396,8 @@ full SQL regression acceptance remain separately unverified.
     classes: the target class against the rest, as in Dark Numbers
     (agreed 2026-11-13). Refused while the dataset has a group column (the
     investigation does not keep groups apart yet).
-  - [ ] 299j: the investigation's result on the Results tab; "Use the
+  - [x] 299j (also: the run list's status follows the run, asked
+    2026-11-13): the investigation's result on the Results tab; "Use the
     recommendation" fills the dataset's column roles form (Ignored for the
     columns left out), saved only with "Save column roles". A past
     investigation run replaces Voila's "reuse".

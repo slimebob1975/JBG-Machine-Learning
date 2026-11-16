@@ -69,6 +69,11 @@
         .then(function (overview) {
           if (!overview) { setTimeout(tick, 5000); return; }
           if (terminal.indexOf(overview.status) >= 0) { window.location.reload(); return; }
+          /* 299j: the run's status in the list beside the panel follows too
+             (it was drawn once and stayed "Queued"). */
+          document.querySelectorAll('[data-run-status="' + runId + '"] .badge').forEach(function (badge) {
+            badge.textContent = labels[overview.status] || overview.status;
+          });
           var stage = overview.stage || {};
           var label = panel.querySelector("[data-run-stage]");
           if (label) { label.textContent = labels[stage.name] || stage.name || ""; }

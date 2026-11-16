@@ -16,7 +16,8 @@
         {% for item in finished %}
           <tr class="{{ 'hl' if item.run_id == selected_run }}">
             <td class="num"><a href="/ui/results?run={{ item.run_id }}">{{ item.created_at | localtime }}</a></td>
-            <td>{{ item.configuration_name or "–" }}{% if item.configuration_version %} v{{ item.configuration_version }}{% endif %}</td>
+            <td>{{ item.configuration_name or "–" }}{% if item.configuration_version %} v{{ item.configuration_version }}{% endif %}
+              {% if item.kind == "investigation" %}<span class="badge b-neu">{{ _("Feature investigation") }}</span>{% endif %}</td>
           </tr>
         {% endfor %}
         </tbody>
@@ -28,7 +29,36 @@
   </section>
 
   <aside class="card wide">
-  {% if selected_run and overview %}
+  {% if selected_run and is_investigation %}
+    {# 299j: a feature investigation's recommendation. #}
+    <h2>{{ _("Feature investigation") }} <span class="muted">{{ selected_run[:8] }}</span></h2>
+    {% set inv = investigation %}
+    {% if inv %}
+      {% macro score(s) %}{{ s.mean_mcc | num(language) if s.mean_mcc is not none else "–" }}{% if s.std_mcc is not none %} ± {{ s.std_mcc | num(language) }}{% endif %}{% endmacro %}
+      <dl class="meta metrics">
+        <dt>{{ _("Recommendation") }}</dt><dd>{{ inv.selected | length }} {{ _("of") }} {{ inv.original | length }} {{ _("variables") }}</dd>
+        <dt>{{ _("MCC with the recommendation") }}</dt><dd>{{ score(inv.selected_score) }}</dd>
+        <dt>{{ _("MCC with every variable") }}</dt><dd>{{ score(inv.baseline_score) }}</dd>
+        {% if inv.one_vs_rest %}<dt>{{ _("Target class") }}</dt><dd>{{ inv.target }} {{ _("against the other classes") }}</dd>
+        {% elif inv.target %}<dt>{{ _("Target class") }}</dt><dd>{{ inv.target }}</dd>{% endif %}
+        <dt>{{ _("Model type") }}</dt><dd>{{ inv.model_type or "–" }}</dd>
+        <dt>{{ _("Search") }}</dt><dd>{{ inv.evaluated_subsets if inv.evaluated_subsets is not none else "–" }} {{ _("subsets evaluated") }}{% if inv.outer_folds %}, {{ inv.outer_folds }} {{ _("outer folds") }}{% endif %}{% if inv.rows %}, {{ inv.rows }} {{ _("training rows") }}{% endif %}</dd>
+      </dl>
+      <p class="hint">{{ _("The MCC values come from nested cross-validation on the training part: the whole search is repeated in each outer fold, so they are not optimistic about the search. The test part is not used.") }}</p>
+      <div class="layout-two investigation-columns">
+        <div><h3>{{ _("Recommended variables") }}</h3>
+          <ul>{% for name in inv.selected %}<li>{{ name }}</li>{% else %}<li class="muted">–</li>{% endfor %}</ul></div>
+        <div><h3>{{ _("Left out") }}</h3>
+          <ul>{% for name in inv.excluded %}<li>{{ name }}</li>{% else %}<li class="muted">–</li>{% endfor %}</ul></div>
+      </div>
+      <p class="hint">{{ _("Search score for the recommended set (exploratory, not an independent validation)") }}: {{ score(inv.search_score) }}</p>
+      {% if apply and apply.reason == "roles_changed" and apply.mismatch %}
+        <p class="message warn">{{ _("The column roles have changed since the investigation. Columns that differ") }}: {{ apply.mismatch[:20] | join(", ") }}{% if apply.mismatch | length > 20 %} (+{{ apply.mismatch | length - 20 }}){% endif %}</p>
+      {% endif %}
+    {% else %}
+      <p class="message error">{{ _("The investigation's result cannot be read.") }}</p>
+    {% endif %}
+  {% elif selected_run and overview %}
     <h2>{{ _("Run") }} <span class="muted">{{ selected_run[:8] }}</span></h2>
     <nav class="subtabs" aria-label="{{ _('Results') }}">
       {% for key, label in views %}
@@ -163,4 +193,12 @@
 {% endif %}
 {% endblock %}
 {% block actions %}<span class="hint">{{ _("Results of the project's finished runs.") }}</span>
+  {% if is_investigation and apply %}
+    {# 299j: fills the dataset's column roles form; nothing is saved there yet. #}
+    {% if apply.reason is none %}
+      <a class="btn act ready" href="/ui/dataset?dataset={{ apply.dataset_id }}&view=roles&recommendation={{ selected_run }}">{{ _("Use the recommendation") }}</a>
+    {% else %}
+      <button class="btn act blocked" disabled title="{{ _(apply.reason_text) }}">{{ _("Use the recommendation") }}</button>
+    {% endif %}
+  {% endif %}
   {% if selected_run and can_delete %}<a class="btn sub" href="/ui/runs/{{ selected_run }}/delete?back=/ui/results">{{ _("Delete the run…") }}</a>{% endif %}{% endblock %}

@@ -158,6 +158,40 @@ def _redirect(path: str, **query) -> RedirectResponse:
     return RedirectResponse(path + (separator + urlencode(query) if query else ""), status_code=303)
 
 
+def _recommendation(runs, results, dataset_repository):
+    """299j: a feature investigation's recommendation for its dataset's column
+    roles (owner only): (result view, plan, dataset ID), or None when the run
+    is not an investigation of the open project. ``plan["reason"]`` says why
+    it cannot be applied: dataset_gone, no_roles, roles_changed, keeps_all,
+    unreadable."""
+    if runs is None or results is None or dataset_repository is None:
+        return None
+    from JBGRunInvestigation import recommendation_plan, result_view
+    from JBGRunResults import RunResultsUnavailable
+
+    def recommendation(owner: str, project_id: str, run_id: str):
+        item = next((r for r in runs.list_project_runs(owner, project_id)
+                     if r["run_id"] == run_id and r.get("kind") == "investigation"
+                     and r["status"] == "succeeded"), None)
+        if item is None:
+            return None
+        try:
+            saved = results.investigation(owner, run_id)
+        except RunResultsUnavailable:
+            return {}, {"reason": "unreadable", "mismatch": [], "ignore": []}, item.get("dataset_id")
+        dataset_id = item.get("dataset_id")
+        try:
+            roles = dataset_repository.get_roles(owner, project_id, dataset_id)
+        except (KeyError, ValueError, LookupError):
+            return result_view(saved), {"reason": "dataset_gone", "mismatch": [],
+                                        "ignore": []}, dataset_id
+        if roles is None:
+            return result_view(saved), {"reason": "no_roles", "mismatch": [],
+                                        "ignore": []}, dataset_id
+        return result_view(saved), recommendation_plan(saved, roles), dataset_id
+    return recommendation
+
+
 def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: str = "",
                datasets=None, inspection=None, configurations=None, sessions=None,
                sql_server=None, runs=None, project_runs=None, results=None,
@@ -265,7 +299,9 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
         add_dataset_tab(app, principal_dependency=principal_dependency, render=render,
                         redirect=_redirect, active_project=active_project, datasets=datasets,
                         inspection=inspection, configurations=configurations,
-                        sessions=sessions, sql_server=sql_server)
+                        sessions=sessions, sql_server=sql_server,
+                        recommendation=_recommendation(runs, results,
+                                                       getattr(datasets, "_repository", None)))
     if models is not None and runs is not None:
         from JBGWebUIModels import add_models_tab
         add_models_tab(app, principal_dependency=principal_dependency, render=render,
@@ -281,7 +317,9 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
             csv_root=getattr(datasets, "_csv_root", None))
         add_results_tab(app, principal_dependency=principal_dependency, render=render,
                         active_project=active_project, runs=runs, results=results,
-                        reclassification=reclassification, redirect=_redirect)
+                        reclassification=reclassification, redirect=_redirect,
+                        recommendation=_recommendation(runs, results,
+                                                       getattr(datasets, "_repository", None)))
     if project_runs is not None and runs is not None:
         from JBGWebUIRun import add_run_tab
         add_run_tab(app, principal_dependency=principal_dependency, render=render,

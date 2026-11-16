@@ -42,7 +42,7 @@
           <tr class="{{ 'hl' if item.run_id == selected_run }}">
             <td class="num"><a href="/ui/prediction?run={{ item.run_id }}">{{ item.created_at | localtime }}</a></td>
             <td>{{ item.configuration_name or "–" }}{% if item.configuration_version %} v{{ item.configuration_version }}{% endif %}</td>
-            <td><span class="badge {{ 'b-ok' if item.status == 'succeeded' else ('b-fail' if item.status in ('failed', 'interrupted') else 'b-neu') }}">{{ _(stages.get(item.status, item.status)) }}</span></td>
+            <td data-run-status="{{ item.run_id }}"><span class="badge {{ 'b-ok' if item.status == 'succeeded' else ('b-fail' if item.status in ('failed', 'interrupted') else 'b-neu') }}">{{ _(stages.get(item.status, item.status)) }}</span></td>
           </tr>
         {% endfor %}
         </tbody>

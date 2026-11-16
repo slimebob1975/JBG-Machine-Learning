@@ -227,6 +227,15 @@ views Overview, Model comparison, Mispredictions, Feature importance and
 Dark Numbers. Class names and row values are shown only to the person who
 started the run. Older runs may lack some details.
 
+A finished **feature investigation** shows its recommendation: the
+recommended variables and those left out, and the MCC with them and with
+every variable (nested cross-validation on the training part). **Use the
+recommendation** opens the dataset's column roles with the left-out columns
+set to Ignored (a date column only if all its parts were left out); nothing
+is saved until **Save column roles**. It cannot be used if the column roles
+have changed since the investigation, or if the recommendation keeps every
+variable.
+
 **Dark Numbers** shows, when the configuration estimates Dark Numbers, the
 estimated share of hidden cases for each target class. Four estimates are
 made: with the final model and with the cross-trained model on all data, a

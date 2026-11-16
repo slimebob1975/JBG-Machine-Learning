@@ -228,6 +228,15 @@ Projektets avslutade träningskörningar. För en vald körning finns vyerna
 Mörkertal. Klassnamn och radvärden visas bara för den som startade
 körningen. Äldre körningar kan sakna en del detaljer.
 
+En avslutad **variabelundersökning** visar sin rekommendation: de
+rekommenderade variablerna och de utelämnade, och MCC med dem och med alla
+variabler (nästlad korsvalidering på träningsdelen). **Använd
+rekommendationen** öppnar datasetets kolumnroller med de utelämnade
+kolumnerna satta till Ignoreras (en datumkolumn bara om alla dess delar
+utelämnades). Inget sparas förrän du väljer **Spara kolumnroller**. Den kan
+inte användas om kolumnrollerna har ändrats sedan undersökningen, eller om
+rekommendationen behåller alla variabler.
+
 **Mörkertal** visar, när konfigurationen skattar mörkertal, den skattade
 andelen dolda fall för varje målklass. Fyra skattningar görs: med den
 slutliga modellen och med den korstränade modellen på alla data, en
