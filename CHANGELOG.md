@@ -1,3 +1,33 @@
+## Revision 299k - The Overview as designed (2026-11-13)
+
+- Agreed 2026-11-13 (mockup): the Overview for the user, managers and
+  colleagues.
+  - All the user's projects at the top (also without an open project): four
+    key figures (training runs, rows processed, models compared, models in
+    use), each with "of which in the open project"; runs per week (succeeded
+    and failed, 12 weeks); rows processed per project, the open project
+    highlighted.
+  - The open project below: the existing cards ("continue where you left
+    off"), model quality per training run in the configuration's metric (micro
+    averages shown as accuracy; metrics the evaluation does not keep, such as
+    AUC, as MCC) with the average of the last three; rows processed per week;
+    the five latest runs linking to their results.
+  - Charts are SVG drawn on the server (`JBGWebUICharts`), coloured from CSS,
+    with a title, a text alternative and a placeholder text without data.
+    Figures come from the owner's own run records (`JBGOverviewStats`);
+    deleted runs are left out. A `count` filter groups thousands.
+- Rows processed and models compared are recorded by the worker when a run
+  finishes (`result.counts`, no engine change): the rows of the dataset the
+  engine inspects after loading (training), or else the rows fetched (a
+  prediction; CSV predictions may count 0), and how far the "Checking &
+  Training models" bar came. Older runs count as 0; the charts fill in from
+  new runs onward.
+- BACKLOG: "JBG Dark Number Analysis 2.0" (plan in Swedish, generated
+  elsewhere, 2026-11-16), added after the listed items as asked; the plan is
+  kept in `docs/dark_numbers/` (trailing spaces removed).
+- User guides: the Overview.
+- Tests: `tests/test_revision_299k_overview.py`.
+
 ## Revision 299j - The investigation's recommendation, and using it (2026-11-13)
 
 - Voilà retirement item (agreed 2026-11-13), last step of the feature

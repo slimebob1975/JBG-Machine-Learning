@@ -219,8 +219,10 @@ def test_sql_job_runs_with_piped_credentials_and_stores_only_the_projection(tmp_
     assert used and set(used) == {(False, "analyst", "pw")}
     record = store.get(run)
     assert record.status is RunStatus.SUCCEEDED
+    # 299k: plus the Overview's counts (numbers only).
     assert record.result == {"schema_version": 1, "kind": "classification",
-                             "mispredicted_count": None, "class_count": None}
+                             "mispredicted_count": None, "class_count": None,
+                             "counts": {"rows": 0, "models": 0}}
     layer = engine.call_args.kwargs["datalayer"]
     assert layer.config.get_data_table(include_database=True) == "[ExampleDb].[dbo].[Cases]"
 

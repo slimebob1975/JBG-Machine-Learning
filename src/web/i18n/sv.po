@@ -2192,3 +2192,85 @@ msgstr "Ifyllt från variabelundersökningens rekommendation: kolumnerna den ute
 
 msgid "Changed"
 msgstr "Ändrade"
+
+# 299k: the Overview
+msgid "of which in the open project"
+msgstr "varav i det öppna projektet"
+
+msgid "All your projects"
+msgstr "Alla dina projekt"
+
+msgid "Rows processed"
+msgstr "Bearbetade rader"
+
+msgid "Models compared"
+msgstr "Jämförda modeller"
+
+msgid "Models in use"
+msgstr "Modeller i bruk"
+
+msgid "Runs per week"
+msgstr "Körningar per vecka"
+
+msgid "Succeeded"
+msgstr "Lyckades"
+
+msgid "Rows processed per project"
+msgstr "Bearbetade rader per projekt"
+
+msgid "The open project"
+msgstr "Det öppna projektet"
+
+msgid "Rows processed and models compared are recorded when a run finishes, from this version on."
+msgstr "Bearbetade rader och jämförda modeller registreras när en körning blir klar, från och med den här versionen."
+
+msgid "Model quality per training run"
+msgstr "Modellkvalitet per träningskörning"
+
+msgid "Average of the last three"
+msgstr "Medel av de tre senaste"
+
+msgid "Rows processed per week"
+msgstr "Bearbetade rader per vecka"
+
+msgid "Latest runs in the project"
+msgstr "Senaste körningarna i projektet"
+
+msgid "w."
+msgstr "v."
+
+msgid "The configurations' metrics"
+msgstr "Konfigurationernas mått"
+
+msgid "No finished runs in the last 12 weeks."
+msgstr "Inga avslutade körningar de senaste 12 veckorna."
+
+msgid "No rows recorded yet. Runs record them from now on."
+msgstr "Inga rader registrerade ännu. Körningar registrerar dem från och med nu."
+
+msgid "No finished training runs with an evaluation yet."
+msgstr "Inga avslutade träningskörningar med utvärdering ännu."
+
+msgid "Rows"
+msgstr "Rader"
+
+msgid "MCC"
+msgstr "MCC"
+
+msgid "F1 (macro)"
+msgstr "F1 (makro)"
+
+msgid "F1 (weighted)"
+msgstr "F1 (viktat)"
+
+msgid "Recall (macro)"
+msgstr "Recall (makro)"
+
+msgid "Recall (weighted)"
+msgstr "Recall (viktat)"
+
+msgid "Precision (macro)"
+msgstr "Precision (makro)"
+
+msgid "Precision (weighted)"
+msgstr "Precision (viktat)"

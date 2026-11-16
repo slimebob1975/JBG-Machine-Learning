@@ -5,7 +5,31 @@
 {% macro status_badge(status) -%}
   <span class="badge {{ 'b-ok' if status == 'succeeded' else ('b-fail' if status in ('failed', 'interrupted') else 'b-neu') }}">{{ _(stages.get(status, status)) }}</span>
 {%- endmacro %}
+{% macro figure(label, total, opened) -%}
+  <div class="figure"><span class="figure-label">{{ _(label) }}</span>
+    <b class="figure-value">{{ total | count(language) }}</b>
+    {% if not no_project %}<span class="figure-sub">{{ _("of which in the open project") }}: {{ opened | count(language) }}</span>{% endif %}</div>
+{%- endmacro %}
 {% block main %}
+{# 299k (agreed 2026-11-13): all projects first, then the open project. #}
+{% if all %}
+<section class="overview-all">
+  <h2 class="section-title">{{ _("All your projects") }}</h2>
+  <div class="figures">
+    {{ figure("Training runs", all.stats.totals.training_runs, all.stats.open.training_runs) }}
+    {{ figure("Rows processed", all.stats.totals.rows, all.stats.open.rows) }}
+    {{ figure("Models compared", all.stats.totals.models, all.stats.open.models) }}
+    {{ figure("Models in use", all.stats.totals.in_use, all.stats.open.in_use) }}
+  </div>
+  <div class="charts">
+    <div class="card"><h3>{{ _("Runs per week") }}</h3>{{ all.charts.per_week | safe }}
+      <p class="legend"><span class="key chart-ok"></span>{{ _("Succeeded") }} <span class="key chart-fail"></span>{{ _("Failed") }}</p></div>
+    <div class="card"><h3>{{ _("Rows processed per project") }}</h3>{{ all.charts.per_project | safe }}
+      {% if not no_project %}<p class="legend"><span class="key chart-hl"></span>{{ _("The open project") }}</p>{% endif %}</div>
+  </div>
+  <p class="hint">{{ _("Rows processed and models compared are recorded when a run finishes, from this version on.") }}</p>
+</section>
+{% endif %}
 {% if no_project %}
   <div class="card">
     {# 299c (asked 2026-11-13): the tab's name in the sentence is the link. #}
@@ -96,6 +120,29 @@
   </div>
   {% endif %}
 </div>
+{% if all %}
+<section class="overview-project">
+  <div class="charts">
+    <div class="card"><h3>{{ _("Model quality per training run") }}</h3>{{ all.charts.quality | safe }}
+      {% if all.stats.quality_average is not none %}<p class="legend"><span class="key chart-avg"></span>{{ _("Average of the last three") }}: {{ all.stats.quality_average | num(language) }} ({{ all.metric_label }})</p>{% endif %}</div>
+    <div class="card"><h3>{{ _("Rows processed per week") }}</h3>{{ all.charts.rows_per_week | safe }}</div>
+  </div>
+  <div class="card">
+    <h3>{{ _("Latest runs in the project") }}</h3>
+    {% if all.stats.latest %}
+    <table class="grid">
+      <tbody>
+      {% for r in all.stats.latest %}
+        <tr><td class="num"><a href="/ui/{{ 'prediction' if r.kind == 'prediction' else ('results' if r.status == 'succeeded' else 'run') }}?run={{ r.run_id }}">{{ r.created_at.isoformat() | localtime }}</a></td>
+          <td>{{ _("Prediction") if r.kind == "prediction" else (_("Feature investigation") if r.kind == "investigation" else _("Training")) }}{% if r.configuration_name %} <span class="muted">· {{ r.configuration_name }}{% if r.configuration_version %} v{{ r.configuration_version }}{% endif %}</span>{% endif %}</td>
+          <td>{{ status_badge(r.status) }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="empty">{{ _("No runs yet.") }}</p>{% endif %}
+  </div>
+</section>
+{% endif %}
 {% endif %}
 {% endblock %}
 {% block actions %}<span class="hint">{{ _("Open a project to see its overview.") if no_project else _("Overview of the open project.") }}</span>{% endblock %}

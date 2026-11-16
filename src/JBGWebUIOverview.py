@@ -18,7 +18,7 @@ from fastapi.responses import HTMLResponse
 
 
 def add_overview_tab(app, *, principal_dependency, render, active_project, datasets=None,
-                     configurations=None, runs=None, models=None) -> None:
+                     configurations=None, runs=None, models=None, projects=None) -> None:
     from JBGApplicationContracts import RunReference
     from JBGWebUIRun import STAGES
 
@@ -49,6 +49,58 @@ def add_overview_tab(app, *, principal_dependency, render, active_project, datas
                 evaluation = None
         return training, prediction, evaluation
 
+    def all_projects(request, owner, project):
+        """299k (agreed 2026-11-13): key figures and charts over the owner's
+        projects, and the open project's charts. Numbers only."""
+        if runs is None or projects is None:
+            return None
+        from JBGOverviewStats import QUALITY_LABELS, overview_stats
+        from JBGWebUI import request_language, translator
+        from JBGWebUICharts import project_bars, quality_line, week_bars
+        try:
+            owned = projects.list(owner, limit=500)
+            records = runs.owner_records(owner)
+        except Exception:
+            return None
+        names = {p["project_id"]: p["name"] for p in owned}
+        in_use = {pid: sum(1 for m in listed(models, owner, pid) if m.get("state") == "available")
+                  for pid in names}
+        open_id = project["project_id"] if project is not None else None
+        stats = overview_stats(records, project_names=names, open_project=open_id,
+                               models_in_use=in_use)
+        language = request_language(request)
+        _ = translator(language)
+
+        def week_label(week):
+            return f"{_('w.')} {week.isocalendar()[1]}"
+        metric = stats["quality_metric"]
+        metric_label = _(QUALITY_LABELS.get(metric, "The configurations' metrics")) if metric != "" \
+            else _("The configurations' metrics")
+        charts = {
+            "per_week": week_bars(
+                stats["per_week"], [("succeeded", "chart-ok", _("Succeeded")),
+                                    ("failed", "chart-fail", _("Failed"))],
+                label=_("Runs per week"), empty=_("No finished runs in the last 12 weeks."),
+                week_label=week_label, language=language),
+            "per_project": project_bars(
+                stats["per_project"], label=_("Rows processed per project"),
+                empty=_("No rows recorded yet. Runs record them from now on."),
+                language=language),
+        }
+        if open_id is not None:
+            charts["quality"] = quality_line(
+                stats["quality"], stats["quality_average"],
+                label=_("Model quality per training run") + f" ({metric_label})",
+                empty=_("No finished training runs with an evaluation yet."),
+                average_label=_("Average of the last three"),
+                point_label=lambda p: p["created_at"].strftime("%Y-%m-%d"), language=language)
+            charts["rows_per_week"] = week_bars(
+                stats["rows_per_week"], [("rows", "chart-bar", _("Rows"))],
+                label=_("Rows processed per week"),
+                empty=_("No rows recorded yet. Runs record them from now on."),
+                week_label=week_label, language=language)
+        return {"stats": stats, "charts": charts, "metric_label": metric_label}
+
     @app.get("/ui/overview", response_class=HTMLResponse, include_in_schema=False)
     def overview_tab(request: Request, principal=Depends(principal_dependency)):
         owner = principal.principal_key
@@ -70,4 +122,5 @@ def add_overview_tab(app, *, principal_dependency, render, active_project, datas
             context["model_count"] = len(items)
             context["available_count"] = sum(1 for m in items if m.get("state") == "available")
             context["newest_model"] = items[0] if items else None
+        context["all"] = all_projects(request, owner, project)                # 299k
         return render(request, principal, "overview.html", "overview", **context)

@@ -192,6 +192,17 @@ def _recommendation(runs, results, dataset_repository):
     return recommendation
 
 
+def _count_text(value, language: str = "sv") -> str:
+    """299k: a whole number with grouped thousands (a no-break space in
+    Swedish, a comma in English), for the Overview's key figures."""
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return "–"
+    text = f"{number:,}"
+    return text.replace(",", "\u00a0") if language == "sv" else text
+
+
 def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: str = "",
                datasets=None, inspection=None, configurations=None, sessions=None,
                sql_server=None, runs=None, project_runs=None, results=None,
@@ -207,6 +218,7 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
     # 293b2: shares with a decimal comma in Swedish, a point in English.
     templates.env.filters["localtime"] = _local_time            # 294a
     templates.env.filters["num"] = _number_text                  # 295a
+    templates.env.filters["count"] = _count_text                 # 299k
     templates.env.filters["pct"] = lambda value, language="sv": (
         f"{float(value or 0):.1f}".replace(".", "," if language == "sv" else ".") + " %")
     templates.env.globals["static_url"] = (                       # 298d
@@ -335,7 +347,8 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
     from JBGWebUIOverview import add_overview_tab                 # 295d
     add_overview_tab(app, principal_dependency=principal_dependency, render=render,
                      active_project=active_project, datasets=datasets,
-                     configurations=configurations, runs=runs, models=models)
+                     configurations=configurations, runs=runs, models=models,
+                     projects=projects)
     if deletion is not None and runs is not None:                 # 299e
         from JBGWebUIDeletion import add_deletion_pages
         add_deletion_pages(app, principal_dependency=principal_dependency, render=render,

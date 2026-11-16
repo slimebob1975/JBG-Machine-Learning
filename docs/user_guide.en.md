@@ -36,10 +36,18 @@ pages, the page's main button is at both the top and the bottom.
 
 ## Overview
 
-A summary of the open project: the active training dataset, the chosen
-configuration, the latest training and prediction runs and the project's
-models. Each part links to the tab where it is changed. Without an open
-project the page is empty.
+At the top, all your projects: training runs, rows processed, models
+compared and models in use, each with how many are in the open project; runs
+per week (succeeded and failed) and rows processed per project, with the open
+project highlighted. Rows processed and models compared are recorded when a
+run finishes, so runs from before this version count as zero.
+
+Below, the open project: the active training dataset, the chosen
+configuration, the latest runs and the project's models, each linking to the
+tab where it is changed; model quality per training run (the configuration's
+metric) with the average of the last three; rows processed per week; and the
+latest runs, linking to their results. Without an open project only the top
+part is shown.
 
 ## Projects
 

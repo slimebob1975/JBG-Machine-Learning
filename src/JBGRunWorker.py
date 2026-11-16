@@ -116,6 +116,11 @@ class StoreProgressLogger:
         self._inner = {}     # 297a: key -> [kind, total, recorded done, recorded at, latest done]
         # 299g: set here, never looked up through __getattr__ (the engine logger).
         self._checked_at = float("-inf")
+        # 299k: counted for the Overview (no engine change): the rows of the
+        # dataset the engine inspects after loading (or else the rows fetched),
+        # and how far the "Checking & Training models" bar came.
+        self.rows_processed = 0
+        self.models_compared = 0
 
     # --- 297a: inner progress (Voilà's inner bars), for the web interface ---------------
 
@@ -163,6 +168,10 @@ class StoreProgressLogger:
             except (TypeError, ValueError, OverflowError):
                 return result
             bar[4] = done
+            if kind == "models":
+                self.models_compared = max(self.models_compared, done)        # 299k
+            elif kind == "fetch_data" and not self._dataset_rows_seen:
+                self.rows_processed = max(self.rows_processed, done)
             now = time.monotonic()
             if done != previous and (done == total or now - recorded >= self.INNER_INTERVAL):
                 bar[2], bar[3] = done, now
@@ -189,6 +198,22 @@ class StoreProgressLogger:
             kind, total, _recorded_done, _recorded_at, latest = bar
             self._record_inner(kind, total if set_100 else latest, total)
         return result
+
+    _dataset_rows_seen = False
+
+    def investigate_dataset(self, dataset, class_column, show_class_distribution=True,
+                            show_statistics=True):
+        """299k: the loaded dataset's row count is the run's rows processed."""
+        try:
+            self.rows_processed = int(len(dataset))
+            self._dataset_rows_seen = True
+        except (TypeError, ValueError):
+            pass
+        return self._logger.investigate_dataset(dataset, class_column, show_class_distribution,
+                                                show_statistics)
+
+    def counts(self) -> dict:
+        return {"rows": int(self.rows_processed), "models": int(self.models_compared)}
 
     def parse_dataset_progress(self, key, num_lines, row_count):
         """The real logger's version calls its own inline methods, past this wrapper."""
@@ -454,6 +479,7 @@ def run_job(store: RunJobStore, run: RunReference, worker_id: str, *, logger=Non
             projected["evaluation"] = observed.evaluation
         if observed.feature_importance is not None:
             projected["feature_importance"] = observed.feature_importance
+        projected["counts"] = observed.counts()                         # 299k
         store.finish(run, worker_id, RunStatus.SUCCEEDED, result=projected)
         register_trained_model(store, record, run_config)
         return EXIT_FINISHED

@@ -36,10 +36,18 @@ sidor finns sidans huvudknapp både överst och längst ned.
 
 ## Översikt
 
-En sammanfattning av det öppna projektet: aktivt träningsdataset, vald
-konfiguration, senaste tränings- och prediktionskörning och projektets
-modeller. Varje del länkar till fliken där den ändras. Utan öppet projekt är
-sidan tom.
+Överst alla dina projekt: träningskörningar, bearbetade rader, jämförda
+modeller och modeller i bruk, var och en med hur många som finns i det öppna
+projektet. Dessutom körningar per vecka (lyckade och misslyckade) och
+bearbetade rader per projekt, med det öppna projektet markerat. Bearbetade
+rader och jämförda modeller registreras när en körning blir klar, så
+körningar från före den här versionen räknas som noll.
+
+Nedanför det öppna projektet: aktivt träningsdataset, vald konfiguration,
+senaste körningar och projektets modeller, med länkar till flikarna där de
+ändras. Modellkvalitet per träningskörning (konfigurationens mått) med medel
+av de tre senaste, bearbetade rader per vecka och de senaste körningarna med
+länkar till deras resultat. Utan öppet projekt visas bara den övre delen.
 
 ## Projekt
 

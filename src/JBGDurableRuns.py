@@ -143,6 +143,10 @@ class DurableRunService:
         self._store.request_cancel(run)
         return self._snapshot(self._store.get(run))
 
+    def owner_records(self, principal: str, limit: int = 2000) -> tuple:
+        """299k: the owner's run records (deleted runs left out), for the Overview."""
+        return self._store.list_for_owner(principal, limit)
+
     @property
     def can_stop(self) -> bool:
         return self._stop_worker is not None

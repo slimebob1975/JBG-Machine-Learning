@@ -282,3 +282,29 @@ form.copy-roles { margin-bottom: 10px; }
 /* 299j: a feature investigation's recommendation */
 tr.changed td { background: #fdf3dc; }
 .investigation-columns ul { margin: 4px 0 0; padding-left: 18px; }
+/* 299k: the Overview's key figures and server-drawn charts */
+.overview-all, .overview-project { margin-bottom: 18px; }
+.section-title { font-size: 15px; margin: 0 0 10px; }
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.figure { border: 1px solid var(--line, #ddd); border-radius: 8px; padding: 10px 12px; background: var(--card, #fff); }
+.figure-label { display: block; font-size: 12px; color: var(--ink3); }
+.figure-value { display: block; font-size: 22px; margin: 2px 0; }
+.figure-sub { font-size: 12px; color: var(--ink3); }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.charts .card { margin: 0; }
+.charts .card h3 { margin-top: 0; font-size: 14px; }
+svg.chart { width: 100%; height: auto; display: block; }
+.chart-grid { stroke: var(--line, #e2e2e2); stroke-width: 1; }
+.chart-tick { fill: var(--ink3, #666); font-size: 10px; }
+.chart-strong { font-weight: 700; fill: var(--ink, #222); }
+.chart-empty { fill: var(--ink3, #666); font-size: 12px; }
+.chart-ok { fill: var(--ready); background: var(--ready); }
+.chart-fail { fill: var(--blocked); background: var(--blocked); }
+.chart-bar { fill: #7aa7d6; background: #7aa7d6; }
+.chart-hl { fill: #1f5fa8; background: #1f5fa8; }
+.chart-line { fill: none; stroke: #1f5fa8; stroke-width: 2; }
+.chart-dot { fill: #1f5fa8; }
+.chart-avg { stroke: var(--waiting); stroke-width: 2; stroke-dasharray: 5 4; background: var(--waiting); }
+.legend { font-size: 12px; color: var(--ink3); margin: 6px 0 0; }
+.legend .key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
+.legend .key:first-child { margin-left: 0; }

@@ -414,7 +414,7 @@ full SQL regression acceptance remain separately unverified.
     red with the reason on hover until there is something to do, then
     green; the footer's actions also at the top of long pages; buttons
     below long tables also above them.
-  - [ ] Översikt (agreed 2026-11-13; mockup `oversikt_mockup.html` shared in
+  - [x] 299k: Översikt (agreed 2026-11-13; mockup `oversikt_mockup.html` shared in
     the conversation), for the user, managers and colleagues, both scopes:
     - All projects: key figures (training runs, rows processed, models
       compared, models in use), each with "of which in the open project";
@@ -431,6 +431,30 @@ full SQL regression acceptance remain separately unverified.
       fill in from new runs onward.
     - [x] 299c: the empty state's duplicated tab names merged (the tab name
       in the sentence is the link).
+  - [ ] Asked 2026-11-16, after the items above: "JBG Dark Number Analysis
+    2.0", a method specification and step-by-step plan in Swedish
+    (`docs/dark_numbers/JBG_Dark_Number_Analysis_2_0_Implementeringsplan.md`,
+    generated elsewhere, a proposal for review). It keeps the original JBG
+    method as the reproducible reference (always available), develops JBG v2
+    (a stable correction factor c, adaptive label flipping, an explicit
+    class-balance-aware sampling policy) and adds estimators with defined
+    targets (mislabelling matrix, sensitivity intervals, calibrated
+    probabilities, positive-unlabelled learning), separate from ordinary
+    training. The plan's own gate: no production code before the method
+    specification, experiments and acceptance criteria are reviewed.
+    - [ ] DN-01 method contract and baseline (current formulas and code paths,
+      notation, targets, reproducible baseline cases; reviewed before any
+      engine patch).
+    - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
+      no leakage, no effect on the ordinary pipeline).
+    - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,
+      a tested stopping rule).
+    - [ ] DN-04 mislabelling and sensitivity analysis.
+    - [ ] DN-05 PU-SCAR / calibrated probabilistic method.
+    - [ ] DN-06 common benchmark and method review (decision on what goes on).
+    - [ ] DN-07 FastAPI/API/GUI integration (method choice, settings,
+      uncertainty, assumptions; old projects still load).
+    - [ ] DN-08 controlled production pilot.
   - [ ] Noted with 298g: the engine's group-disjoint holdout supports only
     two classes ("Person-disjoint validation currently requires binary
     classification"); grouped cross-validation has no such limit.
