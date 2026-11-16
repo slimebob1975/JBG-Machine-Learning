@@ -2084,3 +2084,13 @@ msgstr "Avbryter: körningen stannar efter steget den arbetar med. Ett långt st
 
 msgid "Stop now"
 msgstr "Stoppa nu"
+
+# 299h: an honest feature selection section
+msgid "In the web interface, the variables are chosen through the column roles on the Dataset tab: a column with the role Ignored is not used by the model."
+msgstr "I webbgränssnittet väljs variablerna med kolumnrollerna på fliken Dataset: en kolumn med rollen Ignoreras används inte av modellen."
+
+msgid "An assisted feature investigation is coming, as a run of its own on the Training tab."
+msgstr "En assisterad variabelundersökning kommer, som en egen körning på fliken Träning."
+
+msgid "variables"
+msgstr "variabler"

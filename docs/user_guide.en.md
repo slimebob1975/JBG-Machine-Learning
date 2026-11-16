@@ -143,6 +143,11 @@ section's title to open or close it. Sections that were open when you saved
 stay open after saving. Less common settings are under **Advanced settings**
 in each section.
 
+**Feature selection**: the variables a model uses are chosen with the column
+roles on the Dataset tab. A column with the role Ignored is not used. An
+assisted feature investigation is coming, as a run of its own on the Training
+tab.
+
 On the left, below the list, **Pipeline** shows the steps of the open
 configuration in the order they run. A green step is used, a purple one
 compares several alternatives and a dashed one is not used. The steps tried

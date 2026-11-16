@@ -52,6 +52,8 @@ def convert_form(schema: dict, form) -> tuple[dict, dict]:
             continue
         section, name = key.split(".", 1)
         form_key = "f:" + key
+        if field.get("inactive") and form_key not in form:
+            continue        # 299h: not shown, not posted: the stored value stays
         raw = form.get(form_key)
         value = None
         try:

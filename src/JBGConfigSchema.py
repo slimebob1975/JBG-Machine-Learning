@@ -41,6 +41,14 @@ GROUPS = (
 )
 # 298b: the configuration schema's version (2: the groups above).
 SCHEMA_VERSION = 2
+# 299h (agreed 2026-11-13): groups whose settings web runs do not use. Their
+# fields are marked "inactive": the form does not show them and, as they are
+# not posted, saving leaves their stored values as they are (Voila reads
+# them). The group stays, with a note on what chooses the variables. Feature selection: only
+# Voila's interface runs the feature investigation and applies its result;
+# in web runs the column roles choose the variables. The investigation comes
+# to the web interface as a run of its own (299i), and its settings return.
+INACTIVE_GROUPS = frozenset({"feature_selection"})
 
 # Values declared here because Config (or the run) checks them inline.
 INLINE_OPTIONS = {
@@ -220,6 +228,8 @@ def configuration_schema(source: str, translate: Callable[[str], str], defaults:
                  "default": defaults[section][name],
                  "nullable": entry.get("nullable", False),
                  "advanced": entry.get("advanced", False)}
+        if entry["group"] in INACTIVE_GROUPS:
+            field["inactive"] = True                     # 299h
         if entry.get("allows_all"):
             field["allows_all"] = True                   # 293c: an "All" (ALL) choice
         for extra in ("minimum", "maximum"):

@@ -79,8 +79,15 @@ def pipeline_steps(schema: dict, values: dict, *, translate, language: str = "sv
         text = ", ".join(parts)
         steps.append(step("text_processing", USED, text[:1].upper() + text[1:]))
 
-    steps.append(step("feature_selection", USED,
-                      label_of("mode.feature_selection_mode", mode.get("feature_selection_mode"))))
+    # 299h: web runs take their variables from the dataset's column roles; the
+    # section's mode is used only by Voila.
+    if roles is None:
+        steps.append(step("feature_selection", USED, translate("Column roles")))
+    else:
+        from JBGDatasetRoles import FEATURE_ROLES
+        count = sum(len(roles.by_role(role)) for role in FEATURE_ROLES)
+        steps.append(step("feature_selection", USED if count else UNUSED,
+                          f"{translate('Column roles')}: {count} {translate('variables')}"))
 
     split = f"{translate('Test share')} {_percent(mode.get('test_size'))}"
     if mode.get("grouped_cross_validation") or mode.get("holdout_split_mode") == "person_disjoint":

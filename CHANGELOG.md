@@ -1,3 +1,28 @@
+## Revision 299h - An honest feature selection section (2026-11-13)
+
+- Voilà retirement item (agreed 2026-11-13), first step of the feature
+  investigation: the Configuration tab's feature selection section had no
+  effect in web runs. Its settings (mode, saved profile, about 25
+  investigation settings) are read only by Voilà's interface, which runs the
+  investigation and applies its result; the engine never reads them.
+  - The section's settings are marked inactive in the configuration schema
+    (`INACTIVE_GROUPS`): the form neither shows nor reads them, so saving
+    leaves the stored values as they are (Voilà keeps working). Dimensionality
+    reduction is unaffected.
+  - The section says what chooses the variables: the column roles on the
+    Dataset tab (Ignored is not used), and that an assisted investigation is
+    coming as a run of its own.
+  - The pipeline picture's feature selection step shows "Column roles: N
+    variables" (the active training dataset's predictors) instead of the
+    Voilà mode.
+- BACKLOG: the agreed plan for the investigation (299i run, 299j result and
+  applying it, later pause/resume; more than two classes as the target class
+  against the rest; refused with a group column), and the request to use
+  commas or dashes instead of semicolons in Swedish instructions (except the
+  Dark Numbers alphas).
+- User guides: the feature selection section.
+- Tests: `tests/test_revision_299h_honest_feature_selection.py`.
+
 ## Revision 299g - Stopping a run that does not stop (2026-11-13)
 
 - Asked 2026-11-13: "Avbryt körningen" on a wrongly configured run seemed to

@@ -375,6 +375,27 @@ full SQL regression acceptance remain separately unverified.
       pause/resume); first make the Variabelurval section honest: it has no
       effect in web runs today.
     - [ ] Minor: rerun, run history (Körhistorik).
+  - [ ] Asked 2026-11-13: Swedish instructions to the user (sv.po, the
+    Swedish user guide) use an ordinary comma or a dash instead of a
+    semicolon. The one exception (agreed 2026-11-13): the list of alphas in
+    the Dark Numbers calculation table keeps its semicolons (299f2), as the
+    comma is the decimal sign there.
+  - [x] 299h (agreed 2026-11-13): the feature selection section is honest:
+    its settings (used only by Voila) are not shown or read by the web form
+    and stay stored; the section and the pipeline picture say the column
+    roles choose the variables.
+  - [ ] 299i: the feature investigation as a run of its own, started on the
+    Training tab with the chosen dataset and configuration (its settings in
+    the configuration's feature selection section again). More than two
+    classes: the target class against the rest, as in Dark Numbers
+    (agreed 2026-11-13). Refused while the dataset has a group column (the
+    investigation does not keep groups apart yet).
+  - [ ] 299j: the investigation's result on the Results tab; "Use the
+    recommendation" fills the dataset's column roles form (Ignored for the
+    columns left out), saved only with "Save column roles". A past
+    investigation run replaces Voila's "reuse".
+  - [ ] Later: pausing and resuming an investigation (the engine keeps a
+    snapshot), if Standard and Extended searches prove long.
   - [x] 299g (asked 2026-11-13): cancelling takes effect after the current
     inner step; "Stoppa nu" ends a cancelled run's worker at once; a dead
     worker of this server is marked interrupted at once.

@@ -143,6 +143,10 @@ avsnitt är stängda när sidan öppnas; klicka på ett avsnitts rubrik för att
 efter sparandet. Ovanligare inställningar finns under **Avancerade
 inställningar** i respektive avsnitt.
 
+**Variabelurval**: variablerna som en modell använder väljs med kolumnrollerna
+på fliken Dataset. En kolumn med rollen Ignoreras används inte. En assisterad
+variabelundersökning kommer, som en egen körning på fliken Träning.
+
 Till vänster, under listan, visar **Pipeline** stegen för den öppnade
 konfigurationen i den ordning de körs. Ett grönt steg används, ett lila
 jämför flera alternativ och ett streckat används inte. De steg som prövas

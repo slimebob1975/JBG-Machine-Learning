@@ -156,7 +156,7 @@
     <form id="config-form" method="post" action="/ui/configuration/{{ selected.configuration_id }}">
       <input type="hidden" name="expected_version" value="{{ selected.version }}">
       {% macro group_block(group, open_first) %}
-        {% set fields = schema.fields | selectattr("group", "equalto", group.key) | list %}
+        {% set fields = schema.fields | selectattr("group", "equalto", group.key) | rejectattr("inactive") | list %}
         {% set has_error = fields | selectattr("key", "in", field_errors.keys() | list) | list %}
         <details class="group" id="section-{{ group.key }}" {{ 'open' if open_first or has_error }}>
           <summary>{{ group.label }}</summary>
@@ -195,6 +195,11 @@
             <p class="hint">{{ _("Settings for newly ticked algorithms appear after saving.") }}</p>
             <p class="hint combinations{{ ' warn' if combinations > 1000 }}">{{ _("Combinations to spot-check") }}: <b>{{ combinations }}</b>
               {% if combinations > 1000 %}– {{ _("only sensible for very small datasets") }}{% endif %}</p>
+          {% endif %}
+          {% if group.key == "feature_selection" %}
+            {# 299h: the section's settings are not used by web runs. #}
+            <p class="hint feature-selection-note">{{ _("In the web interface, the variables are chosen through the column roles on the Dataset tab: a column with the role Ignored is not used by the model.") }}
+              {{ _("An assisted feature investigation is coming, as a run of its own on the Training tab.") }}</p>
           {% endif %}
           {% if group.key == "splitting" %}
             {# 298g: the group column is a column role of the dataset. #}
