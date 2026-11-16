@@ -58,7 +58,7 @@ projektnamnet i raden under rubriken stänger projektet.
 
 **Ta bort projektet…** tar bort projektet med allt i det: dataset,
 konfigurationer, körningar med resultat och prediktioner, och modeller. Skriv
-projektets namn för att bekräfta; knappen **Ta bort** blir orange när namnet
+projektets namn för att bekräfta. Knappen **Ta bort** blir orange när namnet
 stämmer. Tabeller i SQL Server berörs inte.
 
 ## Dataset
@@ -66,16 +66,16 @@ stämmer. Tabeller i SQL Server berörs inte.
 Ett projekt kan ha flera dataset. Varje dataset har en roll: Träning,
 Prediktion eller Blandad.
 
-- **CSV-projekt**: välj en fil (högst 25 MB, med rubrikrad; avgränsaren
+- **CSV-projekt**: välj en fil (högst 25 MB, med rubrikrad – avgränsaren
   känns igen automatiskt), ange namn och roll och välj **Ladda upp**.
 - **SQL-projekt**: logga in med användarnamn och lösenord eller med
   Windows-autentisering. Välj katalog och roll, **Visa tabeller**, välj
   tabell, ange namn och välj **Registrera**. Inloggningen finns bara i
-  serverns minne; efter en omstart av servern loggar du in igen.
+  serverns minne, så efter en omstart av servern loggar du in igen.
 
 Välj **Aktivera för träning** på det dataset som modellen ska tränas på.
 Ett tränings- eller blandat dataset kan byta till den andra rollen med **Byt
-roll till …**; kolumnrollerna och valideringen behålls. Träningen använder
+roll till …**. Kolumnrollerna och valideringen behålls. Träningen använder
 bara rader med klass, och ett blandat dataset kan också predikteras på fliken
 Prediktion. Prediktionsdataset kan inte byta roll.
 Under datasetet finns vyerna Förhandsgranskning, Profil, Klasser och
@@ -103,9 +103,9 @@ månad och veckodag (som punkter på en cirkel, så att december ligger nära
 januari) samt en markering för saknat datum. Datum föreslås aldrig
 automatiskt: en datumkolumn föreslås som ignorerad, och **Behandlas som**
 visar att den kan bli datumvariabel. Datum ska vara i formatet ÅÅÅÅ-MM-DD,
-gärna med klockslag; i SQL-tabeller räknas typerna date, datetime, datetime2
+gärna med klockslag. I SQL-tabeller räknas typerna date, datetime, datetime2
 och smalldatetime. Tänk på att året bara beskriver tiden modellen tränats
-på; för nya år får modellen ett värde den inte har sett.
+på. För nya år får modellen ett värde den inte har sett.
 
 Högst en kolumn kan vara **Gruppkolumn**, till exempel en persons
 identitet. Den håller ihop sina rader när data delas upp, så att samma grupp
@@ -133,7 +133,7 @@ Spara med **Spara kolumnroller** och validera sedan datasetet igen med
 
 Har projektet redan ett dataset med samma kolumner, välj det under
 **Kopiera kolumnroller från** och **Fyll i**. Rollerna fylls i men sparas
-inte förrän du sparar; kolumner som saknas eller inte är tal sägs till.
+inte förrän du sparar. Kolumner som saknas eller inte är tal sägs till.
 En konfiguration kan användas med alla dataset i projektet.
 
 ## Konfiguration
@@ -146,7 +146,7 @@ Variabelurval, Uppdelning, Skalning, Översampling, Undersampling,
 Dimensionsreduktion, Algoritmer, Beslut, Utvärdering, Mörkertal och, i
 SQL-projekt, Prediktioner, sist Avancerat. Skalning, sampling,
 dimensionsreduktion och algoritmen prövas tillsammans i korsvalidering. Alla
-avsnitt är stängda när sidan öppnas; klicka på ett avsnitts rubrik för att
+avsnitt är stängda när sidan öppnas. Klicka på ett avsnitts rubrik för att
 öppna eller stänga det. Avsnitt som var öppna när du sparade är öppna även
 efter sparandet. Ovanligare inställningar finns under **Avancerade
 inställningar** i respektive avsnitt.
@@ -171,20 +171,20 @@ sparade versionen.
 
 I **Uppdelning** väljer du om grupper ska hållas isär vid korsvalidering
 eller vid uppdelningen av testdata. Gruppkolumnen anges inte här utan som
-kolumnroll på fliken Dataset; avsnittet visar vilken kolumn som används.
+kolumnroll på fliken Dataset, och avsnittet visar vilken kolumn som används.
 Grupper isär vid uppdelningen av testdata kräver två klasser. I **Översampling** och **Undersampling** kryssar
-du i de metoder som ska prövas; är inget ikryssat används ingen sampling.
+du i de metoder som ska prövas. Är inget ikryssat används ingen sampling.
 
 I **Mörkertal** väljs **Målklass** bland klasserna i det aktiva
 träningsdatasetets klasskolumn, eller **Alla klasser**. Klasserna läses när
 avsnittet öppnas (i SQL-projekt behövs inloggning). Under fälten visas
-formeln för vald metod och alpha, med målklass och reservmetod; den följer
+formeln för vald metod och alpha, med målklass och reservmetod. Den följer
 dina val direkt, och alpha ”Separated” går bara att välja med metoden
 ”Linear”.
 
 - Rutan **Alla** i en lista markerar alla val. Den markeras också när sista
   valet markeras, och den avmarkeras när ett val avmarkeras.
-- **Spara konfiguration** skapar en ny version; tidigare versioner sparas.
+- **Spara konfiguration** skapar en ny version, och tidigare versioner sparas.
 - **Välj för körning** gör konfigurationen till den som används vid
   träning. Den är röd när konfigurationen redan är vald.
 - **Ta bort konfigurationen…** tar bort den med alla versioner, de
@@ -221,15 +221,15 @@ körningens logg.
 
 **Avbryt körningen** ber körningen att stanna: den stannar efter steget den
 arbetar med, till exempel algoritmkombinationen som prövas. Ett långt steg
-kan ta en stund. När du har avbrutit avslutar **Stoppa nu** körningen direkt;
-steget som pågår går förlorat, vilket inte spelar någon roll för en avbruten
+kan ta en stund. När du har avbrutit avslutar **Stoppa nu** körningen direkt.
+Steget som pågår går förlorat, vilket inte spelar någon roll för en avbruten
 körning. Om programmet på servern stoppas eller avslutas oväntat markeras
 dess körningar som avbrutna: direkt när servern märker det, annars efter fem
 minuter.
 
 Om konfigurationen också predikterar rader utan klass men träningsdatasetet
-saknar sådana rader, tränar körningen bara och hoppar över prediktionen;
-loggen säger det.
+saknar sådana rader, tränar körningen bara och hoppar över prediktionen.
+Loggen säger det.
 
 När körningen är klar visas utvärderingen på testdata, förväxlingsmatrisen
 och de viktigaste variablerna.
@@ -254,7 +254,7 @@ rekommendationen behåller alla variabler.
 andelen dolda fall för varje målklass. Fyra skattningar görs: med den
 slutliga modellen och med den korstränade modellen på alla data, en
 kombinerad och med den korstränade modellen på testdata. De väntas växa i
-den ordningen och bildar tillsammans ett heuristiskt intervall; vyn säger om
+den ordningen och bildar tillsammans ett heuristiskt intervall, och vyn säger om
 ordningen håller. Därunder finns beräkningarna och förväxlingsmatriserna.
 
 I **Felklassificeringar** för en SQL-körning kan du rätta klasser som är
@@ -262,11 +262,11 @@ fel i källdata. Välj **Rätt klass** för raderna och sedan **Granska
 korrigeringarna**. En sida visar ändringarna, och först när du väljer **Skriv
 korrigeringarna** skrivs de till källtabellen med din SQL-inloggning, alla på
 en gång eller ingen. Inloggningen måste få ändra tabellen. Rättade rader
-markeras, och under tabellen listas korrigeringarna; **Ångra** skriver
+markeras, och under tabellen listas korrigeringarna. **Ångra** skriver
 tillbaka den gamla klassen. Nästa träning använder de rättade klasserna.
 
 För en CSV-körning fungerar det likadant, men korrigeringarna sparas i en ny
-version av datasetets fil, som alla senare körningar läser; den uppladdade
+version av datasetets fil, som alla senare körningar läser, och den uppladdade
 filen behålls. Datasetet behöver valideras igen. **Hämta CSV** under fliken
 Dataset hämtar filen med de rättade klasserna.
 
@@ -293,7 +293,7 @@ Prediktion använder modellen som är vald under fliken Modeller.
   utan klasskolumn predikteras i sin helhet.
 - **CSV-projekt**: prediktera träningsdatasetets rader utan klass eller ett
   prediktionsdataset (eller blandat dataset) med samma kolumner. Raderna
-  utan klass predikteras; en fil utan klasskolumn predikteras i sin helhet.
+  utan klass predikteras, och en fil utan klasskolumn predikteras i sin helhet.
   Passar filen inte modellen, eller har alla rader redan en klass, säger
   fliken det innan något startar.
 
@@ -319,7 +319,7 @@ Kommer i en senare version.
   körningarna på det och modellerna som tränats på det, ett projekt allt i
   det. Versioner av CSV-filer som inget längre använder städas bort när ett
   dataset tas bort. En sida visar först exakt vad som tas
-  bort och vad som finns kvar; **Ta bort** (orange) genomför det och kan inte
+  bort och vad som finns kvar. **Ta bort** (orange) genomför det och kan inte
   ångras. Inget tas bort medan en körning som skulle tas bort står i kö eller
   pågår. När en träningskörning tas bort men dess modell finns kvar sparas
   bara körningens inställningar för modellen, dolda. Tabeller i SQL Server

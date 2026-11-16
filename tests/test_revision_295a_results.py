@@ -178,7 +178,7 @@ def test_runs_from_before_295a_say_so(tmp_path):
     with _client(tmp_path) as client:
         _, run = _finished_run(client)                         # no run folder at all
         page = client.get(f"/ui/results?run={run.key}&view=leaderboard").text
-        assert "tidigare körningar sparade dem inte" in page
+        assert "Tidigare körningar sparade dem inte" in page             # 299m: no semicolon
         overview = client.get(f"/ui/results?run={run.key}").text
         assert '<th class="num">1</th>' in overview            # numbered without class names
 

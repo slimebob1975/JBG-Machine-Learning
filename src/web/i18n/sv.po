@@ -420,7 +420,7 @@ msgid "Search preset"
 msgstr "Förinställning för sökning"
 
 msgid "Settings per selected algorithm; empty uses the defaults."
-msgstr "Inställningar per vald algoritm; tomt använder standardvärdena."
+msgstr "Inställningar per vald algoritm. Tomt använder standardvärdena."
 
 msgid "Share of rows kept for testing."
 msgstr "Andel rader som sparas för test."
@@ -815,7 +815,7 @@ msgid "Save configuration"
 msgstr "Spara konfiguration"
 
 msgid "Saving creates a new version; earlier versions are kept."
-msgstr "Att spara skapar en ny version; tidigare versioner sparas."
+msgstr "Att spara skapar en ny version, och tidigare versioner sparas."
 
 msgid "Select a configuration in the list."
 msgstr "Välj en konfiguration i listan."
@@ -919,7 +919,7 @@ msgid "Sign in to SQL Server to choose a catalog and a table."
 msgstr "Logga in på SQL Server för att välja katalog och tabell."
 
 msgid "Text columns with at most this many distinct values are categorised; other text columns are treated as free text. Categorical columns are always categorised."
-msgstr "Textkolumner med högst så här många unika värden kategoriseras; andra textkolumner behandlas som fritext. Kategoriska kolumner kategoriseras alltid."
+msgstr "Textkolumner med högst så här många unika värden kategoriseras, andra textkolumner behandlas som fritext. Kategoriska kolumner kategoriseras alltid."
 
 msgid "Text feature"
 msgstr "Textvariabel"
@@ -1069,7 +1069,7 @@ msgid "Queued"
 msgstr "I kö"
 
 msgid "Rows: actual class; columns: predicted class."
-msgstr "Rader: verklig klass; kolumner: predikterad klass."
+msgstr "Rader: verklig klass – kolumner: predikterad klass."
 
 msgid "Running"
 msgstr "Körs"
@@ -1188,7 +1188,7 @@ msgid "Select a finished run in the list."
 msgstr "Välj en avslutad körning i listan."
 
 msgid "These details are kept for runs made after this update; earlier runs did not keep them."
-msgstr "Detaljerna sparas för körningar som görs efter den här uppdateringen; tidigare körningar sparade dem inte."
+msgstr "Detaljerna sparas för körningar som görs efter den här uppdateringen. Tidigare körningar sparade dem inte."
 
 msgid "weighted"
 msgstr "viktat"
@@ -1324,7 +1324,7 @@ msgid "Back"
 msgstr "Tillbaka"
 
 msgid "Only the end of the log is shown; the download contains all of it."
-msgstr "Bara slutet av loggen visas; nedladdningen innehåller hela."
+msgstr "Bara slutet av loggen visas – nedladdningen innehåller hela."
 
 # 296b: CSV predictions and the predictions view.
 msgid "The predictions can be downloaded as a file when the run has finished."
@@ -1418,14 +1418,14 @@ msgid "Not in this dataset, so their roles were not copied:"
 msgstr "Finns inte i det här datasetet, så deras roller kopierades inte:"
 
 msgid "Numeric in the other dataset but not numbers here; choose another role:"
-msgstr "Numeriska i det andra datasetet men inte tal här; välj en annan roll:"
+msgstr "Numeriska i det andra datasetet men inte tal här. Välj en annan roll:"
 
 # 297e: why a run failed.
 msgid "No model was trained; the log says why."
-msgstr "Ingen modell tränades; loggen visar varför."
+msgstr "Ingen modell tränades. Loggen visar varför."
 
 msgid "The program stopped the run; the log says why."
-msgstr "Programmet avbröt körningen; loggen visar varför."
+msgstr "Programmet avbröt körningen. Loggen visar varför."
 
 msgid "The run could not be started on the server. Try again."
 msgstr "Körningen kunde inte startas på servern. Försök igen."
@@ -1434,13 +1434,13 @@ msgid "The SQL sign-in is missing or has expired. Sign in and start again."
 msgstr "Inloggningen till SQL saknas eller har gått ut. Logga in och starta igen."
 
 msgid "The model does not fit this data (columns or roles); the log says more."
-msgstr "Modellen passar inte de här data (kolumner eller roller); loggen säger mer."
+msgstr "Modellen passar inte de här data (kolumner eller roller). Loggen säger mer."
 
 msgid "The run stopped before it finished, for example when the server was restarted. Start it again."
 msgstr "Körningen stoppades innan den var klar, till exempel när servern startades om. Starta den igen."
 
 msgid "The run failed; the log says why."
-msgstr "Körningen misslyckades; loggen visar varför."
+msgstr "Körningen misslyckades. Loggen visar varför."
 
 # 297f: CSV prediction datasets.
 msgid "The dataset does not fit the model: columns are missing, not numbers, or the ID column is not unique."
@@ -1450,7 +1450,7 @@ msgid "Every row of the dataset has a class: there is nothing to predict."
 msgstr "Alla rader i datasetet har en klass: det finns inget att prediktera."
 
 msgid "The rows without a class are predicted; a file without a class column is predicted in full. The predictions can be downloaded as a file when the run has finished."
-msgstr "Raderna utan klass predikteras; en fil utan klasskolumn predikteras i sin helhet. Prediktionerna kan laddas ned som en fil när körningen är klar."
+msgstr "Raderna utan klass predikteras, och en fil utan klasskolumn predikteras i sin helhet. Prediktionerna kan laddas ned som en fil när körningen är klar."
 
 # 298a: suggested column roles; the Classes view sets the class column.
 msgid "No column roles yet. The roles below are suggested from the dataset's contents."
@@ -1602,14 +1602,14 @@ msgid "Change role to"
 msgstr "Byt roll till"
 
 msgid "Mixed datasets can also be predicted on the Prediction tab; training uses only their rows with a class."
-msgstr "Blandade dataset kan också predikteras på fliken Prediktion; träningen använder bara deras rader med klass."
+msgstr "Blandade dataset kan också predikteras på fliken Prediktion, men träningen använder bara deras rader med klass."
 
 msgid "Put right"
 msgstr "Åtgärda"
 
 # 298g: the group column role.
 msgid "Keeps its rows together; not a feature"
-msgstr "Håller ihop sina rader; ingen variabel"
+msgstr "Håller ihop sina rader – ingen variabel"
 
 msgid "at most one column can be the group column"
 msgstr "Högst en kolumn kan vara gruppkolumn."
@@ -2080,7 +2080,7 @@ msgid "The run could not be stopped: it has already ended."
 msgstr "Körningen kunde inte stoppas: den har redan avslutats."
 
 msgid "Cancelling: the run stops after the step it is working on. A long step can take a while; Stop now ends it at once."
-msgstr "Avbryter: körningen stannar efter steget den arbetar med. Ett långt steg kan ta en stund; Stoppa nu avslutar den direkt."
+msgstr "Avbryter: körningen stannar efter steget den arbetar med. Ett långt steg kan ta en stund, men Stoppa nu avslutar den direkt."
 
 msgid "Stop now"
 msgstr "Stoppa nu"

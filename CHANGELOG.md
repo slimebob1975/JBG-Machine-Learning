@@ -1,3 +1,14 @@
+## Revision 299m - No semicolons in Swedish texts (2026-11-16)
+
+- Asked 2026-11-13: Swedish instructions to the user use an ordinary comma,
+  a dash or two sentences instead of a semicolon. Fifteen messages in
+  `sv.po` and nineteen places in the Swedish user guide are rewritten. The
+  agreed exception stays: the list of alphas in the Dark Numbers calculation
+  table keeps its semicolons, as the comma is the decimal sign (299f2).
+- Tests: `tests/test_revision_299m_swedish_semicolons.py` guards both files
+  and the exception. Older tests that quoted the old wording are updated
+  (295a, 297d, 297e, 298g).
+
 ## Revision 299l - Algorithms in groups (2026-11-16)
 
 - Asked 2026-11-13, groups agreed 2026-11-16: the Configuration tab's

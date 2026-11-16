@@ -155,13 +155,13 @@ def _failed(client, kind, status, error_type):
 
 @pytest.mark.parametrize("kind, path, status, error_type, text", [
     ("training", "/ui/run", RunStatus.FAILED, "NoModelTrained",
-     "Ingen modell tränades; loggen visar varför."),
+     "Ingen modell tränades. Loggen visar varför."),
     ("training", "/ui/run", RunStatus.FAILED, "SystemExit",
-     "Programmet avbröt körningen; loggen visar varför."),
+     "Programmet avbröt körningen. Loggen visar varför."),
     ("prediction", "/ui/prediction", RunStatus.FAILED, "ConfigException",
-     "Modellen passar inte de här data (kolumner eller roller); loggen säger mer."),
+     "Modellen passar inte de här data (kolumner eller roller). Loggen säger mer."),
     ("prediction", "/ui/prediction", RunStatus.FAILED, "OSError",
-     "Körningen misslyckades; loggen visar varför."),
+     "Körningen misslyckades. Loggen visar varför."),
 ])
 def test_the_live_view_says_why_a_run_failed(tmp_path, kind, path, status, error_type, text):
     with _client(tmp_path) as client:

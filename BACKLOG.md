@@ -379,7 +379,7 @@ full SQL regression acceptance remain separately unverified.
     algorithms (for example Linear, Non-linear, Tree, Neural networks,
     Ensemble, Special), sorted alphabetically within each group. Propose the
     group of each algorithm and confirm it before coding.
-  - [ ] Asked 2026-11-13: Swedish instructions to the user (sv.po, the
+  - [x] 299m: Asked 2026-11-13: Swedish instructions to the user (sv.po, the
     Swedish user guide) use an ordinary comma or a dash instead of a
     semicolon. The one exception (agreed 2026-11-13): the list of alphas in
     the Dark Numbers calculation table keeps its semicolons (299f2), as the

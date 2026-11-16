@@ -109,7 +109,7 @@ def test_the_roles_view_offers_the_group_column(tmp_path):
         page = client.get(f"/ui/dataset?dataset={dataset}&view=roles").text
     select = re.search(r'<select name="role:person"[^>]*>(.*?)</select>', page, re.S).group(1)
     assert '<option value="group" selected>Gruppkolumn</option>' in select
-    assert "Håller ihop sina rader; ingen variabel" in page
+    assert "Håller ihop sina rader – ingen variabel" in page
 
 
 def test_two_group_columns_are_refused_on_the_tab(tmp_path):
