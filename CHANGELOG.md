@@ -1,3 +1,21 @@
+## Revision 299n - DN-01: method contract and baseline for Dark Numbers (2026-11-16)
+
+- First step of "JBG Dark Number Analysis 2.0" (agreed 2026-11-16). No engine
+  code changes, as the plan requires before review.
+  - `docs/dark_numbers/DN-01_method_contract.md`: where the method lives, the
+    notation, the five formula branches as implemented, the flip test behind
+    `c`, the four estimates, nine findings where the code differs from the
+    method description or has no defined estimand (F1-F9: undefined rates
+    entering the formula, one-label scopes, folds without flips counting as
+    zero recovery, in-sample recovery, multiclass flips to one class, `c`
+    depending on the CPU count, alpha from the predicted label's certainty,
+    `D` not a proportion, in-sample estimates), and the decisions to take at
+    review before DN-02.
+  - `tests/test_revision_299n_dn01_baseline.py` freezes JBG v1 on synthetic
+    data: every formula branch, the findings, and the flip test end to end
+    (exactly with a rule-based stand-in model, independent of library
+    versions; with logistic regression within a range).
+
 ## Revision 299m - No semicolons in Swedish texts (2026-11-16)
 
 - Asked 2026-11-13: Swedish instructions to the user use an ordinary comma,

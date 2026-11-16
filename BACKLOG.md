@@ -444,7 +444,9 @@ full SQL regression acceptance remain separately unverified.
     specification, experiments and acceptance criteria are reviewed.
     - [ ] DN-01 method contract and baseline (current formulas and code paths,
       notation, targets, reproducible baseline cases; reviewed before any
-      engine patch).
+      engine patch). 299n: delivered for review
+      (`docs/dark_numbers/DN-01_method_contract.md`, findings F1-F9, frozen
+      baseline tests); the review decides section 8 of the contract.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,
