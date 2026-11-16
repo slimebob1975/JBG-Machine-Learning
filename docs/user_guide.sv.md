@@ -144,8 +144,10 @@ efter sparandet. Ovanligare inställningar finns under **Avancerade
 inställningar** i respektive avsnitt.
 
 **Variabelurval**: variablerna som en modell använder väljs med kolumnrollerna
-på fliken Dataset. En kolumn med rollen Ignoreras används inte. En assisterad
-variabelundersökning kommer, som en egen körning på fliken Träning.
+på fliken Dataset. En kolumn med rollen Ignoreras används inte. Inställningarna
+i avsnittet används av variabelundersökningen (se Träning). Quick, Standard
+och Extended bestämmer sökningens omfattning, Custom använder värdena i
+avsnittet.
 
 Till vänster, under listan, visar **Pipeline** stegen för den öppnade
 konfigurationen i den ordning de körs. Ett grönt steg används, ett lila
@@ -188,6 +190,15 @@ konfigurationen.
 
 En avslutad körning kan tas bort med **Ta bort körningen…** (även på flikarna
 Prediktion och Resultat).
+
+**Undersök variabler** startar en variabelundersökning med samma dataset och
+konfiguration. Den söker i träningsdelen efter en mindre uppsättning variabler
+som förutsäger lika bra som alla eller bättre, med nästlad korsvalidering, och
+sparar ingen modell. Med fler än två klasser undersöks Mörkertalens målklass
+(annars den minsta klassen) mot de övriga klasserna. Undersökningen kan ännu
+inte hålla isär grupper och erbjuds därför inte för ett dataset med
+gruppkolumn. När den är klar visar körningen rekommendationen: hur många
+variabler, och MCC med dem och med alla variabler.
 
 Förloppet uppdateras av sig självt. När modellerna tränas och jämförs visar
 en tunnare stapel hur många algoritmkombinationer som är klara, till exempel

@@ -360,6 +360,26 @@ def _compose(record, config, logger, credentials, artifacts: Path | None):
         composed.configuration
 
 
+def _kind(record) -> str:
+    project_run = record.spec.get("project_run") if isinstance(record.spec, dict) else None
+    return project_run.get("kind", "training") if isinstance(project_run, dict) else "training"
+
+
+def _investigate(record, config, observed, logger, own_logger, credentials, artifacts,
+                 results_root, run) -> dict:
+    """299i: run a feature investigation into the run's own folder."""
+    from JBGRunInvestigation import run_investigation
+    if results_root is None:
+        raise ValueError("a results folder is required for an investigation")
+    folder = Path(results_root) / str(record.spec["project_run"]["project_id"]) / run.key
+    folder.mkdir(parents=True, exist_ok=True)
+    observed.results_folder = folder
+    if own_logger:
+        with logger.capture_console_output():
+            return run_investigation(record, config, observed, credentials, artifacts, folder)
+    return run_investigation(record, config, observed, credentials, artifacts, folder)
+
+
 def run_job(store: RunJobStore, run: RunReference, worker_id: str, *, logger=None,
             credentials=None, artifacts: Path | None = None, script_path: Path | None = None,
             log_dir: Path | None = None, heartbeat_seconds: float = 30.0,
@@ -382,6 +402,12 @@ def run_job(store: RunJobStore, run: RunReference, worker_id: str, *, logger=Non
                                    log_filename=f"run_{run.key}_engine.log")
             observed = StoreProgressLogger(logger, store, run, heartbeat)
             observed.checkpoint()                    # cancelled while it was queued
+            if _kind(record) == "investigation":
+                # 299i: the feature investigation (no model, no predictions).
+                summary = _investigate(record, config, observed, logger, own_logger,
+                                       credentials, artifacts, results_root, run)
+                store.finish(run, worker_id, RunStatus.SUCCEEDED, result=summary)
+                return EXIT_FINISHED
             composed, reference, run_config = _compose(record, config, observed,
                                                        credentials, artifacts)
             project_run = record.spec.get("project_run") if isinstance(record.spec, dict) else None

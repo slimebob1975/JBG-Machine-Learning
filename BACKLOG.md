@@ -375,6 +375,10 @@ full SQL regression acceptance remain separately unverified.
       pause/resume); first make the Variabelurval section honest: it has no
       effect in web runs today.
     - [ ] Minor: rerun, run history (Körhistorik).
+  - [ ] Asked 2026-11-13: in the Algorithms section, group the available
+    algorithms (for example Linear, Non-linear, Tree, Neural networks,
+    Ensemble, Special), sorted alphabetically within each group. Propose the
+    group of each algorithm and confirm it before coding.
   - [ ] Asked 2026-11-13: Swedish instructions to the user (sv.po, the
     Swedish user guide) use an ordinary comma or a dash instead of a
     semicolon. The one exception (agreed 2026-11-13): the list of alphas in
@@ -384,7 +388,7 @@ full SQL regression acceptance remain separately unverified.
     its settings (used only by Voila) are not shown or read by the web form
     and stay stored; the section and the pipeline picture say the column
     roles choose the variables.
-  - [ ] 299i: the feature investigation as a run of its own, started on the
+  - [x] 299i: the feature investigation as a run of its own, started on the
     Training tab with the chosen dataset and configuration (its settings in
     the configuration's feature selection section again). More than two
     classes: the target class against the rest, as in Dark Numbers

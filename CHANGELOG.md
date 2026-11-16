@@ -1,3 +1,37 @@
+## Revision 299i - The feature investigation as a run (2026-11-13)
+
+- Voilà retirement item (agreed 2026-11-13): Voilà's feature investigation
+  becomes a run kind of the web interface ("investigation").
+  - Started with "Undersök variabler" on the Training tab, with the active
+    training dataset and the chosen configuration; the same checks as a
+    training run except the run type (it only trains: no predictions,
+    mispredictions, Dark Numbers or feature importance, runtime only) and no
+    group column (agreed: refused, red button with the reason, as the
+    investigation does not keep groups apart yet).
+  - Run by a worker like any run (`JBGRunInvestigation`): the engine's
+    `run_training_feature_search` on the training part; no model, no
+    predictions. A stage ("Undersöker variabler") and an inner bar of feature
+    subsets evaluated; every search event is a cancel checkpoint, and "Stoppa
+    nu" works as for other runs.
+  - More than two classes (agreed 2026-11-13): the Dark Numbers target class,
+    or else the smallest class, against the other classes, as Dark Numbers
+    does. Opt-in engine parameter `one_vs_rest` of
+    `run_training_feature_search` (default off: Voilà unchanged).
+  - The configuration's feature investigation settings are used again (299h
+    hid them): only Voilà's mode and saved profile stay inactive. A named
+    preset (Quick, Standard, Extended) decides the search budget, as choosing
+    it does in Voilà; Custom uses the section's values.
+  - The full result (recommended and original columns, the target class,
+    nested scores) is written to the run folder as `investigation.json`; the
+    run store gets numbers only (counts and MCCs), and the run panel shows
+    them. The Results tab, Overview and Models are for training runs only.
+- BACKLOG: grouping the algorithms (asked 2026-11-13).
+- User guides: the feature investigation.
+- Tests: `tests/test_revision_299i_feature_investigation.py` (a native run of
+  a real investigation in a worker, three classes). `tests/test_revision_299h_
+  honest_feature_selection.py` updated: the investigation settings are shown
+  again.
+
 ## Revision 299h - An honest feature selection section (2026-11-13)
 
 - Voilà retirement item (agreed 2026-11-13), first step of the feature

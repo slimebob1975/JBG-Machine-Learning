@@ -18,6 +18,7 @@ it needs the user's SQL sign-in for that server.
 """
 from __future__ import annotations
 
+import copy
 import json
 import tempfile
 from pathlib import Path
@@ -57,6 +58,10 @@ class IdColumnNotInteger(RunRequestRefused):
 
 class RunDoesNotMatchDataset(ValueError):
     """The configuration's column roles do not fit the dataset (422)."""
+
+
+class InvestigationRefused(RunRequestRefused):
+    """299i: the dataset has a group column, which the investigation cannot keep apart."""
 
 
 class NothingToPredict(RunRequestRefused):
@@ -121,7 +126,11 @@ class ProjectRunService:
             raise DatasetUnavailable("dataset unavailable") from None
 
     def submit(self, principal, project_id: str, *, configuration_id: str,
-               version: int | None = None, dataset_id: str | None = None) -> dict:
+               version: int | None = None, dataset_id: str | None = None,
+               investigation: bool = False) -> dict:
+        """A training run, or (299i) a feature investigation: the same dataset
+        and configuration checks, trained on the training part only, no model,
+        no predictions."""
         owner = principal.principal_key
         project = self._projects.require(owner, project_id)
         if project.source is DataSourceKind.SQL and (
@@ -131,6 +140,13 @@ class ProjectRunService:
         configuration = self._configurations.stored_configuration(
             owner, project_id, configuration_id, version)
         settings = configuration.settings
+        if investigation:
+            # 299i: an investigation only trains (as Voila's does), whatever the
+            # configuration's run type; runtime only, the configuration is unchanged.
+            settings = copy.deepcopy(settings)
+            settings["mode"].update(train=True, predict=False, mispredicted=False,
+                                    calculate_dark_numbers=False,
+                                    calculate_feature_importance=False)
         if not settings["mode"].get("train"):
             raise RunRequestRefused(
                 "prediction-only runs need a saved model and are not available yet")
@@ -146,6 +162,11 @@ class ProjectRunService:
         if roles is None:
             raise RunRequestRefused(
                 "the dataset has no column roles; set them on the Dataset tab first")
+        if investigation and roles.group_column:
+            # 299i (agreed 2026-11-13): the investigation does not keep groups
+            # apart yet, so its recommendation could look better than it is.
+            raise InvestigationRefused(
+                "the feature investigation does not keep groups apart yet")
         if keeps_groups_apart(settings) and not roles.group_column:
             # 298g: the engine would stop at the split; refuse before a worker starts.
             raise RunRequestRefused(
@@ -159,6 +180,9 @@ class ProjectRunService:
                     "configuration_version": configuration.version,
                     "configuration_name": configuration.name,
                     "dataset_id": dataset.dataset_id, "model_id": model_id}
+        if investigation:
+            metadata["kind"] = "investigation"               # 299i: no model
+            del metadata["model_id"]
         if project.source is DataSourceKind.SQL:
             return self._submit_sql(principal, settings, dataset, model_folder, model_id,
                                     metadata, roles)

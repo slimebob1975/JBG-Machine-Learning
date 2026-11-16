@@ -23,6 +23,11 @@ from JBGFeaturePreservation import validate_investigation_feature_preservation
 from SQLDataLayer import DataLayer
 
 
+# 299i: the label the other classes share when one class is investigated
+# against the rest (made unique if a class already has this name).
+REST_LABEL = "(other classes)"
+
+
 def text_options_from_config(config) -> dict:
     """Build the fold-local converter settings used by the ordinary JBG representation."""
     return dict(
@@ -75,7 +80,7 @@ def _exclusive_investigation(output):
 
 def run_training_feature_search(config, logger, options: SearchOptions, on_event=None, output=None,
                                 resume=False, pause_event=None, investigation_mode="selection_plus_diagnostics", subgroup_column=None,
-                                csv_source=None):
+                                csv_source=None, one_vs_rest=False):
     """Fetch and split data exactly once, then expose only original training rows to the search.
 
     The normal JBG holdout remains reserved. This service never runs the classifier task runner,
@@ -164,6 +169,24 @@ def run_training_feature_search(config, logger, options: SearchOptions, on_event
                 )
             source_sql_schema = {column: source_sql_schema[column] for column in X.columns}
         classes = sorted({str(value) for value in y})
+        one_vs_rest_target = None
+        if one_vs_rest and len(classes) > 2:
+            # 299i (agreed 2026-11-13, opt-in, web runs only): more than two
+            # classes are investigated as the target class against the rest,
+            # as Dark Numbers does. The target is the Dark Number target, or
+            # else the smallest class; the other classes share one label.
+            counts = Counter(y)
+            wanted = config.get_dark_number_target()
+            target_value = next((value for value in counts if str(value) == wanted), None) \
+                if wanted else min(counts, key=lambda value: (counts[value], str(value)))
+            if target_value is None:
+                raise ValueError("The Dark Number target class is not among the training classes")
+            rest = REST_LABEL
+            while rest in classes:
+                rest = "_" + rest
+            y = y.where(y.astype(str) == str(target_value), rest)
+            one_vs_rest_target = (target_value, rest)
+            classes = sorted({str(value) for value in y})
         if len(classes) != 2:
             raise ValueError(
                 "Feature-selection investigation currently requires exactly two classes "
@@ -173,7 +196,9 @@ def run_training_feature_search(config, logger, options: SearchOptions, on_event
             )
 
         target = config.get_dark_number_target()
-        if not target:
+        if one_vs_rest_target is not None:
+            target = one_vs_rest_target[0]
+        elif not target:
             counts = Counter(y)
             target = min(counts, key=lambda value: (counts[value], str(value)))
 
@@ -234,6 +259,9 @@ def run_training_feature_search(config, logger, options: SearchOptions, on_event
                 investigation_mode=investigation_mode, subgroup_column=subgroup_column,
             )
     result["output_directory"] = str(output)
+    if not resume and one_vs_rest_target is not None:
+        result["one_vs_rest"] = {"target": str(one_vs_rest_target[0]),
+                                 "rest_label": one_vs_rest_target[1]}       # 299i
     return result
 
 class _InvestigationLogger:

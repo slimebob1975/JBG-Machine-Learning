@@ -14,6 +14,7 @@ TASK_STAGES = frozenset({
     "convert_to_numbers", "train_model", "evaluate_model",
     "feature_importance", "retrain_model", "display_mispredicted",
     "make_predictions", "send_completetion_email",
+    "feature_investigation",                  # 299i: a feature investigation run
 })
 
 

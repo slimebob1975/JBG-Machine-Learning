@@ -199,7 +199,8 @@
           {% if group.key == "feature_selection" %}
             {# 299h: the section's settings are not used by web runs. #}
             <p class="hint feature-selection-note">{{ _("In the web interface, the variables are chosen through the column roles on the Dataset tab: a column with the role Ignored is not used by the model.") }}
-              {{ _("An assisted feature investigation is coming, as a run of its own on the Training tab.") }}</p>
+              {{ _("The settings below are used by the feature investigation, started with Investigate features on the Training tab.") }}
+              {{ _("Quick, Standard and Extended set the size of the search. Custom uses the values below.") }}</p>
           {% endif %}
           {% if group.key == "splitting" %}
             {# 298g: the group column is a column role of the dataset. #}

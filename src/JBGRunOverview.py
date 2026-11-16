@@ -24,6 +24,7 @@ INNER_PROGRESS = {
     "Validation progress": "validation",
     "Feature importance": "feature_importance",
     "Shadow fits": "shadow_fits",
+    "Feature subsets": "feature_subsets",       # 299i: a feature investigation
 }
 INNER_KINDS = frozenset(INNER_PROGRESS.values())
 
@@ -79,6 +80,22 @@ def failure_code(status: RunStatus, error_type: str | None) -> str | None:
     return FAILURES.get(error_type, "other")
 
 
+def investigation_summary(result: dict) -> dict:
+    """299i: the reviewed numbers of a feature investigation's stored result."""
+    def count(name):
+        value = result.get(name)
+        return value if type(value) is int and value >= 0 else None
+
+    def score(name):
+        value = result.get(name)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return None
+        return float(value) if -1.0 <= value <= 1.0 else None
+    return {"selected_count": count("selected_count"), "original_count": count("original_count"),
+            "selected_mcc": score("selected_mcc"), "baseline_mcc": score("baseline_mcc"),
+            "one_vs_rest": result.get("one_vs_rest") is True}
+
+
 def project_run_overview(run_id: str, status: RunStatus, events,
                          result: dict[str, Any] | None = None, *,
                          error_type: str | None = None) -> dict[str, Any]:
@@ -129,6 +146,9 @@ def project_run_overview(run_id: str, status: RunStatus, events,
         from JBGStructuredEvaluation import sanitize_stored_evaluation
         evaluation = sanitize_stored_evaluation(result.get("evaluation"))
     results = {"available": status is RunStatus.SUCCEEDED, "summary": summary}
+    if status is RunStatus.SUCCEEDED and isinstance(result, dict) \
+            and result.get("kind") == "investigation":
+        results["investigation"] = investigation_summary(result)            # 299i
     if evaluation is not None:
         results["evaluation"] = evaluation
     if status is RunStatus.SUCCEEDED and isinstance(result, dict):

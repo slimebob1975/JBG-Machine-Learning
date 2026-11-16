@@ -38,7 +38,7 @@ def add_overview_tab(app, *, principal_dependency, render, active_project, datas
             items = runs.list_project_runs(owner, project_id, limit=200)
         except Exception:
             return None, None, None
-        training = next((r for r in items if r.get("kind", "training") != "prediction"), None)
+        training = next((r for r in items if r.get("kind", "training") == "training"), None)
         prediction = next((r for r in items if r.get("kind") == "prediction"), None)
         evaluation = None
         if training is not None and training["status"] == "succeeded":

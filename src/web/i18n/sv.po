@@ -2094,3 +2094,43 @@ msgstr "En assisterad variabelundersökning kommer, som en egen körning på fli
 
 msgid "variables"
 msgstr "variabler"
+
+# 299i: the feature investigation as a run
+msgid "The settings below are used by the feature investigation, started with Investigate features on the Training tab."
+msgstr "Inställningarna nedan används av variabelundersökningen, som startas med Undersök variabler på fliken Träning."
+
+msgid "Quick, Standard and Extended set the size of the search. Custom uses the values below."
+msgstr "Quick, Standard och Extended bestämmer sökningens omfattning. Custom använder värdena nedan."
+
+msgid "Investigating features"
+msgstr "Undersöker variabler"
+
+msgid "Feature subsets evaluated"
+msgstr "Prövade delmängder av variabler"
+
+msgid "Recommendation"
+msgstr "Rekommendation"
+
+msgid "Keeping every variable was best within this search."
+msgstr "Att behålla alla variabler var bäst inom den här sökningen."
+
+msgid "MCC with the recommendation"
+msgstr "MCC med rekommendationen"
+
+msgid "with every variable"
+msgstr "med alla variabler"
+
+msgid "nested cross-validation on the training part"
+msgstr "nästlad korsvalidering på träningsdelen"
+
+msgid "More than two classes: the target class was investigated against the other classes."
+msgstr "Fler än två klasser: målklassen undersöktes mot de övriga klasserna."
+
+msgid "The feature investigation has started."
+msgstr "Variabelundersökningen har startat."
+
+msgid "The feature investigation cannot keep groups apart yet, and the dataset has a group column."
+msgstr "Variabelundersökningen kan ännu inte hålla isär grupper, och datasetet har en gruppkolumn."
+
+msgid "Investigate features"
+msgstr "Undersök variabler"

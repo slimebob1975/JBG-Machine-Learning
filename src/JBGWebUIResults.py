@@ -197,7 +197,7 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
             # Prediction tab.
             context["finished"] = [r for r in runs.list_project_runs(owner, project["project_id"])
                                    if r["status"] == "succeeded"
-                                   and r.get("kind", "training") != "prediction"]
+                                   and r.get("kind", "training") == "training"]   # 299i
             chosen = run or (context["finished"][0]["run_id"] if context["finished"] else "")
             if any(r["run_id"] == chosen for r in context["finished"]):
                 context["selected_run"] = chosen

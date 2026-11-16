@@ -27,6 +27,7 @@ STAGES = {
     "feature_importance": "Feature importance", "retrain_model": "Training the final model",
     "display_mispredicted": "Finding mispredictions", "make_predictions": "Predicting",
     "send_completetion_email": "Sending the notification",
+    "feature_investigation": "Investigating features",          # 299i
 }
 # (code, passed text, failed text, blocking)
 PREFLIGHT = (
@@ -59,6 +60,9 @@ MESSAGES = {
     "not_fitting": ("error", "The column roles do not fit the dataset."),
     "signin_needed": ("error", "Sign in to SQL Server first."),
     "unavailable": ("error", "The run is no longer available."),
+    "investigation_started": ("ok", "The feature investigation has started."),        # 299i
+    "groups_not_supported": ("error", "The feature investigation cannot keep groups apart "
+                             "yet, and the dataset has a group column."),
     "id_not_integer": ("error", "The ID column of an SQL dataset must hold whole numbers "
                        "(int, bigint, smallint or tinyint). Choose another ID column on the "
                        "Dataset tab (Column roles)."),
@@ -69,8 +73,8 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
                 project_runs, datasets, configurations, sessions, inspection,
                 models=None, results=None, logs=None) -> None:
     from JBGApplicationContracts import RunReference
-    from JBGProjectRuns import (IdColumnNotInteger, RunDoesNotMatchDataset, RunRequestRefused,
-                                keeps_groups_apart)
+    from JBGProjectRuns import (IdColumnNotInteger, InvestigationRefused,
+                                RunDoesNotMatchDataset, RunRequestRefused, keeps_groups_apart)
 
     def preflight(request, principal, project):
         """Fixed check list; the start button needs every blocking check."""
@@ -118,7 +122,19 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
                    "link": None if outcome[code] else links.get(code)}
                   for code, passed, failed, blocking in PREFLIGHT if outcome[code] is not None]
         ready = all(c["passed"] for c in checks if c["blocking"])
-        return checks, ready, configuration
+        # 299i: the feature investigation needs the same, except the run type
+        # (it only trains) and with no group column (it cannot keep groups apart).
+        needed = [c for c in checks if c["blocking"]
+                  and c["code"] not in ("trains", "train_only", "groups")]
+        failing = next((c for c in needed if not c["passed"]), None)
+        if failing is not None:
+            investigate = {"ready": False, "reason": failing["message"]}
+        elif roles is not None and roles.group_column:
+            investigate = {"ready": False, "reason": "The feature investigation cannot keep "
+                           "groups apart yet, and the dataset has a group column."}
+        else:
+            investigate = {"ready": True, "reason": ""}
+        return checks, ready, configuration, investigate
 
     @app.get("/ui/run", response_class=HTMLResponse, include_in_schema=False)
     def run_tab(request: Request, run: str = "", principal=Depends(principal_dependency)):
@@ -130,8 +146,8 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
                    "terminal": TERMINAL, "tab_messages": MESSAGES, "labels": [],
                    "has_log": False, "back": "/ui/run"}
         if project is not None:
-            context["checks"], context["ready"], context["configuration"] = preflight(
-                request, principal, project)
+            (context["checks"], context["ready"], context["configuration"],
+             context["investigate"]) = preflight(request, principal, project)
             context["recent"] = [r for r in runs.list_project_runs(owner, project["project_id"])
                                  if r.get("kind", "training") != "prediction"]
             chosen = run or (context["recent"][0]["run_id"] if context["recent"] else "")
@@ -178,6 +194,29 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
         except (RunRequestRefused, LookupError, ValueError, TypeError, OSError):
             return redirect("/ui/run", message="refused")
         return redirect("/ui/run", run=created["run_id"], message="started")
+
+    @app.post("/ui/run/investigate", include_in_schema=False)
+    def investigate(request: Request, principal=Depends(principal_dependency)):
+        """299i: start a feature investigation with the active training dataset
+        and the chosen configuration (its feature investigation settings)."""
+        project = active_project(request, principal.principal_key)
+        configuration_id = request.cookies.get("jbg_configuration", "")
+        if project is None or not configuration_id:
+            return redirect("/ui/run", message="refused")
+        try:
+            created = project_runs.submit(principal, project["project_id"],
+                                          configuration_id=configuration_id, investigation=True)
+        except InvestigationRefused:
+            return redirect("/ui/run", message="groups_not_supported")
+        except RunDoesNotMatchDataset:
+            return redirect("/ui/run", message="not_fitting")
+        except IdColumnNotInteger:
+            return redirect("/ui/run", message="id_not_integer")
+        except PermissionError:
+            return redirect("/ui/run", message="signin_needed")
+        except (RunRequestRefused, LookupError, ValueError, TypeError, OSError):
+            return redirect("/ui/run", message="refused")
+        return redirect("/ui/run", run=created["run_id"], message="investigation_started")
 
     @app.post("/ui/run/{run_id}/cancel", include_in_schema=False)
     def cancel(request: Request, run_id: str, back: str = Form("/ui/run"),

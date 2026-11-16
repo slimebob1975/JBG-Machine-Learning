@@ -144,9 +144,10 @@ stay open after saving. Less common settings are under **Advanced settings**
 in each section.
 
 **Feature selection**: the variables a model uses are chosen with the column
-roles on the Dataset tab. A column with the role Ignored is not used. An
-assisted feature investigation is coming, as a run of its own on the Training
-tab.
+roles on the Dataset tab. A column with the role Ignored is not used. The
+settings in this section are used by the feature investigation (see
+Training). Quick, Standard and Extended set the size of the search, Custom
+uses the values in the section.
 
 On the left, below the list, **Pipeline** shows the steps of the open
 configuration in the order they run. A green step is used, a purple one
@@ -188,6 +189,16 @@ and the chosen configuration.
 
 A finished run can be deleted with **Delete the run…** (also on the
 Prediction and Results tabs).
+
+**Investigate features** starts a feature investigation with the same
+dataset and configuration. It searches the training part for a smaller set of
+variables that predicts as well as or better than all of them, using nested
+cross-validation, and saves no model. With more than two classes, the Dark
+Numbers target class (or else the smallest class) is investigated against the
+other classes. The investigation cannot keep groups apart yet, so it is not
+offered for a dataset with a group column. When it has finished, the run
+shows the recommendation: how many variables, and the MCC with them and with
+every variable.
 
 The progress updates itself. While the models are trained and compared, a
 thinner bar shows how many algorithm combinations are done, for example

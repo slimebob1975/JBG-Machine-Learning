@@ -27,7 +27,9 @@ def _schema(language="sv"):
 def test_the_sections_fields_are_inactive_and_the_group_stays():
     schema = _schema()
     inactive = [f["key"] for f in schema["fields"] if f.get("inactive")]
-    assert "mode.feature_selection_mode" in inactive and "mode.feature_search_trials" in inactive
+    # 299i: the investigation settings are used again; only Voila's mode and
+    # saved profile stay inactive.
+    assert inactive == ["mode.feature_selection_mode", "mode.feature_selection_profile_id"]
     assert all(f["group"] == "feature_selection" for f in schema["fields"] if f.get("inactive"))
     assert "feature_selection" in [g["key"] for g in schema["groups"]]
     # Dimensionality reduction (mode.feature_selection) is used by the engine.
@@ -62,7 +64,8 @@ def test_the_form_neither_shows_nor_resets_the_stored_settings(tmp_path):
             "feature_selection_mode": "assisted", "feature_search_preset": "Custom",
             "feature_search_trials": 3}})
         page = client.get(f"/ui/configuration?configuration={configuration}").text
-        assert "f:mode.feature_selection_mode" not in page and "f:mode.feature_search_trials" not in page
+        assert "f:mode.feature_selection_mode" not in page
+        assert "f:mode.feature_search_trials" in page                 # 299i: used again
         assert "väljs variablerna med kolumnrollerna på fliken Dataset" in page
         assert "f:mode.feature_selection" in page                     # reduction stays
         schema = _schema()

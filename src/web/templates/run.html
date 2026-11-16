@@ -29,7 +29,7 @@
           <tr class="{{ 'hl' if item.run_id == selected_run }}">
             <td class="num"><a href="/ui/run?run={{ item.run_id }}">{{ item.created_at | localtime }}</a></td>
             <td>{{ item.configuration_name or "–" }}{% if item.configuration_version %} v{{ item.configuration_version }}{% endif %}
-</td>
+              {% if item.kind == "investigation" %}<span class="badge b-neu">{{ _("Feature investigation") }}</span>{% endif %}</td>
             <td><span class="badge {{ 'b-ok' if item.status == 'succeeded' else ('b-fail' if item.status in ('failed', 'interrupted') else 'b-neu') }}">{{ _(stages.get(item.status, item.status)) }}</span></td>
           </tr>
         {% endfor %}
@@ -81,7 +81,7 @@
       {% if results.summary %}
         <p class="hint">{{ _("Classes") }}: {{ results.summary.class_count }} · {{ _("Mispredicted rows (all labelled rows)") }}: {{ results.summary.mispredicted_count }}</p>
       {% endif %}
-      <p><a href="/ui/results?run={{ overview.run_id }}">{{ _("All results of this run") }} ›</a></p>
+      {% if not results.investigation %}<p><a href="/ui/results?run={{ overview.run_id }}">{{ _("All results of this run") }} ›</a></p>{% endif %}
     {% elif finished and overview.status != "succeeded" %}
       <p class="message error">{{ _("The run did not finish successfully.") }}</p>
     {% endif %}
@@ -95,6 +95,12 @@
 
 {% block actions %}
   <span class="hint">{{ _("Starts a training run with the active dataset and the selected configuration.") }}</span>
+  {# 299i: a feature investigation with the same dataset and configuration. #}
+  {% if investigate and investigate.ready %}
+    <form method="post" action="/ui/run/investigate"><button class="btn act ready">{{ _("Investigate features") }}</button></form>
+  {% elif investigate %}
+    <button class="btn act blocked" disabled title="{{ _(investigate.reason) }}">{{ _("Investigate features") }}</button>
+  {% endif %}
   {% if ready %}
     <form method="post" action="/ui/run"><button class="btn act ready">{{ _("Start training") }}</button></form>
   {% else %}
