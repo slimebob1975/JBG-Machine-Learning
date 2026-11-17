@@ -103,7 +103,9 @@ def test_one_false_positive_prevents_skip():
     results = run(ph, ['Ja', 'Nej', 'Nej', 'Ja'], [FixedModel(['Ja', 'Ja', 'Nej', 'Nej'])], combine=False)
     assert ph.correction_calls == [('Cross', ['Ja'], 4)]
     assert results['corr_source'].tolist() == ['direct']
-    assert results['dark_number'].iloc[0] == pytest.approx(1.5)
+    # 299u, JBG v1.2: D estimates a share and is capped at 1 (was 1.5).
+    assert results['dark_number'].iloc[0] == pytest.approx(1.0)
+    assert bool(results['capped'].iloc[0]) is True
 
 
 def test_holdout_fp_requires_cross_correction_even_when_full_data_fp_is_zero():
@@ -113,8 +115,11 @@ def test_holdout_fp_requires_cross_correction_even_when_full_data_fp_is_zero():
     results = run(ph, ['Ja', 'Nej', 'Ja', 'Nej'], [cross, retrained],
                   validation=([4, 5], ['Ja', 'Nej']))
     assert ph.correction_calls == [('Cross', ['Ja'], 4)]
-    assert results['corr_source'].tolist() == ['direct', 'direct', 'not_needed_zero_fp', 'direct']
-    assert results.loc[results['Model type'].str.startswith('D_cv_test'), 'dark_number'].iloc[0] == 2.0
+    # 299u, JBG v1.2: c is not applied to the unseen test part (D was 2.0 with c = 2).
+    test_part = results['Model type'].str.startswith('D_cv_test')
+    assert results.loc[test_part, 'corr_source'].tolist() == ['not applied (test part)']
+    assert results.loc[~test_part, 'corr_source'].tolist() == ['direct', 'not_needed_zero_fp', 'direct']
+    assert results.loc[test_part, 'dark_number'].iloc[0] == 1.0
 
 
 @pytest.mark.parametrize('combine', [True, False])

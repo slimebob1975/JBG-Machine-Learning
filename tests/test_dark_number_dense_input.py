@@ -151,7 +151,10 @@ def test_dense_requirement_reaches_both_correction_fallbacks(monkeypatch, branch
     np.testing.assert_array_equal(received[0], X.iloc[:120].to_numpy())
     np.testing.assert_array_equal(received[1], X.to_numpy())
     expected_source = 'regressed_same_model' if branch == 'regression' else 'perturbed_same_model'
-    assert set(ph.dark_numbers['corr_source']) == {expected_source}
+    # 299u, JBG v1.2: the unseen test part does not use c.
+    names = ph.dark_numbers['Model type'].replace('', pd.NA).ffill().astype(str)
+    in_sample = ~names.str.startswith('D_cv_test')
+    assert set(ph.dark_numbers.loc[in_sample, 'corr_source']) == {expected_source}
 
 
 def test_unrelated_dark_number_typeerror_is_not_densified():

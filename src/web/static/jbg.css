@@ -312,3 +312,9 @@ svg.chart { width: 100%; height: auto; display: block; }
 .choice-group { margin: 8px 0 4px; break-inside: avoid; page-break-inside: avoid; display: inline-block; width: 100%; }
 .choice-group-head { margin: 6px 0 2px; font-size: 13px; }
 .link-button { background: none; border: 0; padding: 0; color: var(--link, #1f5fa8); text-decoration: underline; cursor: pointer; font: inherit; font-size: 12px; }
+/* 299u: the Dark Number equation on the Results tab */
+.dark-equation { margin-bottom: 16px; }
+.dark-equation h3 { margin-top: 0; }
+.equation-parts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 10px 0; font-size: 13px; }
+.equation-parts dt { font-weight: 600; font-family: "Cambria Math", "Times New Roman", serif; }
+.equation-parts dd { margin: 0; }

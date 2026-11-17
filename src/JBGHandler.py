@@ -3338,9 +3338,19 @@ class PredictionsHandler:
         for result_name, Y_eval, Y_pred, Y_prob_pred, correction_owner in reports:
             self._update_confusion_matrix(result_name, Y_eval, Y_pred, all_labels)
             if Y_prob_pred is not None:
+                corrs = corrs_by_model[correction_owner]
+                sources = corr_sources_by_model[correction_owner]
+                if result_name.startswith("D_cv_test"):
+                    # 299u, JBG v1.2 (settled 2026-11-16): c corrects for a model
+                    # reproducing the registered (wrong) labels of rows it was
+                    # trained on. The test part is unseen, so c is not applied.
+                    corrs = {label: 1.0 for label in corrs}
+                    sources = {label: (source if source == "not_needed_zero_fp"
+                                       else "not applied (test part)")
+                               for label, source in sources.items()}
                 self._update_dark_numbers(
                     result_name, Y_eval, Y_pred, Y_prob_pred, type,
-                    corrs_by_model[correction_owner], corr_sources_by_model[correction_owner],
+                    corrs, sources,
                     corr_models_by_model[correction_owner], targets=target_labels,
                     class_probabilities=(self.__dict__.get("dark_number_class_probabilities")
                                          or {}).get(result_name),                 # 299t

@@ -27,8 +27,10 @@ EXPECTED = {
     ("single_alpha", "a"): (0.575, 0.3066666666666666),
     ("single_alpha", "b"): (0.55, 0.309375),
     ("single_alpha", "c"): (0.5, 0.07142857142857145),
-    ("separated_alpha", "a"): ([0.55, 0.6], 0.176),
-    ("separated_alpha", "b"): ([0.6, 0.525], 0.1771875),
+    # 299u, JBG v1.2: alpha_FN weighs the misses only, 1 + alpha_FN (1 - TP_r).
+    # At 299m: a 0.176, b 0.1771875 (c unchanged: no misses' weight to move).
+    ("separated_alpha", "a"): ([0.55, 0.6], 0.26399999999999996),
+    ("separated_alpha", "b"): ([0.6, 0.525], 0.28406249999999994),
     ("separated_alpha", "c"): ([0.5, 1.0], 0.07142857142857145),
     ("non_linear", "a"): (1.0, 0.16148853579008574),
     ("non_linear", "b"): (1.0, 0.1654554995061972),

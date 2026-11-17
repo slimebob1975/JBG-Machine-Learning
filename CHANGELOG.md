@@ -1,3 +1,29 @@
+## Revision 299u - JBG v1.2: the agreed reading of the Dark Number equation (2026-11-16)
+
+- DN-01 review, F8 and the reading of the equation settled 2026-11-16.
+  Results change in normal cases, hence JBG v1.2
+  (`DarkNumberCalculator.METHOD_VERSION`).
+  - `D` estimates the hidden share (of the rows registered as another class,
+    the share that really are the target class) and is capped at 1, with a
+    flag (`capped`) and a note in the view (the estimate has broken down).
+  - Standard equation: `D = min(c · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`.
+    `α_FN` weighs the misses only (it multiplied the whole factor `2 − TP_r`).
+  - `c` corrects the in-sample estimates for memorisation and is not applied
+    to the unseen test part (source "not applied (test part)"; a test part
+    with no false positives keeps "not_needed_zero_fp").
+  - The single-alpha and non-linear forms keep their shape, with the same cap
+    and use of `c`.
+- Results → Mörkertal (asked 2026-11-16): a new section at the top with the
+  equation the run used (MathML) and each part explained; the summary notes
+  capped estimates.
+- About tab (asked 2026-11-16): the user guides get a detailed section
+  "Mörkertal i detalj (JBG 1.2)" / "Dark Numbers in detail (JBG 1.2)".
+- The DN-01 contract records the reading. Frozen tests change on purpose: the
+  299n separated-alpha pins (old values in a comment), the version, and three
+  older tests (a capped 1.5, a test part without `c`, fallback sources
+  in-sample only).
+- Tests: `tests/test_revision_299u_jbg_v12.py`.
+
 ## Revision 299t - JBG v1.1: alpha target against the rest (2026-11-16)
 
 - DN-01 review, F7 settled 2026-11-16 (reading 1): the alpha weights use the

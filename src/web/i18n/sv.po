@@ -2340,3 +2340,43 @@ msgstr "Modellen passar sina träningsrader tydligt bättre än rader den inte h
 
 msgid "Accuracy on unseen rows"
 msgstr "Träffsäkerhet på osedda rader"
+
+# 299u: JBG v1.2, the equation on the Results tab
+msgid "The equation"
+msgstr "Ekvationen"
+
+msgid "D is capped at 100 %."
+msgstr "D begränsas till högst 100 %."
+
+msgid "The About tab explains the method in more detail."
+msgstr "Fliken Om förklarar metoden mer i detalj."
+
+msgid "At least one estimate exceeded 100 % and is shown as 100 %: the estimate has broken down for this target class."
+msgstr "Minst en skattning översteg 100 % och visas som 100 %: skattningen har brutit samman för den här målklassen."
+
+msgid "The estimated share of hidden cases: of the rows registered as another class, the share that really belong to the target class. Capped at 100 %, where the estimate has broken down."
+msgstr "Den skattade andelen dolda fall: av raderna som är registrerade som en annan klass, andelen som egentligen hör till målklassen. Begränsas till 100 %, där skattningen har brutit samman."
+
+msgid "FP / (FP + TN): the share of the rows registered as another class that the model predicts as the target class. These are the candidates for hidden cases."
+msgstr "FP / (FP + TN): andelen av raderna registrerade som en annan klass som modellen förutsäger som målklassen. Det är kandidaterna till dolda fall."
+
+msgid "FN / (TP + FN): the share of the target class's own rows that the model misses. A model that misses known cases also misses hidden ones, so the share above is scaled up by 1 plus this share."
+msgstr "FN / (TP + FN): andelen av målklassens egna rader som modellen missar. En modell som missar kända fall missar också dolda, så andelen ovan skalas upp med 1 plus den här andelen."
+
+msgid "The mean probability of the target class on the false positives: a confident false positive counts almost fully, an uncertain one little."
+msgstr "Medelsannolikheten för målklassen på de falska positiva: en säker falsk positiv räknas nästan fullt, en osäker lite."
+
+msgid "The mean probability of not being the target class on the false negatives. It weighs the misses only."
+msgstr "Medelsannolikheten för att inte vara målklassen på de falska negativa. Den väger bara missarna."
+
+msgid "The mean certainty on all errors, the target class against the rest."
+msgstr "Medelsäkerheten på alla fel, målklassen mot de övriga."
+
+msgid "The root of the non-linear form."
+msgstr "Roten i den icke-linjära formen."
+
+msgid "The correction factor 1/r from the flip test, where r is the share of deliberately relabelled rows of the target class that the model still recognises. It corrects for a model that reproduces the registered labels of rows it was trained on, so it is used for the estimates on all data and not for the unseen test part. It must lie between 1 and 10, otherwise the estimate is undefined."
+msgstr "Korrektionsfaktorn 1/r från ommärkningstestet, där r är andelen avsiktligt ommärkta rader av målklassen som modellen ändå känner igen. Den korrigerar för en modell som återger de registrerade etiketterna för rader den tränats på, så den används för skattningarna på alla data och inte för den osedda testdelen. Den måste ligga mellan 1 och 10, annars är skattningen odefinierad."
+
+msgid "alpha_FP / alpha_FN: mean certainty on FP / FN (alpha_FN weighs the misses only)"
+msgstr "α_FP / α_FN: medelsäkerhet för FP / FN (α_FN väger bara missarna)"

@@ -270,6 +270,69 @@ percentage points above its accuracy on unseen rows). Such a model tends to
 learn the deliberately wrong labels in the test behind c, so c and the Dark
 Number may then be too high.
 
+### Dark Numbers in detail (JBG 1.2)
+
+**What is estimated.** For a target class T, the Dark Number D estimates the
+hidden share: of the rows registered as another class, the share that really
+belong to T. Multiplied by the number of rows registered as another class, it
+gives the estimated number of hidden cases. It is computed separately for
+each target class, the target class against all the others.
+
+**The equation** (linear method, separated alpha, the default):
+`D = min(c · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`
+
+- `1 − TN_r = FP / (FP + TN)`: the share of the rows registered as another
+  class that the model predicts as T. These are the candidates for hidden
+  cases. Without the other factors, `min((1 − TN_r) · (2 − TP_r), 1)` is the
+  basic estimate of the hidden share.
+- `1 − TP_r = FN / (TP + FN)`: the share of T's own rows that the model
+  misses. A model that misses known cases also misses hidden ones, so the
+  candidates are scaled up by 1 plus this share. It is a cautious version of
+  dividing by TP_r: equal for good models, more restrained for weak ones.
+- `α_FP`: the mean probability of T on the false positives. Not every false
+  positive is a hidden case, some are plain model errors. A confident false
+  positive counts almost fully, an uncertain one little (soft counting).
+- `α_FN`: the mean probability of not being T on the false negatives. It
+  weighs the misses only, so with no misses the scaling factor is 1.
+- `c = 1/r`: the correction factor from the flip test. A share of T's rows is
+  deliberately given another class (20 % by default, spread over the other
+  classes by their size), a copy of the model is trained, and r is the share
+  of those rows the model still recognises as T. A model that learns its
+  training data by heart reproduces the registered, wrong labels and finds
+  few hidden cases among the rows it was trained on. `c` corrects for that.
+  In practice it is large for models prone to overtraining and close to 1 for
+  the others. The test uses 4 folds and 2 repeats on every computer.
+- The result is capped at 100 %. A value above it means that the estimate
+  has broken down for that target class, and the view says so.
+
+**The four estimates** are made with the cross-trained model on the test
+part, with the cross-trained model on all data, with the final model on all
+data, and combined. The test part is new to the model, so `c` is not used
+there. The other three include rows the model was trained on and are
+corrected with `c`. The estimates are expected to grow in that order and
+together form a heuristic range.
+
+**Undefined estimates.** An estimate is undefined when the part of the data
+it is made on lacks rows of T or of the other classes, or when `c` could not
+be estimated or lies outside 1–10 (the model must recognise at least 10 % of
+the relabelled rows). That means the pipeline or the dataset is ill-suited to
+the problem for that target class. With no false positives the Dark Number
+is 0 whatever `c` is.
+
+**Warnings.** When the model behind `c` fits its own training rows at least
+95 % and at least 5 percentage points better than rows it has not seen, it
+probably memorises them, and `c` and the Dark Number may be too high. The
+calculation table shows both values.
+
+**Other forms.** Without alpha, D uses `(2 − TP_r)` without weights. The
+single-alpha and non-linear forms are kept as they were, with the same cap and
+the same use of `c`.
+
+**What comes next.** Version 2 measures the flip test's recovery on rows the
+model has not been trained on, gives `c` an uncertainty, and adds methods that
+estimate the hidden share directly with intervals. The plan is in
+`docs/dark_numbers/` in the repository.
+
 In **Mispredictions** of an SQL run you can correct classes that are wrong
 in the source data. Choose the **Right class** for the rows, then **Review
 the corrections**. A page shows the changes, and only when you choose

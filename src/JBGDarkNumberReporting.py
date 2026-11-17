@@ -45,6 +45,7 @@ def build_dark_number_intervals(matrix):
                 point["source"] = source
                 # 299q, JBG v1.1 (DN-01 F4): whether the correction model memorises.
                 # 299q2: the fit compared with the accuracy on unseen rows.
+                point["capped"] = str(row.get("capped", "")).strip().lower() in ("true", "1")
                 point["memorises"] = DarkNumberCalculator.memorises(
                     row.get("corr_train_fit"), row.get("corr_unseen_accuracy"))
                 try:

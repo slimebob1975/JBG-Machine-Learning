@@ -107,7 +107,7 @@ Numbered for review. Each is frozen as current behaviour by the tests and is
 - **F7. Alpha is the certainty of the predicted label** *(settled in v1.1, section 9)*, not the probability
   of `T`: for an FP row the probability of `T`, for an FN row the probability
   of the (wrongly) predicted other class.
-- **F8. `D` is not a proportion.** Its range is `[0, 2c]` (`base`) and larger
+- **F8. `D` is not a proportion.** *(Settled in v1.2, section 9.)* Its range is `[0, 2c]` (`base`) and larger
   with F1. The plan therefore reports `D_JBG` separately from `H`/`U` until a
   translation is validated.
 - **F9. Two of four estimates are in-sample** (`D_cv_full` partly,
@@ -233,3 +233,40 @@ two the same way. The combined estimate takes each row's probabilities from
 the model it takes the row from. Two-class results are unchanged. The
 probabilities are model scores, not calibrated probabilities; calibration
 belongs to v2 (DN-05).
+
+### JBG v1.2 (299u, settled 2026-11-16): F8 and the reading of the equation
+
+Agreed in discussion (results change in normal cases, hence a new version,
+`METHOD_VERSION = "1.2"`):
+
+- **What `D` estimates.** The hidden share `H = P(Y=T | S≠T)`: of the rows
+  registered as another class, the share that really are `T`. Without
+  weights and correction, `D₀ = min((1 − TN_r)(2 − TP_r), 1)`.
+- **The first factor** `1 − TN_r = FP/(FP+TN)`: the candidates for hidden
+  cases among the rows registered as not `T`.
+- **The second factor** `2 − TP_r = 1 + FN/(TP+FN)`: a model that misses known
+  `T` cases also misses hidden ones, so the candidates are scaled up. It is
+  the linear approximation of `1/TP_r` near `TP_r = 1`, more restrained for
+  weak models. Not divided by two: with perfect detection `D₀ = FPR`.
+- **Capped at 1** with a flag (`capped`): above 1 the estimate has broken
+  down for that target.
+- **The alphas are soft counting.** `α_FP · FP` is the expected number of
+  real `T` cases among the false positives. `α_FN` weighs the misses only:
+  `1 + α_FN (1 − TP_r)`; it multiplied the whole factor, so with no misses a
+  low `α_FN` still pulled `D` down.
+- **`c` corrects in-sample estimates for memorisation.** A model trained on
+  rows reproduces their registered (wrong) labels, which suppresses exactly
+  the false positives `D` counts; `c = 1/r` from the flip test measures that
+  suppression. It is used for the estimates on all data and not for the
+  unseen test part (source "not applied (test part)"). This matches the
+  practical experience that `c` is large for models prone to overtraining.
+
+The standard equation (linear, separated alpha):
+
+`D = min(c_scope · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`, with
+`c_scope = c` in-sample and `1` on the test part.
+
+The single-alpha and non-linear forms keep their shape (not reviewed), with
+the same cap and the same use of `c`. The Results tab shows the equation the
+run used with each part explained, and the user guide (About tab) explains
+the method in detail.

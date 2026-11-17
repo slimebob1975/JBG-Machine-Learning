@@ -14,7 +14,11 @@ class DarkNumberCalculator:
     #   - c could not be estimated, or lies outside [CORRECTION_MIN,
     #     CORRECTION_MAX]: the pipeline is ill-suited to the problem.
     # With no false positives and rows outside the target, D = 0 whatever c is.
-    METHOD_VERSION = "1.1"
+    METHOD_VERSION = "1.2"               # 299u: the agreed reading (see below)
+    # 299u, JBG v1.2 (settled 2026-11-16): D estimates the hidden share H, the
+    # share of the rows registered as not T that really are T, so it is capped
+    # at 1 (with a flag: the estimate has broken down there).
+    CAP = 1.0
     UNDEFINED = -1.0
     CORRECTION_MIN = 1.0
     CORRECTION_MAX = 10.0
@@ -97,7 +101,7 @@ class DarkNumberCalculator:
     FORMULA_LATEX = {
         "base": r"D = c\,(1 - TN_r)\,(2 - TP_r)",
         "single_alpha": r"D = c\,\alpha\,(1 - TN_r)\,(2 - TP_r)",
-        "separated_alpha": r"D = c\,\alpha_{FP}\,(1 - TN_r)\,\alpha_{FN}\,(2 - TP_r)",
+        "separated_alpha": r"D = c\,\alpha_{FP}\,(1 - TN_r)\,(1 + \alpha_{FN}\,(1 - TP_r))",
         "non_linear": r"D = c\,(1 - TN_r^{1/k})\,(2 - TP_r^{1/k})",
         "non_linear_alpha": r"D = c\,\alpha\,(1 - TN_r^{1/k})\,(2 - TP_r^{1/k})",
     }
@@ -105,7 +109,7 @@ class DarkNumberCalculator:
     FORMULA_ALPHA_NOTES = {
         "base": "No alpha",
         "single_alpha": "alpha: mean certainty on errors",
-        "separated_alpha": "alpha_FP / alpha_FN: mean certainty on FP / FN",
+        "separated_alpha": "alpha_FP / alpha_FN: mean certainty on FP / FN (alpha_FN weighs the misses only)",
         "non_linear": "No alpha",
         "non_linear_alpha": "alpha: mean certainty on errors",
     }
@@ -237,7 +241,10 @@ class DarkNumberCalculator:
         alpha_FN = pred_prob[(real == 1) & (predicted == 0)].mean() if FN > 0 else 1
 
         # Calculate dark number using separated alpha correction
-        dark_number = corr * alpha_FP * (1 - TNr) * alpha_FN * (2 - TPr)
+        # 299u, JBG v1.2 (settled 2026-11-16): soft counting. alpha_FN weighs the
+        # misses only, 1 + alpha_FN * (1 - TP_r); it multiplied the whole factor
+        # (2 - TP_r), so with no misses a low alpha_FN still pulled D down.
+        dark_number = corr * alpha_FP * (1 - TNr) * (1 + alpha_FN * (1 - TPr))
         
         return [alpha_FP, alpha_FN], dark_number
 
@@ -275,7 +282,8 @@ class DarkNumberCalculator:
         """
 
         # This DataFrame will hold the results
-        dark_numbers = pd.DataFrame(columns=["type", "target", "alphas", "corr", "dark_number"])
+        dark_numbers = pd.DataFrame(columns=["type", "target", "alphas", "corr", "dark_number",
+                                             "capped"])
 
         # What types of dark numbers to consider?
         if type == "all":
@@ -323,7 +331,12 @@ class DarkNumberCalculator:
                 else:
                     raise ValueError(f"The type of dark number is not supported: {type}")
                 
-                row = {"type": type, "target": target, "alphas": alpha, "corr": corr, "dark_number": dark_number}
+                # 299u, JBG v1.2: capped at 1, with a flag.
+                capped = dark_number != self.UNDEFINED and dark_number > self.CAP
+                if capped:
+                    dark_number = self.CAP
+                row = {"type": type, "target": target, "alphas": alpha, "corr": corr,
+                       "dark_number": dark_number, "capped": bool(capped)}
                 dark_numbers.loc[len(dark_numbers)] = row
             
         return dark_numbers

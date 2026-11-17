@@ -480,7 +480,11 @@ full SQL regression acceptance remain separately unverified.
       - [x] 299s: F6 settled (4 folds x 2 repeats on every computer).
       - [x] 299t: F7 settled (alpha target against the rest: `1 − P(T)` on
         false negatives).
-      - [ ] F8, F9 and the rest of section 8, one at a time.
+      - [x] 299u: F8 and the reading of the equation settled as JBG v1.2
+        (`D` estimates the hidden share, capped at 1; `α_FN` on the misses
+        only; `c` in-sample only); the equation shown on Results, the method
+        explained under About.
+      - [ ] F9 and the rest of section 8, one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,

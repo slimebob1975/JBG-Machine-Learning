@@ -129,6 +129,46 @@ def alpha_text(value, language: str = "sv"):
         _number_text(number, language) for number in numbers)
 
 
+# 299u (asked 2026-11-16): the equation behind the run's Dark Numbers, each
+# part explained (JBG v1.2). (symbol as HTML, text, calculation types it is
+# shown for; None: every type.)
+EQUATION_PARTS = (
+    ("D", "The estimated share of hidden cases: of the rows registered as another class, "
+          "the share that really belong to the target class. Capped at 100 %, where the "
+          "estimate has broken down.", None),
+    ("1 − TN<sub>r</sub>", "FP / (FP + TN): the share of the rows registered as another class "
+                          "that the model predicts as the target class. These are the "
+                          "candidates for hidden cases.", None),
+    ("1 − TP<sub>r</sub>", "FN / (TP + FN): the share of the target class's own rows that the "
+                          "model misses. A model that misses known cases also misses hidden "
+                          "ones, so the share above is scaled up by 1 plus this share.", None),
+    ("α<sub>FP</sub>", "The mean probability of the target class on the false positives: a "
+                       "confident false positive counts almost fully, an uncertain one little.",
+     {"separated_alpha"}),
+    ("α<sub>FN</sub>", "The mean probability of not being the target class on the false "
+                       "negatives. It weighs the misses only.", {"separated_alpha"}),
+    ("α", "The mean certainty on all errors, the target class against the rest.",
+     {"single_alpha", "non_linear_alpha"}),
+    ("k", "The root of the non-linear form.", {"non_linear", "non_linear_alpha"}),
+    ("c", "The correction factor 1/r from the flip test, where r is the share of "
+          "deliberately relabelled rows of the target class that the model still recognises. "
+          "It corrects for a model that reproduces the registered labels of rows it was "
+          "trained on, so it is used for the estimates on all data and not for the unseen "
+          "test part. It must lie between 1 and 10, otherwise the estimate is undefined.", None),
+)
+
+
+def dark_equation(calculation_type: str, translate):
+    """299u: the formula card and its explained parts for one calculation type."""
+    from JBGWebUIDarkNumbers import formula_cards
+    card = formula_cards(translate)["formulas"].get(calculation_type)
+    if card is None:
+        return None
+    parts = [{"symbol": symbol, "text": translate(text)} for symbol, text, types in EQUATION_PARTS
+             if types is None or calculation_type in types]
+    return {"type": calculation_type, "card": card, "parts": parts}
+
+
 def _share_text(value, language: str) -> str:
     """299q: a share 0..1 as a percentage with one decimal, or "–"."""
     try:
@@ -233,6 +273,7 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                    "correctable": False, "corrected": {}, "correction_log": [], "review": None,
                    "correction_source": "",
                    "dark_estimates": DARK_ESTIMATES, "dark_reasons": DARK_REASONS,
+                   "dark_equation": None,
                    "dark_columns": DARK_COLUMNS, "investigation": None, "apply": None}
         if project is not None:
             # 296a: results belong to training runs; prediction runs are on the
@@ -292,6 +333,9 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                                             request_language(request))
                         context["dark_summary"] = with_percentages(
                             results.dark_number_summary(owner, chosen), request_language(request))
+                        types = [i.get("formula") for i in context["dark_summary"] if i.get("formula")]
+                        if types:
+                            context["dark_equation"] = dark_equation(types[0], translate)  # 299u
                         try:
                             context["dark_matrix"] = estimate_first(readable_dark_table(
                                 results.detail(owner, chosen, "dark_numbers_matrix",

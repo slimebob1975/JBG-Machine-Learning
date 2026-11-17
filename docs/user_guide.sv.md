@@ -270,6 +270,70 @@ procentenheter över träffsäkerheten på osedda rader). En sådan modell
 tenderar att lära sig de avsiktligt fel märkta raderna i testet bakom c, så c
 och mörkertalet kan då vara för höga.
 
+### Mörkertal i detalj (JBG 1.2)
+
+**Vad som skattas.** För en målklass T skattar mörkertalet D den dolda
+andelen: av raderna som är registrerade som en annan klass, andelen som
+egentligen hör till T. Multiplicerat med antalet rader registrerade som en
+annan klass ger det det skattade antalet dolda fall. Det beräknas för varje
+målklass för sig, målklassen mot alla de övriga.
+
+**Ekvationen** (linjär metod, separerad alfa, standardvalet):
+`D = min(c · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`
+
+- `1 − TN_r = FP / (FP + TN)`: andelen av raderna registrerade som en annan
+  klass som modellen förutsäger som T. Det är kandidaterna till dolda fall.
+  Utan de andra faktorerna är `min((1 − TN_r) · (2 − TP_r), 1)` den
+  grundläggande skattningen av den dolda andelen.
+- `1 − TP_r = FN / (TP + FN)`: andelen av T:s egna rader som modellen missar.
+  En modell som missar kända fall missar också dolda, så kandidaterna skalas
+  upp med 1 plus den andelen. Det är en försiktig variant av att dela med
+  TP_r: lika för bra modeller, mer återhållsam för svaga.
+- `α_FP`: medelsannolikheten för T på de falska positiva. Alla falska
+  positiva är inte dolda fall, en del är vanliga modellfel. En säker falsk
+  positiv räknas nästan fullt, en osäker lite (mjuk räkning).
+- `α_FN`: medelsannolikheten för att inte vara T på de falska negativa. Den
+  väger bara missarna, så utan missar är skalfaktorn 1.
+- `c = 1/r`: korrektionsfaktorn från ommärkningstestet. En andel av T:s rader
+  får avsiktligt en annan klass (20 % som standard, fördelat på de övriga
+  klasserna efter deras storlek), en kopia av modellen tränas, och r är
+  andelen av de raderna som modellen ändå känner igen som T. En modell som
+  lär sig träningsdata utantill återger de registrerade, felaktiga
+  etiketterna och hittar få dolda fall bland raderna den tränats på. `c`
+  korrigerar för det. I praktiken är den stor för modeller som lätt
+  övertränas och nära 1 för de andra. Testet använder 4 veck och 2
+  upprepningar på alla datorer.
+- Resultatet begränsas till 100 %. Ett värde över det betyder att
+  skattningen har brutit samman för den målklassen, och vyn säger det.
+
+**De fyra skattningarna** görs med den korstränade modellen på testdelen,
+med den korstränade modellen på alla data, med den slutliga modellen på alla
+data och kombinerat. Testdelen är ny för modellen, så `c` används inte där.
+De tre andra innehåller rader som modellen tränats på och korrigeras med `c`.
+Skattningarna väntas växa i den ordningen och bildar tillsammans ett
+heuristiskt intervall.
+
+**Odefinierade skattningar.** En skattning är odefinierad när den del av
+data som den görs på saknar rader av T eller av de övriga klasserna, eller
+när `c` inte kunde skattas eller ligger utanför 1–10 (modellen måste känna
+igen minst 10 % av de ommärkta raderna). Det betyder att pipelinen eller
+datasetet inte passar problemet för den målklassen. Utan falska positiva är
+mörkertalet 0 oavsett `c`.
+
+**Varningar.** När modellen bakom `c` passar sina egna träningsrader minst
+95 % och minst 5 procentenheter bättre än rader den inte har sett, memorerar
+den troligen dem, och `c` och mörkertalet kan då vara för höga.
+Beräkningstabellen visar båda värdena.
+
+**Andra former.** Utan alfa använder D `(2 − TP_r)` utan vikter. Formerna med
+en alfa och de icke-linjära formerna är oförändrade, med samma begränsning
+och samma användning av `c`.
+
+**Vad som kommer.** Version 2 mäter ommärkningstestets återfinnande på rader
+som modellen inte tränats på, ger `c` en osäkerhet och lägger till metoder
+som skattar den dolda andelen direkt med intervall. Planen finns i
+`docs/dark_numbers/` i repositoriet.
+
 I **Felklassificeringar** för en SQL-körning kan du rätta klasser som är
 fel i källdata. Välj **Rätt klass** för raderna och sedan **Granska
 korrigeringarna**. En sida visar ändringarna, och först när du väljer **Skriv
