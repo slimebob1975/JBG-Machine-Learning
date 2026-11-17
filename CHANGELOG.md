@@ -1,3 +1,27 @@
+## Revision 299q - JBG v1.1: a warning when the correction model memorises (2026-11-16)
+
+- DN-01 review, F4 settled 2026-11-16 (option C): recovery in the flip test is
+  measured on the rows the correction model was fitted on, so a model that
+  memorises its training rows reproduces the flipped labels, understating
+  recovery and overstating `c`. v1.1 keeps this (no number changes) and warns:
+  - The flip test also measures the fitted copy's fit to its unflipped
+    training rows (one extra prediction per fold, no extra fitting),
+    `train_fit_` on the estimator.
+  - The Dark Number results get a column `corr_train_fit` beside
+    `corr_source` ("Anpassning till träningsdata (korrektionsmodell)").
+  - At 0.99 or more the log warns, and Results → Mörkertal notes that `c`
+    and the Dark Number may be too high.
+- The DN-01 contract records the v2 definition: recovery measured
+  out-of-fold (the label frequency of positive-unlabelled learning), for
+  DN-03.
+- BACKLOG (asked 2026-11-16): the Training tab's "Starta träning" and
+  "Undersök variabler" are unavailable while a run of the project is queued
+  or running (probably "Starta prediktion" too).
+- User guides: the warning.
+- Tests: `tests/test_revision_299q_memorisation_warning.py` (a decision tree
+  fits 100 % and recovers 0 %; logistic regression stays below the
+  threshold).
+
 ## Revision 299p - JBG v1.1: folds without flipped rows (2026-11-16)
 
 - DN-01 review, F3 settled 2026-11-16 (option B): a fold of the flip test with

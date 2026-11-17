@@ -18,6 +18,10 @@ class DarkNumberCalculator:
     UNDEFINED = -1.0
     CORRECTION_MIN = 1.0
     CORRECTION_MAX = 10.0
+    # 299q, JBG v1.1 (DN-01 F4, settled 2026-11-16): a correction model that fits
+    # at least this share of its own training rows in the flip test is taken to
+    # memorise them; c may then be overestimated (a warning, D is unchanged).
+    MEMORISATION_THRESHOLD = 0.99
 
     @classmethod
     def bounded_correction(cls, corr, source: str):

@@ -28,7 +28,7 @@ class NaNValueError(Exception):
     pass
 
 def evaluate_split(estimator, X, y, train_idx, repeat_idx,
-                   flip_fraction, positive_class, predict_mode, random_state):
+                   flip_fraction, positive_class, predict_mode, random_state, return_fit=False):
     """
     Top-level evaluation function for Parallel.
     """
@@ -42,7 +42,7 @@ def evaluate_split(estimator, X, y, train_idx, repeat_idx,
         # 299p, JBG v1.1 (DN-01 F3, settled 2026-11-16): nothing was flipped, so
         # nothing was measured. It counted as recovery 0, which pulled the mean
         # down and pushed c up; such a fold is now left out.
-        return None
+        return (None, None) if return_fit else None
 
     flip_indices = rng.choice(pos_indices, size=n_flip, replace=False)
 
@@ -65,7 +65,17 @@ def evaluate_split(estimator, X, y, train_idx, repeat_idx,
     else:
         raise ValueError("predict_mode must be 'predict' or 'predict_proba'")
 
-    return reidentified / n_flip
+    if not return_fit:
+        return reidentified / n_flip
+    # 299q, JBG v1.1 (DN-01 F4, settled 2026-11-16): how closely the fitted copy
+    # reproduces its own unflipped training labels. A value near 1 means the
+    # model memorises its training data, so it also tends to reproduce the
+    # flipped (wrong) labels and the in-sample recovery understates, c overstates.
+    kept = np.ones(len(y_train_flipped), dtype=bool)
+    kept[flip_indices] = False
+    train_fit = float(np.mean(model.predict(X_train[kept]) == y_train_flipped[kept])) \
+        if kept.any() else None
+    return reidentified / n_flip, train_fit
 
 
 class DarkNumberCorrectionFactorEstimator(BaseEstimator):
@@ -96,6 +106,7 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
         self.correction_status_ = None
         self.is_valid_for_regression_ = False
         self.recovery_results_ = None
+        self.train_fit_ = None                   # 299q
         self.mean_recovery_ = None
         self.parallel_backend = parallel_backend
         self.logger = logger
@@ -172,7 +183,7 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
             delayed(evaluate_split)(
                 self.estimator, X_sub, y_sub, train_idx, repeat_idx,
                 self.flip_fraction, self.positive_class,
-                self.predict_mode, self.random_state
+                self.predict_mode, self.random_state, True               # 299q: training fit
             )
             for repeat_idx in range(self.n_repeats)
             for train_idx, _ in skf.split(X_sub, y_sub)
@@ -180,6 +191,11 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
 
         # Try running tasks with retry logic
         results = self._run_parallel(tasks)
+        # 299q: each fold returns (recovery, training fit); plain recoveries too.
+        pairs = [value if isinstance(value, tuple) else (value, None) for value in results]
+        results = [recovery for recovery, _ in pairs]
+        fits = [fit for recovery, fit in pairs if recovery is not None and fit is not None]
+        self.train_fit_ = float(np.mean(fits)) if fits else None
         # 299p, JBG v1.1 (DN-01 F3): only folds with flipped rows are measured,
         # and at least half of all folds must be, or c cannot be estimated.
         measured = [float(value) for value in results if value is not None]

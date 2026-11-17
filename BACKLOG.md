@@ -379,6 +379,10 @@ full SQL regression acceptance remain separately unverified.
     algorithms (for example Linear, Non-linear, Tree, Neural networks,
     Ensemble, Special), sorted alphabetically within each group. Propose the
     group of each algorithm and confirm it before coding.
+  - [ ] Asked 2026-11-16: while a run of the project is queued or running,
+    "Starta träning" and "Undersök variabler" on the Training tab are
+    unavailable (red, with the reason), and probably "Starta prediktion" on
+    the Prediction tab.
   - [x] 299m: Asked 2026-11-13: Swedish instructions to the user (sv.po, the
     Swedish user guide) use an ordinary comma or a dash instead of a
     semicolon. The one exception (agreed 2026-11-13): the list of alphas in
@@ -457,7 +461,10 @@ full SQL regression acceptance remain separately unverified.
         the GUI, when the pipeline's own `c` is unusable. When opted in, it is
         used for the whole Dark Numbers computation (TP_r and TN_r as well as
         `c`), since all of them depend on the chosen pipeline.
-      - [ ] F4-F9 and the rest of section 8, one at a time.
+      - [x] 299q: F4 settled (v1.1 warns when the correction model fits at
+        least 99 % of its training rows; out-of-fold recovery is the v2
+        definition for DN-03).
+      - [ ] F5-F9 and the rest of section 8, one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,

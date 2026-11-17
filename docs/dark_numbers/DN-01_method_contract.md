@@ -93,7 +93,7 @@ Numbered for review. Each is frozen as current behaviour by the tests and is
   0.0 when `n_flip = 0` instead of leaving the fold out. With few target rows
   this pulls `mean(r)` down and `c` up, a candidate cause of extreme factors
   such as the `c ≈ 8237` in the plan's background case.
-- **F4. Recovery is in-sample.** The flipped rows are part of the training
+- **F4. Recovery is in-sample.** *(Settled in v1.1 as a warning, section 9.)* The flipped rows are part of the training
   data the clone is fitted on, so `r` measures how strongly the model resists
   memorising wrong labels, not how well it finds hidden cases in new data.
   The estimand of `c` follows from this (plan step 5).
@@ -179,3 +179,21 @@ not explain extreme factors such as `c ≈ 8237`; the likelier cause is F4: a
 flexible model fitted on the flipped rows reproduces their wrong labels on
 those same rows, so recovery is near zero and `c = 1/r` explodes. The fix
 stays as a guard for direct use of the flip test.
+
+### F4 (299q, settled 2026-11-16, option C): in-sample recovery
+
+v1.1 keeps in-sample recovery (the v1 reference is unchanged), and warns when
+it is likely misleading. The flip test also measures the fitted copy's fit to
+its own unflipped training rows (one extra prediction, no extra fitting). At
+0.99 or more (`MEMORISATION_THRESHOLD`) the model is taken to memorise its
+training rows; the log and the Mörkertal view then say that `c` and `D` may
+be too high. The fit is reported beside `c` (`corr_train_fit`). No number
+changes. For example, a decision tree fits 100 % of its training rows and
+recovers 0 % of the flipped rows (`c` infinite, undefined by v1.1).
+
+**The v2 definition (for DN-03).** Recovery is measured out-of-fold: a
+fraction of the target rows is relabelled once over the whole dataset; each
+relabelled row is predicted by a model trained on the other folds; `r` is the
+share of relabelled rows predicted as the target, and `c = 1/r̄` within
+v1.1's bounds. This is the label frequency of positive-unlabelled learning
+(Elkan and Noto, 2008), which DN-05 also builds on.

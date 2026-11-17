@@ -2266,6 +2266,8 @@ class PredictionsHandler:
     dark_numbers: pd.DataFrame = field(init=False)
     dark_numb_conf_matrix: pd.DataFrame = field(init=False)
     dark_number_fallback_events: pd.DataFrame = field(init=False)
+    # 299q: (correction model, target) -> fit to its own training rows (flip test)
+    dark_number_train_fits: dict = field(init=False, default_factory=dict)
     model: str = field(init=False)
     class_report: dict = field(init=False)
 
@@ -3102,6 +3104,16 @@ class PredictionsHandler:
                     f"-{DarkNumberCalculator.CORRECTION_MAX:g}); the Dark Number is undefined (-1). "
                     "The pipeline is ill-suited to this problem.")
             corr, corr_source = bounded, bounded_source
+            # 299q, JBG v1.1 (DN-01 F4): the correction model's fit to its own
+            # training rows in the flip test, kept beside c for the results.
+            fit = getattr(locals().get("corr_estimator"), "train_fit_", None)
+            self.__dict__.setdefault("dark_number_train_fits", {})[(corr_model, label)] = fit
+            if fit is not None and fit >= DarkNumberCalculator.MEMORISATION_THRESHOLD \
+                    and corr != DarkNumberCalculator.UNDEFINED:
+                self.handler.logger.print_warning(
+                    f"Dark Number correction for {model_name}, target {label}: the model fits "
+                    f"{fit:.1%} of its training rows, so it may memorise them; the in-sample "
+                    "recovery behind c may then be too low and c and the Dark Number too high.")
             corrs[label] = corr
             corr_sources[label] = corr_source
             corr_models[label] = corr_model
@@ -3365,6 +3377,15 @@ class PredictionsHandler:
                 corr_source_position,
                 "corr_source",
                 model_dark_numbers["target"].map(corr_sources).fillna("unknown"),
+            )
+        if corr_models is not None and getattr(self, "dark_number_train_fits", None):
+            # 299q, JBG v1.1 (DN-01 F4): the correction model's training fit.
+            fits = self.dark_number_train_fits
+            model_dark_numbers.insert(
+                model_dark_numbers.columns.get_loc("corr_source") + 1
+                if "corr_source" in model_dark_numbers else len(model_dark_numbers.columns),
+                "corr_train_fit",
+                [fits.get((corr_models.get(target), target)) for target in model_dark_numbers["target"]],
             )
         
         # Put together the results for the dark numbers

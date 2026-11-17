@@ -31,7 +31,8 @@ DARK_REASONS = {"unestimable": "cannot be estimated", "missing": "missing",
                                         "pipeline is ill-suited to this problem"}
 DARK_COLUMNS = {"Model type": "Estimate", "type": "Calculation", "target": "Target class",
                 "alphas": "Alpha", "corr": "Correction (c)", "corr_model": "Correction from",
-                "corr_source": "Basis of the correction", "dark_number": "Dark Number"}
+                "corr_source": "Basis of the correction", "dark_number": "Dark Number",
+                "corr_train_fit": "Training fit (correction model)"}           # 299q
 
 
 # 299a2 (asked 2026-11-12): the engine's English column names in the result
@@ -127,6 +128,18 @@ def alpha_text(value, language: str = "sv"):
         _number_text(number, language) for number in numbers)
 
 
+def _share_text(value, language: str) -> str:
+    """299q: a share 0..1 as a percentage with one decimal, or "–"."""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return "–"
+    if number != number:
+        return "–"
+    text = f"{100 * number:.1f} %"
+    return text.replace(".", ",") if language == "sv" else text
+
+
 def _is_undefined(value) -> bool:
     """299o, JBG v1.1: -1 marks an undefined Dark Number or correction factor."""
     try:
@@ -152,6 +165,8 @@ def readable_dark_table(detail: dict, translate, language: str = "sv") -> dict:
                 row[index] = value.replace("_", " ")
             elif column in ("corr", "dark_number") and _is_undefined(value):
                 row[index] = translate("Undefined")                         # 299o
+            elif column == "corr_train_fit":
+                row[index] = _share_text(value, language)                   # 299q
             elif column == "alphas":
                 row[index] = alpha_text(value, language)
     return detail
