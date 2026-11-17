@@ -2879,6 +2879,14 @@ class PredictionsHandler:
             [self.dark_number_fallback_events, pd.DataFrame([event])], ignore_index=True
         )
 
+    def _dark_number_unseen_accuracy(self, model_name):
+        """299q2: the model's accuracy on unseen rows (its own test part, or else
+        the cross-trained model's, as the final model has none of its own)."""
+        known = self.__dict__.get("dark_number_unseen_accuracy") or {}
+        if model_name in known:
+            return known[model_name]
+        return next(iter(known.values()), None)
+
     def _calculate_dark_number_corrections(self, model, X, Y, labels, flip_fraction, random_state, model_name):
         """Estimate one correction factor per one-vs-rest target for a specific model/data pairing."""
         corrs = {}
@@ -3108,12 +3116,15 @@ class PredictionsHandler:
             # training rows in the flip test, kept beside c for the results.
             fit = getattr(locals().get("corr_estimator"), "train_fit_", None)
             self.__dict__.setdefault("dark_number_train_fits", {})[(corr_model, label)] = fit
-            if fit is not None and fit >= DarkNumberCalculator.MEMORISATION_THRESHOLD \
+            unseen = self._dark_number_unseen_accuracy(corr_model)
+            if DarkNumberCalculator.memorises(fit, unseen) \
                     and corr != DarkNumberCalculator.UNDEFINED:
+                compared = "" if unseen is None else f" against {unseen:.1%} on unseen rows"
                 self.handler.logger.print_warning(
                     f"Dark Number correction for {model_name}, target {label}: the model fits "
-                    f"{fit:.1%} of its training rows, so it may memorise them; the in-sample "
-                    "recovery behind c may then be too low and c and the Dark Number too high.")
+                    f"{fit:.1%} of its training rows{compared}, so it may memorise them; the "
+                    "in-sample recovery behind c may then be too low and c and the Dark Number "
+                    "too high.")
             corrs[label] = corr
             corr_sources[label] = corr_source
             corr_models[label] = corr_model
@@ -3207,6 +3218,11 @@ class PredictionsHandler:
                     context=f"{context} predict", estimator=model,
                 )
                 Y_pred = pd.Series(predicted, index=Y_eval.index)
+                if estimate_name == "D_cv_test":
+                    # 299q2: accuracy on rows the model has not seen, compared
+                    # with the correction model's training fit (memorisation).
+                    self.__dict__.setdefault("dark_number_unseen_accuracy", {})[model_name] = \
+                        float((Y_pred == Y_eval).mean())
                 Y_prob_pred = None
                 if can_predict_proba:
                     probabilities, estimator_X = call_with_resolved_input(
@@ -3381,11 +3397,17 @@ class PredictionsHandler:
         if corr_models is not None and getattr(self, "dark_number_train_fits", None):
             # 299q, JBG v1.1 (DN-01 F4): the correction model's training fit.
             fits = self.dark_number_train_fits
+            position = model_dark_numbers.columns.get_loc("corr_source") + 1 \
+                if "corr_source" in model_dark_numbers else len(model_dark_numbers.columns)
             model_dark_numbers.insert(
-                model_dark_numbers.columns.get_loc("corr_source") + 1
-                if "corr_source" in model_dark_numbers else len(model_dark_numbers.columns),
-                "corr_train_fit",
+                position, "corr_train_fit",
                 [fits.get((corr_models.get(target), target)) for target in model_dark_numbers["target"]],
+            )
+            # 299q2: the accuracy on unseen rows the fit is compared with.
+            model_dark_numbers.insert(
+                position + 1, "corr_unseen_accuracy",
+                [self._dark_number_unseen_accuracy(corr_models.get(target))
+                 for target in model_dark_numbers["target"]],
             )
         
         # Put together the results for the dark numbers

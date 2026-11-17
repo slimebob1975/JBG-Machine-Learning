@@ -18,10 +18,34 @@ class DarkNumberCalculator:
     UNDEFINED = -1.0
     CORRECTION_MIN = 1.0
     CORRECTION_MAX = 10.0
-    # 299q, JBG v1.1 (DN-01 F4, settled 2026-11-16): a correction model that fits
-    # at least this share of its own training rows in the flip test is taken to
-    # memorise them; c may then be overestimated (a warning, D is unchanged).
+    # 299q/299q2, JBG v1.1 (DN-01 F4, settled 2026-11-16): a correction model is
+    # taken to memorise its training rows (c may then be overestimated; a
+    # warning, D is unchanged) when its fit to them in the flip test is at least
+    # MEMORISATION_FIT and exceeds its accuracy on unseen rows (the cross-trained
+    # model's test part) by at least MEMORISATION_GAP. An easy problem gives
+    # high values for both and is not flagged. Without an unseen accuracy, only
+    # the fit can be judged: MEMORISATION_THRESHOLD (299q's rule).
+    MEMORISATION_FIT = 0.95
+    MEMORISATION_GAP = 0.05
     MEMORISATION_THRESHOLD = 0.99
+
+    @classmethod
+    def memorises(cls, fit, unseen=None) -> bool:
+        """299q2: whether a correction model with this training fit (and accuracy
+        on unseen rows, if known) is taken to memorise its training rows."""
+        try:
+            fit = float(fit)
+        except (TypeError, ValueError):
+            return False
+        if fit != fit:
+            return False
+        try:
+            unseen = float(unseen)
+        except (TypeError, ValueError):
+            unseen = None
+        if unseen is None or unseen != unseen:
+            return fit >= cls.MEMORISATION_THRESHOLD
+        return fit >= cls.MEMORISATION_FIT and fit - unseen >= cls.MEMORISATION_GAP
 
     @classmethod
     def bounded_correction(cls, corr, source: str):

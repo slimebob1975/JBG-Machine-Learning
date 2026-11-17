@@ -464,6 +464,14 @@ full SQL regression acceptance remain separately unverified.
       - [x] 299q: F4 settled (v1.1 warns when the correction model fits at
         least 99 % of its training rows; out-of-fold recovery is the v2
         definition for DN-03).
+      - [x] 299q2: the warning compares the training fit with the accuracy
+        on unseen rows (fit at least 0.95 and 5 percentage points above).
+      - [ ] Later (asked 2026-11-16): a "Mörkertal: avancerat" group in the
+        configuration's Dark Numbers section, with `c_max` (now 10), the
+        memorisation rule (now 0.95 and 5 percentage points) and the opt-in
+        standard estimator. The values used are stored with each result and
+        shown in the calculation table, so results stay comparable; new
+        Config fields go into `Config.LATER_KEYS`.
       - [ ] F5-F9 and the rest of section 8, one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).

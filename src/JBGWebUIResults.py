@@ -32,7 +32,8 @@ DARK_REASONS = {"unestimable": "cannot be estimated", "missing": "missing",
 DARK_COLUMNS = {"Model type": "Estimate", "type": "Calculation", "target": "Target class",
                 "alphas": "Alpha", "corr": "Correction (c)", "corr_model": "Correction from",
                 "corr_source": "Basis of the correction", "dark_number": "Dark Number",
-                "corr_train_fit": "Training fit (correction model)"}           # 299q
+                "corr_train_fit": "Training fit (correction model)",           # 299q
+                "corr_unseen_accuracy": "Accuracy on unseen rows"}             # 299q2
 
 
 # 299a2 (asked 2026-11-12): the engine's English column names in the result
@@ -165,7 +166,7 @@ def readable_dark_table(detail: dict, translate, language: str = "sv") -> dict:
                 row[index] = value.replace("_", " ")
             elif column in ("corr", "dark_number") and _is_undefined(value):
                 row[index] = translate("Undefined")                         # 299o
-            elif column == "corr_train_fit":
+            elif column in ("corr_train_fit", "corr_unseen_accuracy"):
                 row[index] = _share_text(value, language)                   # 299q
             elif column == "alphas":
                 row[index] = alpha_text(value, language)

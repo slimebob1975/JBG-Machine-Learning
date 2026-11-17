@@ -264,9 +264,11 @@ måste hitta minst 10 % av de rader som avsiktligt märktes om i testet bakom
 c). Det betyder att pipelinen eller datasetet inte passar för att skatta
 mörkertal för den målklassen.
 
-En varning visas när modellen bakom c anpassar sig till minst 99 % av sina
-egna träningsrader. En sådan modell tenderar att lära sig de avsiktligt fel
-märkta raderna i testet bakom c, så c och mörkertalet kan då vara för höga.
+En varning visas när modellen bakom c passar sina egna träningsrader tydligt
+bättre än rader den inte har sett (en anpassning på minst 95 %, minst 5
+procentenheter över träffsäkerheten på osedda rader). En sådan modell
+tenderar att lära sig de avsiktligt fel märkta raderna i testet bakom c, så c
+och mörkertalet kan då vara för höga.
 
 I **Felklassificeringar** för en SQL-körning kan du rätta klasser som är
 fel i källdata. Välj **Rätt klass** för raderna och sedan **Granska

@@ -2335,5 +2335,8 @@ msgstr "Korrektionsfaktorn c måste ligga mellan 1 och 10, det vill säga modell
 msgid "Training fit (correction model)"
 msgstr "Anpassning till träningsdata (korrektionsmodell)"
 
-msgid "The model fits almost all of its training rows (at least 99 %), so it may memorise them. The correction factor c may then be too large and the Dark Number too high."
-msgstr "Modellen anpassar sig till nästan alla sina träningsrader (minst 99 %), så den kan memorera dem. Korrektionsfaktorn c kan då vara för stor och mörkertalet för högt."
+msgid "The model fits its training rows clearly better than rows it has not seen (a fit of at least 95 % and at least 5 percentage points above its accuracy on unseen rows), so it may memorise them. The correction factor c may then be too large and the Dark Number too high."
+msgstr "Modellen passar sina träningsrader tydligt bättre än rader den inte har sett (en anpassning på minst 95 % och minst 5 procentenheter över träffsäkerheten på osedda rader), så den kan memorera dem. Korrektionsfaktorn c kan då vara för stor och mörkertalet för högt."
+
+msgid "Accuracy on unseen rows"
+msgstr "Träffsäkerhet på osedda rader"

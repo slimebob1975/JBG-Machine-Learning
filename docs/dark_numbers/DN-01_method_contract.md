@@ -187,7 +187,12 @@ it is likely misleading. The flip test also measures the fitted copy's fit to
 its own unflipped training rows (one extra prediction, no extra fitting). At
 0.99 or more (`MEMORISATION_THRESHOLD`) the model is taken to memorise its
 training rows; the log and the Mörkertal view then say that `c` and `D` may
-be too high. The fit is reported beside `c` (`corr_train_fit`). No number
+be too high. 299q2 (settled 2026-11-16) sharpens the rule: the fit is
+compared with the accuracy on unseen rows (the cross-trained model's test
+part), and the warning is given when the fit is at least 0.95 and at least 5
+percentage points above it (`MEMORISATION_FIT`, `MEMORISATION_GAP`); an easy
+problem gives high values for both and is not flagged. Without an unseen
+accuracy, the fit-only rule (0.99) applies. The fit is reported beside `c` (`corr_train_fit`). No number
 changes. For example, a decision tree fits 100 % of its training rows and
 recovers 0 % of the flipped rows (`c` infinite, undefined by v1.1).
 

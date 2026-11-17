@@ -1,3 +1,22 @@
+## Revision 299q2 - The memorisation warning compares with unseen rows (2026-11-16)
+
+- Asked 2026-11-16: 0.99 was too high (it missed moderate memorisers such as
+  boosting), and a lower fixed threshold would also flag sound models on easy
+  problems. The correction model's training fit is now compared with its
+  accuracy on unseen rows (the cross-trained model's test part; the final
+  model has none of its own and is compared with the cross-trained model's):
+  warn when the fit is at least 0.95 and at least 5 percentage points above
+  it (`DarkNumberCalculator.memorises`, `MEMORISATION_FIT`,
+  `MEMORISATION_GAP`). Without an unseen accuracy, the fit-only rule (0.99)
+  applies. One rule for the log and the Mörkertal view.
+- The Dark Number results get a column `corr_unseen_accuracy` ("Träffsäkerhet
+  på osedda rader") after the training fit.
+- BACKLOG (asked 2026-11-16): a "Mörkertal: avancerat" group in the
+  configuration with `c_max`, the memorisation rule and the opt-in standard
+  estimator; the values used are stored with each result.
+- User guides: the warning's rule.
+- Tests: `tests/test_revision_299q2_memorisation_gap.py`.
+
 ## Revision 299q - JBG v1.1: a warning when the correction model memorises (2026-11-16)
 
 - DN-01 review, F4 settled 2026-11-16 (option C): recovery in the flip test is

@@ -264,9 +264,11 @@ model must find at least 10 % of the rows that were deliberately relabelled
 in the test behind c). It means that the pipeline or the dataset is
 ill-suited to estimating Dark Numbers for that target class.
 
-A warning says when the model behind c fits at least 99 % of its own
-training rows. Such a model tends to learn the deliberately wrong labels in
-the test behind c, so c and the Dark Number may then be too high.
+A warning says when the model behind c fits its own training rows clearly
+better than rows it has not seen (a fit of at least 95 %, at least 5
+percentage points above its accuracy on unseen rows). Such a model tends to
+learn the deliberately wrong labels in the test behind c, so c and the Dark
+Number may then be too high.
 
 In **Mispredictions** of an SQL run you can correct classes that are wrong
 in the source data. Choose the **Right class** for the rows, then **Review

@@ -5,10 +5,10 @@ from math import isfinite
 
 import pandas as pd
 
-# 299q, JBG v1.1 (DN-01 F4): a correction model fitting at least this share of
-# its own training rows in the flip test is taken to memorise them (the same
-# value as DarkNumberCalculator.MEMORISATION_THRESHOLD).
-MEMORISATION_THRESHOLD = 0.99
+from JBGDarkNumbers import DarkNumberCalculator
+
+# 299q (kept for older callers): the fit-only threshold.
+MEMORISATION_THRESHOLD = DarkNumberCalculator.MEMORISATION_THRESHOLD
 
 
 INTERVAL_SCOPES = (
@@ -44,12 +44,9 @@ def build_dark_number_intervals(matrix):
                 source = str(row.get("corr_source", "unknown"))
                 point["source"] = source
                 # 299q, JBG v1.1 (DN-01 F4): whether the correction model memorises.
-                try:
-                    fit = float(row.get("corr_train_fit"))
-                except (TypeError, ValueError):
-                    fit = None
-                point["memorises"] = bool(fit is not None and isfinite(fit)
-                                          and fit >= MEMORISATION_THRESHOLD)
+                # 299q2: the fit compared with the accuracy on unseen rows.
+                point["memorises"] = DarkNumberCalculator.memorises(
+                    row.get("corr_train_fit"), row.get("corr_unseen_accuracy"))
                 try:
                     value = float(row["dark_number"])
                 except (ValueError, TypeError, OverflowError):
