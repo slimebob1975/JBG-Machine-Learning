@@ -472,7 +472,10 @@ full SQL regression acceptance remain separately unverified.
         standard estimator. The values used are stored with each result and
         shown in the calculation table, so results stay comparable; new
         Config fields go into `Config.LATER_KEYS`.
-      - [ ] F5-F9 and the rest of section 8, one at a time.
+      - [x] 299r: F5 settled (multiclass flips to a random other class by
+        size).
+      - [ ] F6-F9 and the rest of section 8, one at a time (after the
+        summary asked for 2026-11-16).
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,

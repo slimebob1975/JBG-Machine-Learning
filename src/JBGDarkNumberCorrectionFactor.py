@@ -49,7 +49,18 @@ def evaluate_split(estimator, X, y, train_idx, repeat_idx,
     other_class = [c for c in np.unique(y_train) if c != positive_class]
     if not other_class:
         raise ValueError("Cannot find a negative class different from the positive_class.")
-    y_train_flipped[flip_indices] = other_class[0]
+    if len(other_class) == 1:
+        y_train_flipped[flip_indices] = other_class[0]
+    else:
+        # 299r, JBG v1.1 (DN-01 F5, settled 2026-11-16, option A): with more than
+        # two classes each flipped row gets a random other class, drawn in
+        # proportion to the other classes' sizes in the training part, as
+        # mislabelling into "the rest" would look. It always got the first other
+        # class in sorted order, so c depended on the class names. Two classes:
+        # unchanged (the only other class, and no draw).
+        sizes = np.array([np.sum(y_train == c) for c in other_class], dtype=float)
+        drawn = rng.choice(len(other_class), size=n_flip, p=sizes / sizes.sum())
+        y_train_flipped[flip_indices] = np.asarray(other_class, dtype=object)[drawn]
 
     model = clone(estimator)
     model.fit(X_train, y_train_flipped)

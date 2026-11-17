@@ -1,3 +1,14 @@
+## Revision 299r - JBG v1.1: multiclass flips by class size (2026-11-16)
+
+- DN-01 review, F5 settled 2026-11-16 (option A): with more than two classes,
+  each row flipped in the flip test behind `c` gets a random other class,
+  drawn in proportion to the other classes' sizes in the training part. It
+  always got the first other class in sorted order, so `c` depended on the
+  class names and tested only the target against its alphabetical neighbour.
+  Two-class results are unchanged; the draw is reproducible with the seed.
+- Tests: `tests/test_revision_299r_multiclass_flips.py`; the 299n baseline
+  test for F5 changes on purpose (old values in its docstring).
+
 ## Revision 299q2 - The memorisation warning compares with unseen rows (2026-11-16)
 
 - Asked 2026-11-16: 0.99 was too high (it missed moderate memorisers such as

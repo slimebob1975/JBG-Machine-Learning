@@ -97,7 +97,7 @@ Numbered for review. Each is frozen as current behaviour by the tests and is
   data the clone is fitted on, so `r` measures how strongly the model resists
   memorising wrong labels, not how well it finds hidden cases in new data.
   The estimand of `c` follows from this (plan step 5).
-- **F5. With more than two classes, flipped rows go to one class:** the first
+- **F5. With more than two classes, flipped rows go to one class:** *(settled in v1.1, section 9)* the first
   other class in sorted order, not "the rest" or a random other class, though
   the log says "flipped to non-target labels".
 - **F6. `c` depends on the computer.** `n_splits × n_repeats` is chosen from
@@ -202,3 +202,11 @@ relabelled row is predicted by a model trained on the other folds; `r` is the
 share of relabelled rows predicted as the target, and `c = 1/r̄` within
 v1.1's bounds. This is the label frequency of positive-unlabelled learning
 (Elkan and Noto, 2008), which DN-05 also builds on.
+
+### F5 (299r, settled 2026-11-16, option A): multiclass flips
+
+With more than two classes, each flipped row gets a random other class, drawn
+in proportion to the other classes' sizes in the training part, as
+mislabelling into "the rest" would look (reproducible with the seed). It
+always got the first other class in sorted order, so `c` depended on the
+class names. Two-class results are unchanged.

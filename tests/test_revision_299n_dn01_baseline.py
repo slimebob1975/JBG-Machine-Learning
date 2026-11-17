@@ -150,7 +150,9 @@ def test_f4_recovery_is_measured_on_the_rows_the_clone_was_fitted_on():
     assert seen["predict"] <= seen["fit"]
 
 
-def test_f5_flipped_rows_go_to_the_first_other_class():
+def test_f5_flipped_rows_go_to_other_classes_by_size():
+    """299r, JBG v1.1 (settled 2026-11-16): a random other class by size.
+    At 299m every flipped row went to the first other class ("a": 34, "c": 30)."""
     labels = {}
 
     class Recorder(Rule):
@@ -160,8 +162,8 @@ def test_f5_flipped_rows_go_to_the_first_other_class():
     y = np.array(["b"] * 40 + ["a"] * 30 + ["c"] * 30)
     X = np.c_[np.arange(100.0), np.zeros(100)]
     evaluate_split(Recorder(), X, y, np.arange(100), 0, 0.1, "b", "predict", 1)
-    assert (labels["y"] == "b").sum() == 36 and (labels["y"] == "a").sum() == 34
-    assert (labels["y"] == "c").sum() == 30
+    assert (labels["y"] == "b").sum() == 36
+    assert (labels["y"] == "a").sum() > 30 and (labels["y"] == "c").sum() > 30
 
 
 def test_f6_folds_and_repeats_follow_the_cpu_count():
