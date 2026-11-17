@@ -379,6 +379,9 @@ full SQL regression acceptance remain separately unverified.
     algorithms (for example Linear, Non-linear, Tree, Neural networks,
     Ensemble, Special), sorted alphabetically within each group. Propose the
     group of each algorithm and confirm it before coding.
+  - [ ] Asked 2026-11-16: a clearer log: a timestamp and a level (DEBUG,
+    INFO, WARNING, ERROR) on every line, and no empty lines (probably left
+    from running in a terminal).
   - [ ] Asked 2026-11-16: while a run of the project is queued or running,
     "Starta träning" and "Undersök variabler" on the Training tab are
     unavailable (red, with the reason), and probably "Starta prediktion" on
@@ -474,8 +477,8 @@ full SQL regression acceptance remain separately unverified.
         Config fields go into `Config.LATER_KEYS`.
       - [x] 299r: F5 settled (multiclass flips to a random other class by
         size).
-      - [ ] F6-F9 and the rest of section 8, one at a time (after the
-        summary asked for 2026-11-16).
+      - [x] 299s: F6 settled (4 folds x 2 repeats on every computer).
+      - [ ] F7-F9 and the rest of section 8, one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,

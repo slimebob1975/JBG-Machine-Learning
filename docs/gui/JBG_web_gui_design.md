@@ -513,6 +513,7 @@ The map above is the target. What exists after revision 285m3:
 | `/ui/results` (Dark Numbers) | 299q | JBG v1.1: the correction model's training fit beside `c`; a warning at 0.99 or more (`c` may be too high) |
 | `/ui/results` (Dark Numbers) | 299q2 | The memorisation warning compares the training fit with the accuracy on unseen rows (at least 0.95 and 5 percentage points above); a column for the unseen accuracy |
 | (engine, no GUI change) | 299r | JBG v1.1: multiclass flips in the flip test go to a random other class by size |
+| (engine, no GUI change) | 299s | JBG v1.1: the flip test behind `c` uses 4 folds × 2 repeats on every computer |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

@@ -2918,12 +2918,13 @@ class PredictionsHandler:
                     f"[DEBUG] Considering label: {label} among labels: {labels} for corr_estimator"
                 )
 
-            n_splits, n_repeats = self._auto_n_splits_and_repeats(
-                n_jobs_desired=-1,
-                min_n_splits=4,
-                min_n_repeats=2,
-                max_multiplier=3
-            )
+            # 299s, JBG v1.1 (DN-01 F6, settled 2026-11-16, option A1): fixed
+            # folds and repeats, so c is the same on every computer. They were
+            # chosen from the CPU count (4 x 2 on 2, 4 and 8 cores, which is
+            # kept; 4 x 3, 5 x 2, 7 x 2, 4 x 4 ... elsewhere). The core count now
+            # only sets how many folds run at the same time.
+            n_splits = DarkNumberCalculator.FLIP_TEST_FOLDS
+            n_repeats = DarkNumberCalculator.FLIP_TEST_REPEATS
             # Apply the same negative-cap semantics as the shared CV executor.
             # A configured -1 means unlimited up to the logical CPU count.
             # PredictionsHandler does not implement ModelHandler._resolve_n_jobs.

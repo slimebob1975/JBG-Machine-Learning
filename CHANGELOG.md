@@ -1,3 +1,19 @@
+## Revision 299s - JBG v1.1: the same c on every computer (2026-11-16)
+
+- DN-01 review, F6 settled 2026-11-16 (option A1): the flip test behind `c`
+  uses 4 folds × 2 repeats on every computer
+  (`DarkNumberCalculator.FLIP_TEST_FOLDS`, `FLIP_TEST_REPEATS`). They were
+  chosen from the CPU count (4 × 3 on 6 and 12 cores, 5 × 2 on 10, 7 × 2 on
+  14, 4 × 4 on 16, ...), which changed the training-part size and the number
+  of measurements, so `c` and `D` differed between machines (synthetic data,
+  logistic regression: 2.71 to 3.15). 2-, 4- and 8-core machines used 4 × 2
+  already and give the same results as before. The core count now only sets
+  how many folds run at the same time.
+- BACKLOG (asked 2026-11-16): the log with a timestamp and a level (DEBUG,
+  INFO, WARNING, ERROR) on every line, and no empty lines.
+- Tests: `tests/test_revision_299s_fixed_folds.py` (the same `c` for 2, 6, 10
+  and 16 cores).
+
 ## Revision 299r - JBG v1.1: multiclass flips by class size (2026-11-16)
 
 - DN-01 review, F5 settled 2026-11-16 (option A): with more than two classes,

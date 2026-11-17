@@ -167,6 +167,8 @@ def test_f5_flipped_rows_go_to_other_classes_by_size():
 
 
 def test_f6_folds_and_repeats_follow_the_cpu_count():
+    """The helper still chooses by the CPU count; since 299s (JBG v1.1) the flip
+    test no longer uses it (fixed 4 x 2, see test_revision_299s)."""
     from JBGHandler import PredictionsHandler
     choose = PredictionsHandler._auto_n_splits_and_repeats
     chosen = {cores: choose(None, n_jobs_desired=cores, min_n_splits=4, min_n_repeats=2,

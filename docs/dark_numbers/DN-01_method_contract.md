@@ -100,7 +100,7 @@ Numbered for review. Each is frozen as current behaviour by the tests and is
 - **F5. With more than two classes, flipped rows go to one class:** *(settled in v1.1, section 9)* the first
   other class in sorted order, not "the rest" or a random other class, though
   the log says "flipped to non-target labels".
-- **F6. `c` depends on the computer.** `n_splits × n_repeats` is chosen from
+- **F6. `c` depends on the computer.** *(Settled in v1.1, section 9.)* `n_splits × n_repeats` is chosen from
   the CPU count (`_auto_n_splits_and_repeats`, at least 4 × 2), so the same
   data can give different `c` on different machines. Within one repeat, all
   folds use the same random seed for drawing flips.
@@ -210,3 +210,14 @@ in proportion to the other classes' sizes in the training part, as
 mislabelling into "the rest" would look (reproducible with the seed). It
 always got the first other class in sorted order, so `c` depended on the
 class names. Two-class results are unchanged.
+
+### F6 (299s, settled 2026-11-16, option A1): fixed folds and repeats
+
+The flip test uses 4 folds × 2 repeats on every computer
+(`FLIP_TEST_FOLDS`, `FLIP_TEST_REPEATS`); the CPU count only sets how many
+folds run at the same time. It was chosen from the CPU count, so `c` differed
+between machines (synthetic data, logistic regression: 2.71 to 3.15).
+2-, 4- and 8-core machines already used 4 × 2 and are unchanged. The repeats
+still reuse the same folds (only the flip draw changes); fresh folds per
+repeat and more repeats for a steadier `c` belong to v2 (DN-03), and folds and
+repeats may become settings in "Mörkertal: avancerat".

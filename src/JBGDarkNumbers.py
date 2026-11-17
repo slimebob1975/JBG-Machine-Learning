@@ -25,6 +25,10 @@ class DarkNumberCalculator:
     # model's test part) by at least MEMORISATION_GAP. An easy problem gives
     # high values for both and is not flagged. Without an unseen accuracy, only
     # the fit can be judged: MEMORISATION_THRESHOLD (299q's rule).
+    # 299s, JBG v1.1 (DN-01 F6, settled 2026-11-16, option A1): the flip test's
+    # folds and repeats, independent of the computer's CPU count.
+    FLIP_TEST_FOLDS = 4
+    FLIP_TEST_REPEATS = 2
     MEMORISATION_FIT = 0.95
     MEMORISATION_GAP = 0.05
     MEMORISATION_THRESHOLD = 0.99
