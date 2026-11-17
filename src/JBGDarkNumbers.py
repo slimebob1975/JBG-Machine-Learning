@@ -65,6 +65,21 @@ class DarkNumberCalculator:
         return value, source
 
     @staticmethod
+    def target_vs_rest_certainty(class_probabilities, target, predicted_binary, fallback):
+        """299t, JBG v1.1 (DN-01 F7, settled 2026-11-16, reading 1): the certainty
+        behind each verdict for one target, target against the rest: P(target) on
+        rows predicted as the target and 1 - P(target) on the others. It was the
+        probability of the predicted label only, which with more than two classes
+        is less than the certainty that a row is not the target (the rest's
+        probability is split between the other classes). Two classes: the same
+        values. Without class probabilities (direct calls), the old values."""
+        if class_probabilities is None or target not in getattr(class_probabilities, "columns", ()):
+            return fallback
+        p_target = pd.Series(class_probabilities[target].to_numpy(dtype=float),
+                             index=predicted_binary.index)
+        return p_target.where(predicted_binary == 1, 1.0 - p_target)
+
+    @staticmethod
     def _counts(real: pd.Series, predicted: pd.Series):
         """TN, FP, FN, TP for target (1) against the rest (0), also for a scope
         with one label only (299o, DN-01 F2: it raised)."""
@@ -253,7 +268,8 @@ class DarkNumberCalculator:
 
     # Unified interface for calculating dark numbers
     def compute_dark_numbers(self, real_target: pd.Series, pred_target: pd.Series, prob_pred: pd.Series, \
-                            type="base", root_degree=3, corrs=None, targets=None):
+                            type="base", root_degree=3, corrs=None, targets=None,
+                            class_probabilities=None):
         """
         corrs should be a dictionary with correction factors for each class in real_target 
         """
@@ -288,19 +304,21 @@ class DarkNumberCalculator:
                 # Convert to binary classification 
                 real_target_bin = pd.Series(real_target.apply(func=(lambda x: 1 if x == target else 0)), name="real_target")
                 pred_target_bin = pd.Series(pred_target.apply(func=(lambda x: 1 if x == target else 0)), name="pred_target")
+                alpha_prob = self.target_vs_rest_certainty(
+                    class_probabilities, target, pred_target_bin, prob_pred)       # 299t
 
                 if type == "base":
                     dark_number = self.compute_dark_number(real_target_bin, pred_target_bin, corr)
                     alpha = 1.0   
                 elif type == "single_alpha":
-                    alpha, dark_number = self.compute_dark_number_single_alpha(real_target_bin, pred_target_bin, prob_pred, corr)
+                    alpha, dark_number = self.compute_dark_number_single_alpha(real_target_bin, pred_target_bin, alpha_prob, corr)
                 elif type == "separated_alpha":
-                    alpha, dark_number = self.compute_dark_number_separated_alpha(real_target_bin, pred_target_bin, prob_pred, corr)
+                    alpha, dark_number = self.compute_dark_number_separated_alpha(real_target_bin, pred_target_bin, alpha_prob, corr)
                 elif type == "non_linear":
-                    alpha, dark_number = self.compute_dark_number_non_linear(real_target_bin, pred_target_bin, prob_pred, \
+                    alpha, dark_number = self.compute_dark_number_non_linear(real_target_bin, pred_target_bin, alpha_prob, \
                                                                 use_alpha=False, root_degree=root_degree, corr=corr)
                 elif type == "non_linear_alpha":
-                    alpha, dark_number = self.compute_dark_number_non_linear(real_target_bin, pred_target_bin, prob_pred, \
+                    alpha, dark_number = self.compute_dark_number_non_linear(real_target_bin, pred_target_bin, alpha_prob, \
                                                                 use_alpha=True, root_degree=root_degree, corr=corr)
                 else:
                     raise ValueError(f"The type of dark number is not supported: {type}")

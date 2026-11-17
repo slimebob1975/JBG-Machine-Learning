@@ -478,7 +478,9 @@ full SQL regression acceptance remain separately unverified.
       - [x] 299r: F5 settled (multiclass flips to a random other class by
         size).
       - [x] 299s: F6 settled (4 folds x 2 repeats on every computer).
-      - [ ] F7-F9 and the rest of section 8, one at a time.
+      - [x] 299t: F7 settled (alpha target against the rest: `1 − P(T)` on
+        false negatives).
+      - [ ] F8, F9 and the rest of section 8, one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,

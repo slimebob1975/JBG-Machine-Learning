@@ -3192,6 +3192,9 @@ class PredictionsHandler:
         # correction, so it must be included in that model's dependency check.
         reports = []
         full_data_predictions = []
+        # 299t: class probabilities per estimate, fresh for every computation.
+        self.__dict__["dark_number_class_probabilities"] = {}
+        self.__dict__["dark_number_combined_parts"] = []
         dense_models = set()
         for model_index, (model, model_name, can_predict_proba) in enumerate(
             zip(models, model_names, supports_predict_proba)
@@ -3233,8 +3236,17 @@ class PredictionsHandler:
                     Y_prob_pred = pd.Series(
                         [max(row) for row in probabilities], index=Y_eval.index
                     )
+                    # 299t, JBG v1.1 (DN-01 F7): every class's probability, so
+                    # alpha can use P(target) and 1 - P(target) per target.
+                    class_probabilities = pd.DataFrame(
+                        np.asarray(probabilities), index=Y_eval.index,
+                        columns=list(getattr(model, "classes_", range(np.shape(probabilities)[1]))))
+                    self.__dict__.setdefault("dark_number_class_probabilities", {})[
+                        f"{estimate_name} - {model_name}"] = class_probabilities
                     if include_in_combined:
                         full_data_predictions.append((Y_pred, Y_prob_pred, model_index))
+                        self.__dict__.setdefault("dark_number_combined_parts", []).append(
+                            (Y_pred, Y_prob_pred, class_probabilities))
                 if scipy_sparse.issparse(original_input) and not scipy_sparse.issparse(estimator_X):
                     dense_models.add(model_index)
                 reports.append((f"{estimate_name} - {model_name}", Y_eval, Y_pred, Y_prob_pred, model_index))
@@ -3249,10 +3261,20 @@ class PredictionsHandler:
         if combine_models and full_data_predictions:
             Y_pred_worst = Y.copy(deep=True)
             Y_prob_pred_worst = pd.Series([0.0 for _ in range(Y.size)], index=Y.index)
-            for Y_pred, Y_prob_pred, _ in full_data_predictions:
+            # 299t: the class probabilities of the model each row is taken from.
+            parts = self.__dict__.get("dark_number_combined_parts") or []
+            columns = sorted({c for _, _, frame in parts for c in frame.columns}, key=str)
+            class_worst = pd.DataFrame(0.0, index=Y.index, columns=columns) if parts else None
+            for position, (Y_pred, Y_prob_pred, _) in enumerate(full_data_predictions):
                 replace_mask = (Y_pred != Y) & (Y_prob_pred >= Y_prob_pred_worst)
                 Y_pred_worst = Y_pred_worst.mask(replace_mask, Y_pred)
                 Y_prob_pred_worst = Y_prob_pred_worst.mask(replace_mask, Y_prob_pred)
+                if class_worst is not None and position < len(parts):
+                    frame = parts[position][2].reindex(columns=columns, fill_value=0.0)
+                    class_worst = class_worst.mask(replace_mask, frame, axis=0)
+            if class_worst is not None:
+                self.__dict__.setdefault("dark_number_class_probabilities", {})[
+                    "Combined (legacy full-data)"] = class_worst
             legacy_owner = 0 if supports_predict_proba[0] else full_data_predictions[0][2]
             reports.append(("Combined (legacy full-data)", Y, Y_pred_worst, Y_prob_pred_worst, legacy_owner))
 
@@ -3320,6 +3342,8 @@ class PredictionsHandler:
                     result_name, Y_eval, Y_pred, Y_prob_pred, type,
                     corrs_by_model[correction_owner], corr_sources_by_model[correction_owner],
                     corr_models_by_model[correction_owner], targets=target_labels,
+                    class_probabilities=(self.__dict__.get("dark_number_class_probabilities")
+                                         or {}).get(result_name),                 # 299t
                 )
 
         return None
@@ -3376,11 +3400,13 @@ class PredictionsHandler:
         corr_sources=None,
         corr_models=None,
         targets=None,
+        class_probabilities=None,
     ):
         
         # Compute dark numbers
         model_dark_numbers = DarkNumberCalculator().compute_dark_numbers(
-            Y, Y_pred, Y_prob_pred, type=type, corrs=corrs, targets=targets
+            Y, Y_pred, Y_prob_pred, type=type, corrs=corrs, targets=targets,
+            class_probabilities=class_probabilities,                            # 299t
         )
         if corr_models is not None:
             model_dark_numbers.insert(

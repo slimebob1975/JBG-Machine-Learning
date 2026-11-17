@@ -104,7 +104,7 @@ Numbered for review. Each is frozen as current behaviour by the tests and is
   the CPU count (`_auto_n_splits_and_repeats`, at least 4 × 2), so the same
   data can give different `c` on different machines. Within one repeat, all
   folds use the same random seed for drawing flips.
-- **F7. Alpha is the certainty of the predicted label**, not the probability
+- **F7. Alpha is the certainty of the predicted label** *(settled in v1.1, section 9)*, not the probability
   of `T`: for an FP row the probability of `T`, for an FN row the probability
   of the (wrongly) predicted other class.
 - **F8. `D` is not a proportion.** Its range is `[0, 2c]` (`base`) and larger
@@ -221,3 +221,15 @@ between machines (synthetic data, logistic regression: 2.71 to 3.15).
 still reuse the same folds (only the flip draw changes); fresh folds per
 repeat and more repeats for a steadier `c` belong to v2 (DN-03), and folds and
 repeats may become settings in "Mörkertal: avancerat".
+
+### F7 (299t, settled 2026-11-16, reading 1): alpha target against the rest
+
+Alpha weighs each error by the model's certainty in its verdict, target
+against the rest, like the rest of the formula: `α_FP = mean P(T)` over false
+positives (as before) and `α_FN = mean (1 − P(T))` over false negatives (it
+was the probability of the predicted class, which with more than two classes
+is less than the certainty that the row is not `T`). Single alpha mixes the
+two the same way. The combined estimate takes each row's probabilities from
+the model it takes the row from. Two-class results are unchanged. The
+probabilities are model scores, not calibrated probabilities; calibration
+belongs to v2 (DN-05).

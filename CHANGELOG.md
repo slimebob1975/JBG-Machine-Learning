@@ -1,3 +1,20 @@
+## Revision 299t - JBG v1.1: alpha target against the rest (2026-11-16)
+
+- DN-01 review, F7 settled 2026-11-16 (reading 1): the alpha weights use the
+  model's certainty in its verdict, target against the rest: `P(target)` on
+  false positives (unchanged) and `1 − P(target)` on false negatives. They
+  used the probability of the predicted class, which with more than two
+  classes is lower than the certainty that a row is not the target (with
+  target probabilities a 0.30, b 0.40, c 0.30, a false negative for `a` got
+  0.40 instead of 0.70). Single alpha and the non-linear alpha follow. Two-class
+  results are unchanged.
+  - The handler keeps every class's probability per estimate (reset for each
+    computation) and passes them to the calculator
+    (`DarkNumberCalculator.target_vs_rest_certainty`); the combined estimate
+    takes each row's probabilities from the model it takes the row from.
+    Direct calls without class probabilities behave as before.
+- Tests: `tests/test_revision_299t_target_vs_rest_alpha.py`.
+
 ## Revision 299s - JBG v1.1: the same c on every computer (2026-11-16)
 
 - DN-01 review, F6 settled 2026-11-16 (option A1): the flip test behind `c`
