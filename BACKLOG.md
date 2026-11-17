@@ -484,6 +484,8 @@ full SQL regression acceptance remain separately unverified.
         (`D` estimates the hidden share, capped at 1; `α_FN` on the misses
         only; `c` in-sample only); the equation shown on Results, the method
         explained under About.
+      - [x] 299v (asked 2026-11-16): the Dark Number also as the growth of
+        the target class (percentage, factor, counts, missing share).
       - [ ] F9 and the rest of section 8, one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).

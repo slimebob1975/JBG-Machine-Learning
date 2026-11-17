@@ -78,6 +78,79 @@ _ESTIMATE_PREFIXES = (("D_re_full", "D_retrained_full"), ("D_cv_full", "D_cv_ful
 _CORRECTION_MODELS = {"Cross-trained model": "Cross-trained model", "Retrained model": "Final model"}
 
 
+def matrix_counts(detail) -> dict:
+    """299v: per estimate (its "Model type"), the rows registered in each class:
+    the row sums of its confusion matrix (rows are the registered classes)."""
+    counts, current = {}, None
+    columns = detail.get("columns") or []
+    for row in detail.get("rows") or []:
+        if len(row) < 3:
+            continue
+        name = str(row[1] or "").strip()
+        if name:
+            current = name
+            counts[current] = {}
+        if current is None:
+            continue
+        total = 0.0
+        for value in row[2:len(columns)]:
+            try:
+                total += float(value)
+            except (TypeError, ValueError):
+                pass
+        counts[current][str(row[0])] = total
+    return counts
+
+
+def _counts_for(label: str, counts: dict):
+    from JBGDarkNumberReporting import INTERVAL_SCOPES
+    prefix = dict(INTERVAL_SCOPES).get(label)
+    if prefix is None:
+        return None
+    found = [c for name, c in counts.items()
+             if (name == prefix if label == "D_comb" else name.startswith(prefix))]
+    return found[0] if len(found) == 1 else None
+
+
+def with_growth(summary: list, counts: dict, language: str) -> list:
+    """299v (asked 2026-11-16): the Dark Number as growth of the target class.
+    With D the hidden share among the rows registered as another class, the
+    hidden cases are D * N_rest and the target class grows by
+    g = D * N_rest / N_target, where N_rest and N_target are the registered
+    rows of the same estimate. The share of all real target cases that were
+    missing from the register is g / (1 + g). Assumes, like D, that the rows
+    registered as the target are the target."""
+    def factor_text(g):
+        text = f"×{1 + g:.2f}"
+        return text.replace(".", ",") if language == "sv" else text
+    for interval in summary:
+        target = str(interval.get("target"))
+        growths = []
+        for point in interval.get("points", []):
+            point["growth"] = None
+            found = _counts_for(point.get("label", ""), counts)
+            if point.get("value") is None or not found or target not in found:
+                continue
+            n_target = found[target]
+            n_rest = sum(v for k, v in found.items() if k != target)
+            if n_target <= 0:
+                continue
+            hidden = point["value"] * n_rest
+            g = hidden / n_target
+            point.update(growth=g, growth_text=f"+{percent_text(g, language)} ({factor_text(g)})",
+                         hidden=hidden, registered_target=int(round(n_target)),
+                         registered_rest=int(round(n_rest)),
+                         missing_text=percent_text(g / (1 + g), language))
+            growths.append(g)
+        top = max(growths) if growths else 0.0
+        for point in interval.get("points", []):
+            if point.get("growth") is not None:
+                point["growth_bar"] = 0.0 if top <= 0 else round(100 * point["growth"] / top, 1)
+        interval["growth_range_text"] = (f"+{percent_text(min(growths), language)} – "
+                                         f"+{percent_text(max(growths), language)}") if growths else ""
+    return summary
+
+
 def percent_text(value: float, language: str) -> str:
     """A share as a percentage with two decimals ("0,10 %" in Swedish)."""
     if value > 0 and value * 100 < 0.005:
@@ -273,7 +346,7 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                    "correctable": False, "corrected": {}, "correction_log": [], "review": None,
                    "correction_source": "",
                    "dark_estimates": DARK_ESTIMATES, "dark_reasons": DARK_REASONS,
-                   "dark_equation": None,
+                   "dark_equation": None, "dark_view": "share",
                    "dark_columns": DARK_COLUMNS, "investigation": None, "apply": None}
         if project is not None:
             # 296a: results belong to training runs; prediction runs are on the
@@ -333,6 +406,15 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                                             request_language(request))
                         context["dark_summary"] = with_percentages(
                             results.dark_number_summary(owner, chosen), request_language(request))
+                        # 299v: the hidden share, or the target class's growth.
+                        context["dark_view"] = ("growth" if request.query_params.get("dark_view")
+                                                == "growth" else "share")
+                        try:
+                            counts = matrix_counts(results.detail(
+                                owner, chosen, "dark_numbers_matrix", page_size=500))
+                        except RunResultsUnavailable:
+                            counts = {}
+                        with_growth(context["dark_summary"], counts, request_language(request))
                         types = [i.get("formula") for i in context["dark_summary"] if i.get("formula")]
                         if types:
                             context["dark_equation"] = dark_equation(types[0], translate)  # 299u

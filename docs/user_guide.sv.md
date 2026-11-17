@@ -306,6 +306,16 @@ målklass för sig, målklassen mot alla de övriga.
 - Resultatet begränsas till 100 %. Ett värde över det betyder att
   skattningen har brutit samman för den målklassen, och vyn säger det.
 
+**Två läsarter.** Ett val överst i vyn Mörkertal visar antingen andelen
+bland de övriga klasserna (som ovan) eller målklassens tillväxt: hur mycket
+den skulle växa om de dolda fallen lades till, `g = D · N_övriga / N_mål`,
+där N_övriga och N_mål är raderna registrerade som en annan klass och som
+målklassen i samma skattning. Tillväxten visas i procent och som faktor, med
+det skattade antalet dolda fall, de registrerade fallen och andelen av alla
+verkliga fall som saknades i registret, `g / (1 + g)`. Liksom D förutsätter
+den att raderna registrerade som målklassen hör dit. Med en sällsynt
+målklass ger små ändringar i D stora ändringar i tillväxten.
+
 **De fyra skattningarna** görs med den korstränade modellen på testdelen,
 med den korstränade modellen på alla data, med den slutliga modellen på alla
 data och kombinerat. Testdelen är ny för modellen, så `c` används inte där.

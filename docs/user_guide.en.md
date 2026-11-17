@@ -305,6 +305,17 @@ each target class, the target class against all the others.
 - The result is capped at 100 %. A value above it means that the estimate
   has broken down for that target class, and the view says so.
 
+**Two readings.** A switch at the top of the Dark Numbers view shows either
+the share among the other classes (as above), or the growth of the target
+class: how much it would grow if the hidden cases were added,
+`g = D · N_rest / N_target`, where N_rest and N_target are the rows
+registered as another class and as the target class in the same estimate.
+The growth is shown as a percentage and a factor, with the estimated number
+of hidden cases, the registered cases, and the share of all real cases that
+were missing from the register, `g / (1 + g)`. Like D, it assumes that the
+rows registered as the target class belong to it. With a rare target class,
+small changes in D give large changes in the growth.
+
 **The four estimates** are made with the cross-trained model on the test
 part, with the cross-trained model on all data, with the final model on all
 data, and combined. The test part is new to the model, so `c` is not used

@@ -2380,3 +2380,37 @@ msgstr "Korrektionsfaktorn 1/r från ommärkningstestet, där r är andelen avsi
 
 msgid "alpha_FP / alpha_FN: mean certainty on FP / FN (alpha_FN weighs the misses only)"
 msgstr "α_FP / α_FN: medelsäkerhet för FP / FN (α_FN väger bara missarna)"
+
+# 299v: the growth of the target class
+msgid "rest"
+msgstr "övriga"
+
+msgid "target"
+msgstr "mål"
+
+msgid "The growth of the target class if the hidden cases were added: the hidden cases (D times the rows registered as another class) as a share of the rows registered as the target class. It assumes, like D, that the rows registered as the target class belong to it. With a rare target class, small changes in D give large changes in g."
+msgstr "Målklassens tillväxt om de dolda fallen lades till: de dolda fallen (D gånger raderna registrerade som en annan klass) som andel av raderna registrerade som målklassen. Den förutsätter, liksom D, att raderna registrerade som målklassen hör dit. Med en sällsynt målklass ger små ändringar i D stora ändringar i g."
+
+msgid "The share of all real cases of the target class that are missing from the register."
+msgstr "Andelen av alla verkliga fall i målklassen som saknas i registret."
+
+msgid "Share among the other classes"
+msgstr "Andel bland de övriga"
+
+msgid "Growth of the target class"
+msgstr "Tillväxt för målklassen"
+
+msgid "How much each target class would grow if the hidden cases were added, with the counts behind it. The four estimates are expected to grow from left to right."
+msgstr "Hur mycket varje målklass skulle växa om de dolda fallen lades till, med antalen bakom. De fyra skattningarna väntas växa från vänster till höger."
+
+msgid "Counts"
+msgstr "Antal"
+
+msgid "hidden"
+msgstr "dolda"
+
+msgid "registered in the target class"
+msgstr "registrerade i målklassen"
+
+msgid "of all real cases missing"
+msgstr "av alla verkliga fall saknas"

@@ -1,3 +1,22 @@
+## Revision 299v - Dark Numbers as growth of the target class (2026-11-16)
+
+- Asked 2026-11-16: Results → Mörkertal can show the Dark Number in two
+  readings, chosen with a switch at the top ("Andel bland de övriga" /
+  "Tillväxt för målklassen", `dark_view` in the link):
+  - the share among the other classes, as before (how many of the cats are
+    really dogs);
+  - the growth of the target class if the hidden cases were added:
+    `g = D · N_rest / N_target`, from each estimate's own confusion matrix
+    (the rows registered as another class and as the target class), as a
+    percentage and a factor ("+35,00 % (×1,35)"), with the estimated number
+    of hidden cases, the registered cases and the share of all real cases
+    that were missing, `g / (1 + g)` (the plan's `U`).
+  - The equation section explains both formulas in the growth view. Like D,
+    the growth assumes that the rows registered as the target class belong to
+    it, and with a rare target class small changes in D give large changes.
+- User guides: the two readings.
+- Tests: `tests/test_revision_299v_dark_number_growth.py`.
+
 ## Revision 299u - JBG v1.2: the agreed reading of the Dark Number equation (2026-11-16)
 
 - DN-01 review, F8 and the reading of the equation settled 2026-11-16.

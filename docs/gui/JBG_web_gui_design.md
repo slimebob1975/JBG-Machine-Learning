@@ -516,6 +516,7 @@ The map above is the target. What exists after revision 285m3:
 | (engine, no GUI change) | 299s | JBG v1.1: the flip test behind `c` uses 4 folds × 2 repeats on every computer |
 | (engine, no GUI change) | 299t | JBG v1.1: alpha weights target against the rest (`1 − P(T)` on false negatives); two classes unchanged |
 | `/ui/results` (Dark Numbers), `/ui/about` | 299u | JBG v1.2: the equation the run used with each part explained; capped estimates noted; the method explained in detail in the user guides |
+| `/ui/results` (Dark Numbers) | 299v | A switch between the hidden share among the other classes and the growth of the target class (percentage, factor, counts, missing share), from each estimate's confusion matrix |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

@@ -135,13 +135,41 @@
             <dl class="equation-parts">
               {% for part in dark_equation.parts %}<dt>{{ part.symbol | safe }}</dt><dd>{{ part.text }}</dd>{% endfor %}
             </dl>
+            {% if dark_view == "growth" %}
+              {# 299v: the growth of the target class follows from D and the registered rows. #}
+              <dl class="equation-parts">
+                <dt>g = D · N<sub>{{ _("rest") }}</sub> / N<sub>{{ _("target") }}</sub></dt>
+                <dd>{{ _("The growth of the target class if the hidden cases were added: the hidden cases (D times the rows registered as another class) as a share of the rows registered as the target class. It assumes, like D, that the rows registered as the target class belong to it. With a rare target class, small changes in D give large changes in g.") }}</dd>
+                <dt>g / (1 + g)</dt>
+                <dd>{{ _("The share of all real cases of the target class that are missing from the register.") }}</dd>
+              </dl>
+            {% endif %}
             <p class="hint">{{ _("The About tab explains the method in more detail.") }}</p>
           </div>
         {% endif %}
+        {# 299v (asked 2026-11-16): two readings of the same Dark Number. #}
+        <p class="view-toggle">{{ _("Show") }}:
+          {% if dark_view == "growth" %}<a href="/ui/results?run={{ selected_run }}&view=dark_numbers&dark_view=share">{{ _("Share among the other classes") }}</a>{% else %}<b>{{ _("Share among the other classes") }}</b>{% endif %} ·
+          {% if dark_view == "growth" %}<b>{{ _("Growth of the target class") }}</b>{% else %}<a href="/ui/results?run={{ selected_run }}&view=dark_numbers&dark_view=growth">{{ _("Growth of the target class") }}</a>{% endif %}</p>
         {# 298j: the estimates per target class, as the Voila GUI summarises them. #}
+        {% if dark_view == "growth" %}
+        <p class="hint">{{ _("How much each target class would grow if the hidden cases were added, with the counts behind it. The four estimates are expected to grow from left to right.") }}</p>
+        {% else %}
         <p class="hint">{{ _("The estimated share of hidden cases of each target class. The four estimates are expected to grow from left to right; together they form a heuristic range. Values are proportions.") }}</p>
+        {% endif %}
         {% for interval in dark_summary %}
           <h3>{{ _("Target class") }}: {{ interval.target }} <span class="muted">· {{ interval.formula | replace("_", " ") }}</span></h3>
+          {% if dark_view == "growth" %}
+          {# 299v: the growth of the target class, with the counts behind it. #}
+          <table class="grid dark-range">
+            <thead><tr><th>{{ _("Estimate") }}</th><th class="num">{{ _("Dark Number") }}</th><th>{{ _("Growth of the target class") }}</th><th>{{ _("Counts") }}</th></tr></thead>
+            <tbody>{% for p in interval.points %}<tr><td>{{ _(dark_estimates.get(p.label, p.label)) }}</td>
+              <td class="num">{% if p.value is not none %}{{ p.value | num(language) }}{% else %}{{ _(dark_reasons.get(p.reason, p.reason)) }}{% endif %}</td>
+              <td class="dark-bar-cell">{% if p.growth is not none %}<span class="dark-track"><span class="dark-bar" style="width: {{ p.growth_bar }}%"></span></span><span class="dark-percent">{{ p.growth_text }}</span>{% endif %}</td>
+              <td class="dark-counts">{% if p.growth is not none %}≈ {{ p.hidden | round | int | count(language) }} {{ _("hidden") }} · {{ p.registered_target | count(language) }} {{ _("registered in the target class") }} · {{ p.missing_text }} {{ _("of all real cases missing") }}{% else %}–{% endif %}</td></tr>{% endfor %}</tbody>
+          </table>
+          {% if interval.growth_range_text %}<p class="hint">{{ _("Range") }}: <b>{{ interval.growth_range_text }}</b></p>{% endif %}
+          {% else %}
           <table class="grid dark-range">
             <thead><tr><th>{{ _("Estimate") }}</th><th class="num">{{ _("Dark Number") }}</th><th>{{ _("In percent") }}</th></tr></thead>
             <tbody>{% for p in interval.points %}<tr><td>{{ _(dark_estimates.get(p.label, p.label)) }}</td>
@@ -149,6 +177,7 @@
               <td class="dark-bar-cell">{% if p.percent %}<span class="dark-track"><span class="dark-bar" style="width: {{ p.bar }}%"></span></span><span class="dark-percent">{{ p.percent }}</span>{% endif %}</td></tr>{% endfor %}</tbody>
           </table>
           {% if interval.range_text %}<p class="hint">{{ _("Range") }}: <b>{{ interval.range_text }}</b></p>{% endif %}
+          {% endif %}
           {% if interval.status == "ordered" %}<p class="hint">{{ _("The estimates are in the expected order.") }}</p>
           {% elif interval.status == "broken" %}<p class="message warn">{{ _("The estimates are not in the expected order.") }}</p>
           {% else %}<p class="message warn">{{ _("The order could not be checked: an estimate is missing or cannot be estimated.") }}</p>{% endif %}
