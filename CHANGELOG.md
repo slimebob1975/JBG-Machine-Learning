@@ -1,3 +1,27 @@
+## Revision 299o - JBG v1.1: undefined Dark Numbers and bounds on c (2026-11-16)
+
+- DN-01 review, settled 2026-11-16 (F1, F2 and the bounds on `c`): a
+  correction of the standard method that leaves `D` unchanged in normal cases
+  (`DarkNumberCalculator.METHOD_VERSION = "1.1"`).
+  - `D = −1` ("undefined") when a rate is undefined (`TN + FP = 0` or
+    `TP + FN = 0`, also a one-label scope, which raised; the non-linear form
+    no longer gives complex numbers).
+  - `c` must lie in `[1, 10]` (`c_max = 10`: at least 10 % of the flipped rows
+    recovered). An estimate outside, or a `c` that cannot be estimated (it was
+    silently 1.0), gives `c = −1` and `D = −1`, logged as a warning: the
+    pipeline is ill-suited to the problem. There was no upper limit before.
+  - With no false positives and rows outside the target, `D = 0` whatever `c`
+    is (never −0).
+  - Results → Mörkertal shows "Odefinierad" with the cause, and explains the
+    bounds on `c`.
+- The DN-01 contract gets a section "Settled at review". The frozen baseline
+  tests for F1 and F2 change on purpose (old values in comments). An older
+  test (`test_dark_number_dense_input`) expected a direct estimate of
+  `c = 14` to be used; it is now undefined and the check is relaxed.
+- BACKLOG: an opt-in standard estimator for `c` chosen in the GUI.
+- User guides: undefined Dark Numbers.
+- Tests: `tests/test_revision_299o_jbg_v11.py`.
+
 ## Revision 299n - DN-01: method contract and baseline for Dark Numbers (2026-11-16)
 
 - First step of "JBG Dark Number Analysis 2.0" (agreed 2026-11-16). No engine

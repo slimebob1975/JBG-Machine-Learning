@@ -42,7 +42,11 @@ def build_dark_number_intervals(matrix):
                     value = float(row["dark_number"])
                 except (ValueError, TypeError, OverflowError):
                     value = float("nan")
-                if not isfinite(value):
+                if value == -1.0:
+                    # 299o, JBG v1.1: -1 means undefined, with its cause.
+                    point["reason"] = ("undefined correction" if source.startswith("undefined/")
+                                       else "undefined rate")
+                elif not isfinite(value):
                     point["reason"] = "non-finite"
                 elif "unestimable" in source or source in {"unknown", "nan", "", "None"}:
                     point["reason"] = "unestimable" if "unestimable" in source else "unknown correction"

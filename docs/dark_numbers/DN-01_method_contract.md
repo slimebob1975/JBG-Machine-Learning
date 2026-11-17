@@ -83,11 +83,11 @@ For each target `T`, with the model's estimator cloned:
 Numbered for review. Each is frozen as current behaviour by the tests and is
 **not** fixed here.
 
-- **F1. Undefined rates enter the formula.** With no negatives (no positives)
+- **F1. Undefined rates enter the formula.** *(Settled in v1.1, section 9.)* With no negatives (no positives)
   `TN_r` (`TP_r`) is −1, so `1 − TN_r = 2` (`2 − TP_r = 3`) instead of an
   undefined result; in the non-linear form the root of −1 gives a complex
   number, which is reported as it is.
-- **F2. A scope with one label only** makes `confusion_matrix(...).ravel()`
+- **F2. A scope with one label only** *(settled in v1.1, section 9)* makes `confusion_matrix(...).ravel()`
   return one value, and the four-way unpacking raises.
 - **F3. A fold with no flips counts as recovery 0.** `evaluate_split` returns
   0.0 when `n_flip = 0` instead of leaving the fold out. With few target rows
@@ -141,3 +141,27 @@ this contract.
 5. The exact specification of CLEAN_SMOTE and undersampling (plan step 6), to
    be written with DN-02.
 6. Benchmark measures and decision rules (plan step 7), fixed before DN-06.
+
+## 9. Settled at review
+
+### JBG v1.1 (299o, settled 2026-11-16): F1, F2 and the bounds on `c`
+
+A correction of the standard method that leaves `D` unchanged in every normal
+case (`DarkNumberCalculator.METHOD_VERSION = "1.1"`):
+
+- `FP = 0` gives `TN_r = 1` and `D = 0`; `FN = 0` gives `TP_r = 1`. As before.
+- If `TN + FP = 0` or `TP + FN = 0`, a rate is undefined and `D = −1`
+  ("undefined"), in every branch. This also covers a scope with one label
+  (F2), which raised before. The pipeline and/or the dataset are ill chosen
+  for that target.
+- `c` must satisfy `1 ≤ c ≤ c_max` with `c_max = 10`, that is the model must
+  recover at least 10 % of the flipped rows (a recovery below that cannot be
+  told from chance in an unstable setting). Otherwise `c = −1` and `D = −1`.
+- If `c` cannot be estimated (it was silently 1.0, "fallback/unestimable"),
+  `c = −1` and `D = −1`: the pipeline is ill-suited to the problem.
+- With `FP = 0` and rows outside the target, `D = 0` whatever `c` is.
+
+Since a valid `D` is never negative, −1 cannot be mistaken for a value. The
+Results tab shows "Odefinierad" with the cause. Later (backlog): an opt-in
+standard estimator for `c` (for example logistic regression with standard
+scaling), chosen in the GUI, when the pipeline's own `c` is unusable.

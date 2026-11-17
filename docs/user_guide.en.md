@@ -257,6 +257,13 @@ expected to grow in that order and together form a heuristic range; the
 view says whether the order holds. Below are the calculations and the
 confusion matrices.
 
+An estimate can be **Undefined**. That happens when the part of the data it
+is made on lacks rows of the target class or of the other classes, or when
+the correction factor c could not be estimated or lies outside 1–10 (the
+model must find at least 10 % of the rows that were deliberately relabelled
+in the test behind c). It means that the pipeline or the dataset is
+ill-suited to estimating Dark Numbers for that target class.
+
 In **Mispredictions** of an SQL run you can correct classes that are wrong
 in the source data. Choose the **Right class** for the rows, then **Review
 the corrections**. A page shows the changes, and only when you choose

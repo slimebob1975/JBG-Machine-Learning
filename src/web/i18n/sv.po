@@ -2317,3 +2317,16 @@ msgstr "välj alla"
 
 msgid "clear"
 msgstr "rensa"
+
+# 299o: JBG v1.1, undefined Dark Numbers
+msgid "Undefined"
+msgstr "Odefinierad"
+
+msgid "Undefined: this part has no rows of the target class or none of the other classes"
+msgstr "Odefinierad: den här delen saknar rader av målklassen eller av de övriga klasserna"
+
+msgid "Undefined: no usable correction factor (c), the pipeline is ill-suited to this problem"
+msgstr "Odefinierad: ingen användbar korrektionsfaktor (c), pipelinen passar inte det här problemet"
+
+msgid "The correction factor c must lie between 1 and 10, that is the model must find at least 10 % of the deliberately relabelled rows. Otherwise the Dark Number is undefined."
+msgstr "Korrektionsfaktorn c måste ligga mellan 1 och 10, det vill säga modellen måste hitta minst 10 % av de avsiktligt ommärkta raderna. Annars är mörkertalet odefinierat."

@@ -78,20 +78,21 @@ def test_the_five_formula_branches():
         assert row["corr"] == CORRS[row["target"]]
 
 
-def test_f1_undefined_rates_enter_the_formula():
+def test_f1_undefined_rates_make_the_dark_number_undefined():
+    """299o, JBG v1.1 (settled 2026-11-16): an undefined rate gives D = -1.
+    At 299m: 8/3 (with 1 - TN_r = 2), and a complex number in the non-linear form."""
     calculator = DarkNumberCalculator()
     assert calculator.compute_posneg_rates(0, 0, 1, 1) == (0.5, -1)
-    # no negatives: 1 - TN_r = 2, TP_r = 2/3 -> D = 1 * 2 * (4/3)
-    assert calculator.compute_dark_number(pd.Series([1, 1, 1]), pd.Series([1, 0, 1])) == \
-        pytest.approx(8 / 3)
+    assert calculator.compute_dark_number(pd.Series([1, 1, 1]), pd.Series([1, 0, 1])) == -1.0
     _, value = calculator.compute_dark_number_non_linear(
         pd.Series([0, 0]), pd.Series([0, 1]), pd.Series([0.6, 0.7]), root_degree=3)
-    assert isinstance(value, complex) or np.iscomplexobj(value)       # root of -1
+    assert value == -1.0
 
 
-def test_f2_a_scope_with_one_label_raises():
-    with pytest.raises(ValueError):
-        DarkNumberCalculator().compute_dark_number(pd.Series([0, 0, 0]), pd.Series([0, 0, 0]))
+def test_f2_a_scope_with_one_label_is_undefined():
+    """299o, JBG v1.1: a one-label scope has an undefined rate (D = -1). At 299m: raised."""
+    assert DarkNumberCalculator().compute_dark_number(pd.Series([0, 0, 0]),
+                                                      pd.Series([0, 0, 0])) == -1.0
 
 
 def test_f7_alpha_is_the_certainty_of_the_predicted_label():

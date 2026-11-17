@@ -257,6 +257,13 @@ kombinerad och med den korstränade modellen på testdata. De väntas växa i
 den ordningen och bildar tillsammans ett heuristiskt intervall, och vyn säger om
 ordningen håller. Därunder finns beräkningarna och förväxlingsmatriserna.
 
+En skattning kan vara **Odefinierad**. Det händer när den del av data som den
+görs på saknar rader av målklassen eller av de övriga klasserna, eller när
+korrektionsfaktorn c inte kunde skattas eller ligger utanför 1–10 (modellen
+måste hitta minst 10 % av de rader som avsiktligt märktes om i testet bakom
+c). Det betyder att pipelinen eller datasetet inte passar för att skatta
+mörkertal för den målklassen.
+
 I **Felklassificeringar** för en SQL-körning kan du rätta klasser som är
 fel i källdata. Välj **Rätt klass** för raderna och sedan **Granska
 korrigeringarna**. En sida visar ändringarna, och först när du väljer **Skriv

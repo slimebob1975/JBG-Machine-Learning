@@ -23,7 +23,12 @@ DARK_ESTIMATES = {"D_re_full": "Final model, all data", "D_cv_full": "Cross-trai
 DARK_REASONS = {"unestimable": "cannot be estimated", "missing": "missing",
                 "ambiguous": "ambiguous", "non-finite": "not a number",
                 "unknown correction": "unknown correction",
-                "inconsistent zero-FP result": "inconsistent"}
+                "inconsistent zero-FP result": "inconsistent",
+                # 299o, JBG v1.1
+                "undefined rate": "Undefined: this part has no rows of the target class or "
+                                  "none of the other classes",
+                "undefined correction": "Undefined: no usable correction factor (c), the "
+                                        "pipeline is ill-suited to this problem"}
 DARK_COLUMNS = {"Model type": "Estimate", "type": "Calculation", "target": "Target class",
                 "alphas": "Alpha", "corr": "Correction (c)", "corr_model": "Correction from",
                 "corr_source": "Basis of the correction", "dark_number": "Dark Number"}
@@ -122,6 +127,14 @@ def alpha_text(value, language: str = "sv"):
         _number_text(number, language) for number in numbers)
 
 
+def _is_undefined(value) -> bool:
+    """299o, JBG v1.1: -1 marks an undefined Dark Number or correction factor."""
+    try:
+        return float(value) == -1.0
+    except (TypeError, ValueError):
+        return False
+
+
 def readable_dark_table(detail: dict, translate, language: str = "sv") -> dict:
     """298j: the engine's Dark Number tables with readable estimate and model
     names and calculation types. Only these known columns are changed, never a
@@ -137,6 +150,8 @@ def readable_dark_table(detail: dict, translate, language: str = "sv") -> dict:
                 row[index] = translate(_CORRECTION_MODELS[value])
             elif column == "type" and isinstance(value, str):
                 row[index] = value.replace("_", " ")
+            elif column in ("corr", "dark_number") and _is_undefined(value):
+                row[index] = translate("Undefined")                         # 299o
             elif column == "alphas":
                 row[index] = alpha_text(value, language)
     return detail

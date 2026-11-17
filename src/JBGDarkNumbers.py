@@ -6,6 +6,47 @@ from sklearn.metrics import confusion_matrix
 
 class DarkNumberCalculator:
 
+    # 299o, JBG v1.1 (agreed 2026-11-16, DN-01 F1/F2 and the bounds on c): a
+    # correction of the standard method that leaves D unchanged in every
+    # normal case. D (and c) are -1, "undefined", when
+    #   - a rate is undefined: no rows outside the target (TN + FP = 0) or no
+    #     target rows (TP + FN = 0) in the scope (also a one-label scope);
+    #   - c could not be estimated, or lies outside [CORRECTION_MIN,
+    #     CORRECTION_MAX]: the pipeline is ill-suited to the problem.
+    # With no false positives and rows outside the target, D = 0 whatever c is.
+    METHOD_VERSION = "1.1"
+    UNDEFINED = -1.0
+    CORRECTION_MIN = 1.0
+    CORRECTION_MAX = 10.0
+
+    @classmethod
+    def bounded_correction(cls, corr, source: str):
+        """(c, source) with v1.1's bounds: an unestimable or out-of-bounds c is -1."""
+        if "unestimable" in str(source):
+            return cls.UNDEFINED, "undefined/unestimable"
+        try:
+            value = float(corr)
+        except (TypeError, ValueError):
+            return cls.UNDEFINED, "undefined/unestimable"
+        if not (cls.CORRECTION_MIN <= value <= cls.CORRECTION_MAX):
+            return cls.UNDEFINED, f"undefined/out_of_bounds ({source})"
+        return value, source
+
+    @staticmethod
+    def _counts(real: pd.Series, predicted: pd.Series):
+        """TN, FP, FN, TP for target (1) against the rest (0), also for a scope
+        with one label only (299o, DN-01 F2: it raised)."""
+        return confusion_matrix(real, predicted, labels=[0, 1]).ravel()
+
+    @classmethod
+    def _undefined(cls, TN, FP, FN, TP, corr) -> bool:
+        """299o: whether D is undefined (-1) for these counts and this c."""
+        if TN + FP == 0 or TP + FN == 0:
+            return True                          # a rate is undefined
+        if FP == 0:
+            return False                         # D = 0 whatever c is
+        return corr == cls.UNDEFINED
+
     FORMULA_LATEX = {
         "base": r"D = c\,(1 - TN_r)\,(2 - TP_r)",
         "single_alpha": r"D = c\,\alpha\,(1 - TN_r)\,(2 - TP_r)",
@@ -95,7 +136,11 @@ class DarkNumberCalculator:
     def compute_dark_number(self, real: pd.Series, predicted: pd.Series, corr: float = 1.0):
         
         # Compute confusion matrix elements
-        TN, FP, FN, TP = confusion_matrix(real, predicted).ravel()
+        TN, FP, FN, TP = self._counts(real, predicted)
+        if self._undefined(TN, FP, FN, TP, corr):
+            return self.UNDEFINED                  # 299o: undefined
+        if FP == 0:
+            corr = 1.0                           # 299o: D = 0, c does not matter
         
         # Computes rates
         TPr, TNr = self.compute_posneg_rates(TN, FP, FN, TP)
@@ -109,7 +154,11 @@ class DarkNumberCalculator:
     def compute_dark_number_single_alpha(self, real: pd.Series, predicted: pd.Series, pred_prob: pd.Series, corr: float = 1.0):
         
         # Compute confusion matrix elements
-        TN, FP, FN, TP = confusion_matrix(real, predicted).ravel()
+        TN, FP, FN, TP = self._counts(real, predicted)
+        if self._undefined(TN, FP, FN, TP, corr):
+            return 1.0, self.UNDEFINED                  # 299o: undefined
+        if FP == 0:
+            corr = 1.0                           # 299o: D = 0, c does not matter
         
         # Computes rates
         TPr, TNr = self.compute_posneg_rates(TN, FP, FN, TP)
@@ -127,7 +176,11 @@ class DarkNumberCalculator:
     def compute_dark_number_separated_alpha(self, real: pd.Series, predicted: pd.Series, pred_prob: pd.Series, corr: float = 1.0):
         
         # Compute confusion matrix elements
-        TN, FP, FN, TP = confusion_matrix(real, predicted).ravel()
+        TN, FP, FN, TP = self._counts(real, predicted)
+        if self._undefined(TN, FP, FN, TP, corr):
+            return [1.0, 1.0], self.UNDEFINED                  # 299o: undefined
+        if FP == 0:
+            corr = 1.0                           # 299o: D = 0, c does not matter
         
         # Computes rates
         TPr, TNr = self.compute_posneg_rates(TN, FP, FN, TP)
@@ -146,7 +199,11 @@ class DarkNumberCalculator:
                                     use_alpha=False,  root_degree: int=3, corr: float = 1.0):
         
         # Compute confusion matrix elements
-        TN, FP, FN, TP = confusion_matrix(real, predicted).ravel()
+        TN, FP, FN, TP = self._counts(real, predicted)
+        if self._undefined(TN, FP, FN, TP, corr):
+            return 1.0, self.UNDEFINED                  # 299o: undefined
+        if FP == 0:
+            corr = 1.0                           # 299o: D = 0, c does not matter
         
         # Computes rates
         TPr, TNr = self.compute_posneg_rates(TN, FP, FN, TP)

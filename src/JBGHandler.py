@@ -3092,6 +3092,15 @@ class PredictionsHandler:
                         "was not classified as resource-constrained; using 1.0 as fallback/unestimable."
                     )
 
+            # 299o, JBG v1.1: an unestimable or out-of-bounds c is -1 (D then -1).
+            bounded, bounded_source = DarkNumberCalculator.bounded_correction(corr, corr_source)
+            if bounded != corr or bounded_source != corr_source:
+                self.handler.logger.print_warning(
+                    f"Dark Number correction for {model_name}, target {label}: c={corr} "
+                    f"({corr_source}) is not usable (allowed {DarkNumberCalculator.CORRECTION_MIN:g}"
+                    f"-{DarkNumberCalculator.CORRECTION_MAX:g}); the Dark Number is undefined (-1). "
+                    "The pipeline is ill-suited to this problem.")
+            corr, corr_source = bounded, bounded_source
             corrs[label] = corr
             corr_sources[label] = corr_source
             corr_models[label] = corr_model

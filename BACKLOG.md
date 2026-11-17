@@ -446,7 +446,14 @@ full SQL regression acceptance remain separately unverified.
       notation, targets, reproducible baseline cases; reviewed before any
       engine patch). 299n: delivered for review
       (`docs/dark_numbers/DN-01_method_contract.md`, findings F1-F9, frozen
-      baseline tests); the review decides section 8 of the contract.
+      baseline tests); the review decides section 8 of the contract, one
+      finding at a time.
+      - [x] 299o: F1, F2 and bounds on `c` settled as JBG v1.1 (`D = −1`
+        when a rate is undefined or `c` is unusable; `1 ≤ c ≤ 10`).
+      - [ ] Later (asked 2026-11-16): an opt-in standard estimator for `c`
+        (for example logistic regression with standard scaling), chosen in
+        the GUI, when the pipeline's own `c` is unusable.
+      - [ ] F3-F9 and the rest of section 8, one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,

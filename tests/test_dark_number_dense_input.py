@@ -75,7 +75,9 @@ def test_real_hist_sparse_scopes_and_corrections_match_dense_run():
         baseline.dark_number_fallback_events.drop(columns='execution_seconds', errors='ignore'),
     )
     assert len(actual.dark_numbers) == 20  # five formulas in each of four scopes
-    assert any('(direct;' in msg for msg in actual.handler.logger.info)
+    # 299o, JBG v1.1: a direct estimate above c_max = 10 (14 here) is logged as
+    # "undefined/out_of_bounds (direct)"; it was still estimated directly.
+    assert any('direct' in msg for msg in actual.handler.logger.info)
     assert not any('Sparse data was passed' in msg for msg in actual.handler.logger.info)
     retries = [w for w in actual.handler.logger.warnings if 'Confirmed sparse-X rejection' in w]
     assert len(retries) == 2  # once per model, then reuse for proba/full scopes/corrections
