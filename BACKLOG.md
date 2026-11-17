@@ -450,10 +450,14 @@ full SQL regression acceptance remain separately unverified.
       finding at a time.
       - [x] 299o: F1, F2 and bounds on `c` settled as JBG v1.1 (`D = −1`
         when a rate is undefined or `c` is unusable; `1 ≤ c ≤ 10`).
+      - [x] 299p: F3 settled (folds without flips left out; at least half
+        of the folds must be measured).
       - [ ] Later (asked 2026-11-16): an opt-in standard estimator for `c`
         (for example logistic regression with standard scaling), chosen in
-        the GUI, when the pipeline's own `c` is unusable.
-      - [ ] F3-F9 and the rest of section 8, one at a time.
+        the GUI, when the pipeline's own `c` is unusable. When opted in, it is
+        used for the whole Dark Numbers computation (TP_r and TN_r as well as
+        `c`), since all of them depend on the chosen pipeline.
+      - [ ] F4-F9 and the rest of section 8, one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,

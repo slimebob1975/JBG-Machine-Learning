@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import numpy as np
 from scipy import sparse as scipy_sparse
 from sklearn.base import BaseEstimator, clone
@@ -17,6 +18,11 @@ DEBUG_LOGGING = False
 BACKEND_PROCESSES = "processes"
 BACKEND_THREADS = "threads"
 
+# 299p, JBG v1.1 (DN-01 F3, settled 2026-11-16): the share of folds that must
+# have flipped rows for the correction factor to be estimated.
+MIN_MEASURED_FOLD_SHARE = 0.5
+
+
 class NaNValueError(Exception):
     """Raised when a NaN value is encountered."""
     pass
@@ -33,7 +39,10 @@ def evaluate_split(estimator, X, y, train_idx, repeat_idx,
     pos_indices = np.where(y_train == positive_class)[0]
     n_flip = int(len(pos_indices) * flip_fraction)
     if n_flip == 0:
-        return 0.0
+        # 299p, JBG v1.1 (DN-01 F3, settled 2026-11-16): nothing was flipped, so
+        # nothing was measured. It counted as recovery 0, which pulled the mean
+        # down and pushed c up; such a fold is now left out.
+        return None
 
     flip_indices = rng.choice(pos_indices, size=n_flip, replace=False)
 
@@ -171,7 +180,23 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
 
         # Try running tasks with retry logic
         results = self._run_parallel(tasks)
-        self.recovery_results_ = [float(value) for value in results]
+        # 299p, JBG v1.1 (DN-01 F3): only folds with flipped rows are measured,
+        # and at least half of all folds must be, or c cannot be estimated.
+        measured = [float(value) for value in results if value is not None]
+        self.skipped_folds_ = len(results) - len(measured)
+        self.recovery_results_ = measured
+        if len(measured) < math.ceil(len(results) * MIN_MEASURED_FOLD_SHARE):
+            if self.logger:
+                self.logger.print_info(
+                    f"[Warning] Only {len(measured)} of {len(results)} folds had flipped rows "
+                    f"of the target; at least half are needed to estimate the correction factor."
+                )
+            self.correction_factor_ = 1.0
+            self.correction_status_ = "too_few_flipped_folds"
+            self.is_valid_for_regression_ = False
+            self.mean_recovery_ = None
+            return self
+        results = measured
 
         # If result contains NaN values, raise ValueError
         if np.isnan(results).any():

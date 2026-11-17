@@ -89,7 +89,7 @@ Numbered for review. Each is frozen as current behaviour by the tests and is
   number, which is reported as it is.
 - **F2. A scope with one label only** *(settled in v1.1, section 9)* makes `confusion_matrix(...).ravel()`
   return one value, and the four-way unpacking raises.
-- **F3. A fold with no flips counts as recovery 0.** `evaluate_split` returns
+- **F3. A fold with no flips counts as recovery 0.** *(Settled in v1.1, section 9.)* `evaluate_split` returns
   0.0 when `n_flip = 0` instead of leaving the fold out. With few target rows
   this pulls `mean(r)` down and `c` up, a candidate cause of extreme factors
   such as the `c ≈ 8237` in the plan's background case.
@@ -165,3 +165,17 @@ Since a valid `D` is never negative, −1 cannot be mistaken for a value. The
 Results tab shows "Odefinierad" with the cause. Later (backlog): an opt-in
 standard estimator for `c` (for example logistic regression with standard
 scaling), chosen in the GUI, when the pipeline's own `c` is unusable.
+
+### F3 (299p, settled 2026-11-16): folds without flips
+
+A fold with no flipped rows measures nothing and is left out of the mean
+(it counted as recovery 0). At least half of all folds must have flipped
+rows; otherwise `c` cannot be estimated, so `c = −1` and `D = −1`.
+
+Found while patching: in the main path F3 does not occur. The minimum number
+of target rows checked before the flip test, `max(⌈3/f⌉, 2 · folds)`,
+leaves at least two flips in every fold's training part. F3 therefore does
+not explain extreme factors such as `c ≈ 8237`; the likelier cause is F4: a
+flexible model fitted on the flipped rows reproduces their wrong labels on
+those same rows, so recovery is near zero and `c = 1/r` explodes. The fix
+stays as a guard for direct use of the flip test.

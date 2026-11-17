@@ -1,3 +1,22 @@
+## Revision 299p - JBG v1.1: folds without flipped rows (2026-11-16)
+
+- DN-01 review, F3 settled 2026-11-16 (option B): a fold of the flip test with
+  no flipped rows measures nothing and is left out of the mean (it counted as
+  recovery 0, pulling the mean down and `c` up). At least half of all folds
+  must have flipped rows (`MIN_MEASURED_FOLD_SHARE = 0.5`); otherwise the
+  status is "too_few_flipped_folds", `c` cannot be estimated, and by v1.1
+  `c = −1` and `D = −1`.
+- Found while patching: in the main path this does not occur, as the minimum
+  number of target rows checked before the flip test leaves at least two
+  flips in every fold. F3 does not explain extreme factors; F4 (in-sample
+  recovery with flexible models) is the likelier cause. Recorded in the DN-01
+  contract.
+- BACKLOG (asked 2026-11-16): the opt-in standard estimator, when chosen,
+  applies to the whole Dark Numbers computation (TP_r and TN_r as well as
+  `c`), since all of them depend on the pipeline.
+- Tests: `tests/test_revision_299p_flipless_folds.py`; the 299n baseline test
+  for F3 changes on purpose (old value in a comment).
+
 ## Revision 299o - JBG v1.1: undefined Dark Numbers and bounds on c (2026-11-16)
 
 - DN-01 review, settled 2026-11-16 (F1, F2 and the bounds on `c`): a

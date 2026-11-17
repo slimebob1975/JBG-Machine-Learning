@@ -127,10 +127,11 @@ def test_the_flip_test_with_logistic_regression_stays_in_range():
     assert 1.0 <= majority.correction_factor_ <= 1.25         # 1.10 at 299m
 
 
-def test_f3_a_fold_without_flips_counts_as_zero_recovery():
+def test_f3_a_fold_without_flips_is_not_measured():
+    """299p, JBG v1.1 (settled 2026-11-16): None, left out. At 299m: 0.0."""
     y = np.array(["neg"] * 95 + ["pos"] * 5)
     X = np.c_[np.arange(100.0), np.zeros(100)]
-    assert evaluate_split(Rule(), X, y, np.arange(100), 0, 0.1, "pos", "predict", 1) == 0.0
+    assert evaluate_split(Rule(), X, y, np.arange(100), 0, 0.1, "pos", "predict", 1) is None
 
 
 def test_f4_recovery_is_measured_on_the_rows_the_clone_was_fitted_on():

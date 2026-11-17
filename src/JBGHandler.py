@@ -2891,6 +2891,7 @@ class PredictionsHandler:
         }
         statistically_unestimable_statuses = recovery_level_unestimable_statuses | {
             "insufficient_sample",
+            "too_few_flipped_folds",              # 299p, JBG v1.1 (DN-01 F3)
         }
 
         self.handler.logger.print_info(
