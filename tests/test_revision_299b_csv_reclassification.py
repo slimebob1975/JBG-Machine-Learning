@@ -175,8 +175,9 @@ def test_the_estimates_get_percentages_and_bars():
     summary = [{"points": [{"value": 0.001042}, {"value": 0.004082}, {"value": None},
                            {"value": 0.01432}]}]
     points = with_percentages(summary, "sv")[0]["points"]
-    assert [p["percent"] for p in points] == ["0,10 %", "0,41 %", None, "1,43 %"]
-    assert [p["bar"] for p in points] == [7.3, 28.5, 0.0, 100.0]
+    # 299w: sorted from the lowest to the highest, undefined last.
+    assert [p["percent"] for p in points] == ["0,10 %", "0,41 %", "1,43 %", None]
+    assert [p["bar"] for p in points] == [7.3, 28.5, 100.0, 0.0]
     assert summary[0]["range_text"] == "0,10 % – 1,43 %"
 
 

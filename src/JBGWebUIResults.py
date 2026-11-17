@@ -148,6 +148,9 @@ def with_growth(summary: list, counts: dict, language: str) -> list:
                 point["growth_bar"] = 0.0 if top <= 0 else round(100 * point["growth"] / top, 1)
         interval["growth_range_text"] = (f"+{percent_text(min(growths), language)} – "
                                          f"+{percent_text(max(growths), language)}") if growths else ""
+        interval["growth_points"] = sorted(                                   # 299w
+            interval.get("points", []),
+            key=lambda p: (p.get("growth") is None, p.get("growth") or 0.0))
     return summary
 
 
@@ -172,6 +175,12 @@ def with_percentages(summary: list, language: str) -> list:
             point["bar"] = 0.0 if value is None or top <= 0 else round(100 * value / top, 1)
         interval["range_text"] = (f"{percent_text(min(values), language)} – "
                                   f"{percent_text(max(values), language)}") if values else ""
+        # 299w (settled 2026-11-16): the four model variants form an interval
+        # with subintervals, sorted from the lowest to the highest (undefined
+        # last); there is no order check.
+        interval["points"] = sorted(
+            interval["points"],
+            key=lambda p: (p.get("value") is None, p.get("value") or 0.0))
     return summary
 
 

@@ -110,7 +110,7 @@ Numbered for review. Each is frozen as current behaviour by the tests and is
 - **F8. `D` is not a proportion.** *(Settled in v1.2, section 9.)* Its range is `[0, 2c]` (`base`) and larger
   with F1. The plan therefore reports `D_JBG` separately from `H`/`U` until a
   translation is validated.
-- **F9. Two of four estimates are in-sample** (`D_cv_full` partly,
+- **F9. Two of four estimates are in-sample** *(settled, section 9)* (`D_cv_full` partly,
   `D_retrained_full` and Combined fully), which matters when they are read as
   a range together with `D_cv_test`.
 
@@ -270,3 +270,13 @@ The single-alpha and non-linear forms keep their shape (not reviewed), with
 the same cap and the same use of `c`. The Results tab shows the equation the
 run used with each part explained, and the user guide (About tab) explains
 the method in detail.
+
+### F9 (299w, settled 2026-11-16): four model variants, sorted
+
+The four estimates are model variants that together form an interval with
+subintervals. They are kept and shown sorted from the lowest to the highest
+(undefined last), each labelled with its model variant, with the subintervals
+listed. There is no order check: after 299u, `c` corrects the in-sample
+variants, so no order follows from the method. Noted for v2: the
+cross-trained model's estimate on all data is multiplied by `c` also on its
+own unseen test part (about a fifth of its rows), a modest over-correction.

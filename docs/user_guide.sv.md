@@ -253,9 +253,10 @@ rekommendationen behåller alla variabler.
 **Mörkertal** visar, när konfigurationen skattar mörkertal, den skattade
 andelen dolda fall för varje målklass. Fyra skattningar görs: med den
 slutliga modellen och med den korstränade modellen på alla data, en
-kombinerad och med den korstränade modellen på testdata. De väntas växa i
-den ordningen och bildar tillsammans ett heuristiskt intervall, och vyn säger om
-ordningen håller. Därunder finns beräkningarna och förväxlingsmatriserna.
+kombinerad och med den korstränade modellen på testdata. De visas sorterade
+från lägst till högst, var och en märkt med sin modellvariant, och bildar
+tillsammans ett intervall med delintervall. Därunder finns beräkningarna och
+förväxlingsmatriserna.
 
 En skattning kan vara **Odefinierad**. Det händer när den del av data som den
 görs på saknar rader av målklassen eller av de övriga klasserna, eller när
@@ -320,8 +321,9 @@ målklass ger små ändringar i D stora ändringar i tillväxten.
 med den korstränade modellen på alla data, med den slutliga modellen på alla
 data och kombinerat. Testdelen är ny för modellen, så `c` används inte där.
 De tre andra innehåller rader som modellen tränats på och korrigeras med `c`.
-Skattningarna väntas växa i den ordningen och bildar tillsammans ett
-heuristiskt intervall.
+De fyra modellvarianterna visas sorterade från lägst till högst och bildar
+tillsammans ett intervall med delintervall. Det finns ingen förväntad
+ordning mellan dem.
 
 **Odefinierade skattningar.** En skattning är odefinierad när den del av
 data som den görs på saknar rader av T eller av de övriga klasserna, eller

@@ -153,9 +153,9 @@
           {% if dark_view == "growth" %}<b>{{ _("Growth of the target class") }}</b>{% else %}<a href="/ui/results?run={{ selected_run }}&view=dark_numbers&dark_view=growth">{{ _("Growth of the target class") }}</a>{% endif %}</p>
         {# 298j: the estimates per target class, as the Voila GUI summarises them. #}
         {% if dark_view == "growth" %}
-        <p class="hint">{{ _("How much each target class would grow if the hidden cases were added, with the counts behind it. The four estimates are expected to grow from left to right.") }}</p>
+        <p class="hint">{{ _("How much each target class would grow if the hidden cases were added, with the counts behind it, for four model variants sorted from the lowest to the highest.") }}</p>
         {% else %}
-        <p class="hint">{{ _("The estimated share of hidden cases of each target class. The four estimates are expected to grow from left to right; together they form a heuristic range. Values are proportions.") }}</p>
+        <p class="hint">{{ _("The estimated share of hidden cases of each target class, for four model variants sorted from the lowest to the highest. Together they form an interval with subintervals.") }}</p>
         {% endif %}
         {% for interval in dark_summary %}
           <h3>{{ _("Target class") }}: {{ interval.target }} <span class="muted">· {{ interval.formula | replace("_", " ") }}</span></h3>
@@ -163,12 +163,14 @@
           {# 299v: the growth of the target class, with the counts behind it. #}
           <table class="grid dark-range">
             <thead><tr><th>{{ _("Estimate") }}</th><th class="num">{{ _("Dark Number") }}</th><th>{{ _("Growth of the target class") }}</th><th>{{ _("Counts") }}</th></tr></thead>
-            <tbody>{% for p in interval.points %}<tr><td>{{ _(dark_estimates.get(p.label, p.label)) }}</td>
+            <tbody>{% for p in interval.growth_points %}<tr><td>{{ _(dark_estimates.get(p.label, p.label)) }}</td>
               <td class="num">{% if p.value is not none %}{{ p.value | num(language) }}{% else %}{{ _(dark_reasons.get(p.reason, p.reason)) }}{% endif %}</td>
               <td class="dark-bar-cell">{% if p.growth is not none %}<span class="dark-track"><span class="dark-bar" style="width: {{ p.growth_bar }}%"></span></span><span class="dark-percent">{{ p.growth_text }}</span>{% endif %}</td>
               <td class="dark-counts">{% if p.growth is not none %}≈ {{ p.hidden | round | int | count(language) }} {{ _("hidden") }} · {{ p.registered_target | count(language) }} {{ _("registered in the target class") }} · {{ p.missing_text }} {{ _("of all real cases missing") }}{% else %}–{% endif %}</td></tr>{% endfor %}</tbody>
           </table>
           {% if interval.growth_range_text %}<p class="hint">{{ _("Range") }}: <b>{{ interval.growth_range_text }}</b></p>{% endif %}
+          {% set parts = interval.growth_points | selectattr("growth", "ne", none) | list %}
+          {% if parts | length > 1 %}<p class="hint">{{ _("Subintervals") }}: {% for p in parts %}{{ _(dark_estimates.get(p.label, p.label)) }} <b>+{{ p.growth_text.split(" (")[0][1:] }}</b>{{ " → " if not loop.last }}{% endfor %}</p>{% endif %}
           {% else %}
           <table class="grid dark-range">
             <thead><tr><th>{{ _("Estimate") }}</th><th class="num">{{ _("Dark Number") }}</th><th>{{ _("In percent") }}</th></tr></thead>
@@ -177,10 +179,9 @@
               <td class="dark-bar-cell">{% if p.percent %}<span class="dark-track"><span class="dark-bar" style="width: {{ p.bar }}%"></span></span><span class="dark-percent">{{ p.percent }}</span>{% endif %}</td></tr>{% endfor %}</tbody>
           </table>
           {% if interval.range_text %}<p class="hint">{{ _("Range") }}: <b>{{ interval.range_text }}</b></p>{% endif %}
+          {% set parts = interval.points | selectattr("percent") | list %}
+          {% if parts | length > 1 %}<p class="hint">{{ _("Subintervals") }}: {% for p in parts %}{{ _(dark_estimates.get(p.label, p.label)) }} <b>{{ p.percent }}</b>{{ " → " if not loop.last }}{% endfor %}</p>{% endif %}
           {% endif %}
-          {% if interval.status == "ordered" %}<p class="hint">{{ _("The estimates are in the expected order.") }}</p>
-          {% elif interval.status == "broken" %}<p class="message warn">{{ _("The estimates are not in the expected order.") }}</p>
-          {% else %}<p class="message warn">{{ _("The order could not be checked: an estimate is missing or cannot be estimated.") }}</p>{% endif %}
           {% if interval.points | selectattr("capped") | list %}<p class="message warn">{{ _("At least one estimate exceeded 100 % and is shown as 100 %: the estimate has broken down for this target class.") }}</p>{% endif %}
           {% if interval.points | selectattr("memorises") | list %}<p class="message warn">{{ _("The model fits its training rows clearly better than rows it has not seen (a fit of at least 95 % and at least 5 percentage points above its accuracy on unseen rows), so it may memorise them. The correction factor c may then be too large and the Dark Number too high.") }}</p>{% endif %}
           {% if interval.points | selectattr("reason", "equalto", "undefined correction") | list %}<p class="hint">{{ _("The correction factor c must lie between 1 and 10, that is the model must find at least 10 % of the deliberately relabelled rows. Otherwise the Dark Number is undefined.") }}</p>{% endif %}

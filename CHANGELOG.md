@@ -1,3 +1,17 @@
+## Revision 299w - Dark Numbers: four model variants, sorted (2026-11-16)
+
+- DN-01 review, F9 settled 2026-11-16: the four estimates are model variants
+  that together form an interval with subintervals. Results → Mörkertal shows
+  them sorted from the lowest to the highest (undefined last), each labelled
+  with its model variant, with a line "Delintervall" listing them in order;
+  the growth view sorts by growth. The order check and its messages are
+  removed (after 299u, `c` corrects the in-sample variants, so no order
+  follows from the method).
+- Noted for v2 in the DN-01 contract: the cross-trained model's estimate on
+  all data also multiplies its own unseen test part by `c`.
+- User guides: the estimates as sorted model variants.
+- Tests: `tests/test_revision_299w_sorted_estimates.py`.
+
 ## Revision 299v - Dark Numbers as growth of the target class (2026-11-16)
 
 - Asked 2026-11-16: Results → Mörkertal can show the Dark Number in two

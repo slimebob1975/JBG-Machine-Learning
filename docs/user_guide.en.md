@@ -253,9 +253,9 @@ variable.
 estimated share of hidden cases for each target class. Four estimates are
 made: with the final model and with the cross-trained model on all data, a
 combined one, and with the cross-trained model on the test data. They are
-expected to grow in that order and together form a heuristic range; the
-view says whether the order holds. Below are the calculations and the
-confusion matrices.
+shown sorted from the lowest to the highest, each labelled with its model
+variant, and together form an interval with subintervals. Below are the
+calculations and the confusion matrices.
 
 An estimate can be **Undefined**. That happens when the part of the data it
 is made on lacks rows of the target class or of the other classes, or when
@@ -320,8 +320,9 @@ small changes in D give large changes in the growth.
 part, with the cross-trained model on all data, with the final model on all
 data, and combined. The test part is new to the model, so `c` is not used
 there. The other three include rows the model was trained on and are
-corrected with `c`. The estimates are expected to grow in that order and
-together form a heuristic range.
+corrected with `c`. The four model variants are shown sorted from the lowest
+to the highest and together form an interval with subintervals. There is no
+expected order between them.
 
 **Undefined estimates.** An estimate is undefined when the part of the data
 it is made on lacks rows of T or of the other classes, or when `c` could not

@@ -2414,3 +2414,13 @@ msgstr "registrerade i målklassen"
 
 msgid "of all real cases missing"
 msgstr "av alla verkliga fall saknas"
+
+# 299w: four model variants sorted, no order check
+msgid "Subintervals"
+msgstr "Delintervall"
+
+msgid "How much each target class would grow if the hidden cases were added, with the counts behind it, for four model variants sorted from the lowest to the highest."
+msgstr "Hur mycket varje målklass skulle växa om de dolda fallen lades till, med antalen bakom, för fyra modellvarianter sorterade från lägst till högst."
+
+msgid "The estimated share of hidden cases of each target class, for four model variants sorted from the lowest to the highest. Together they form an interval with subintervals."
+msgstr "Den skattade andelen dolda fall för varje målklass, för fyra modellvarianter sorterade från lägst till högst. Tillsammans bildar de ett intervall med delintervall."
