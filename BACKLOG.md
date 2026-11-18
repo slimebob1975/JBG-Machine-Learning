@@ -497,10 +497,30 @@ full SQL regression acceptance remain separately unverified.
     - [ ] Asked 2026-11-16: ratio controls for over- and undersampling (for
       example 1 : 1 or 2 : 1), for both the ordinary pipeline and the Dark
       Number correction test (UNDER is 1 : 1 for now).
-    - [ ] 299z (agreed 2026-11-16, done first): a validation study of JBG 1.2
+    - [x] 300c: the study was run (report `DN-06_v12_validation_report.md`):
+      JBG 1.2 does not estimate the hidden share (8 of 52 cells pass for the
+      test part). Next: decide how results are presented now, and test
+      estimators with a defined target and zero level (mixture-proportion
+      estimation, DN-05) with the same study before any engine work. DN-03
+      (a better c) does not address the main error.
+    - [x] 299z (agreed 2026-11-16, done first): a validation study of JBG 1.2
       against a known truth (`DN-06_v12_validation_protocol.md`,
       `JBGDarkNumberStudy`). Thresholds to approve, then run and report. Its
       result decides how much of DN-03 to DN-05 is needed, and where.
+    - [ ] Asked 2026-11-18: Dark Numbers per subgroup of a variable (for
+      example age group or sex), chosen in the configuration's Dark Numbers
+      section, only for columns with the role "categorical". First version:
+      c and the Dark Number are estimated once for the whole population and
+      the result is divided among the categories (in proportion to each
+      category's alpha-weighted false positives, so the parts add up to the
+      total), with a minimum category size below which a share is not shown
+      on its own. Shown per category, also in the growth view. A more
+      rigorous handling, where differences in the model's accuracy between
+      groups are eliminated, is future work.
+    - [ ] Later (asked 2026-11-18): several levels of subgroups, for example
+      sex and then age group: the first variable splits the dataset into x
+      groups, each with its own complete estimation (D including c), and each
+      group's result is divided among the categories of the second variable.
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,
       a tested stopping rule).
     - [ ] DN-04 mislabelling and sensitivity analysis.

@@ -1,3 +1,26 @@
+## Revision 300c - The validation study's report; copying roles into SQL datasets (2026-11-18)
+
+- The validation study of JBG 1.2 was run (600 populations, no failed runs):
+  `docs/dark_numbers/DN-06_v12_validation_report.md`. JBG 1.2 does not
+  estimate the hidden share: the test-part estimate passed the approved
+  thresholds in 8 of 52 cells, the in-sample estimates in 1–2. The estimate is
+  set mostly by the model's own error level (target share and class overlap)
+  and follows the truth only weakly; `c` inflates the in-sample estimates. A
+  standard positive-unlabelled estimator, tried outside the engine, follows
+  the truth better with good separation but also fails when the classes
+  overlap. The protocol is marked as approved and run.
+- Reported 2026-11-18: "Kopiera kolumnroller från" into an SQL dataset listed
+  every numeric column as "not numbers here". The SQL profile gives SQL types
+  ("int", "decimal", ...) where the check expected "number"; they are now
+  translated as elsewhere. The message says why, with each column's type in
+  this dataset.
+- BACKLOG (asked 2026-11-18): Dark Numbers per subgroup (first version: one
+  estimation, the result divided among the categories of a categorical
+  column), and later several levels of subgroups.
+- A FutureWarning from the 299z test is gone.
+- Tests: `tests/test_revision_300c_copy_roles_sql_types.py`; 297d's test
+  follows the new message.
+
 ## Revision 300b - Every change counts as a project change (2026-11-18)
 
 - Asked 2026-11-18: the Projects list is ordered by each project's last

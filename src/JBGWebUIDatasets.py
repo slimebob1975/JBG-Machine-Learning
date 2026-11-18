@@ -189,8 +189,16 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
                                        if pair[0]["dataset_id"] == roles_from), None)
                         if source is not None and not roles_draft and profile:
                             from JBGDatasetRoles import copy_roles
-                            kinds = {c["name"]: c["type"] for c in profile["columns"]}
+                            # 300c: an SQL profile gives the SQL type ("int",
+                            # "decimal", ...), a CSV profile "number"/"text";
+                            # every numeric SQL column looked "not a number".
+                            from JBGDatasetInspection import NUMERIC_SQL_TYPES
+                            types = {c["name"]: str(c["type"]) for c in profile["columns"]}
+                            kinds = {name: "number" if t.lower() == "number"
+                                     or t.lower() in NUMERIC_SQL_TYPES else "text"
+                                     for name, t in types.items()}
                             mapping, missing, not_numeric = copy_roles(source[1], kinds)
+                            not_numeric = [f"{name} ({types[name]})" for name in not_numeric]
                             context["roles"] = mapping
                             context["categorical_limit"] = source[1].categorical_limit
                             context["roles_copied_from"] = source[0]["name"]

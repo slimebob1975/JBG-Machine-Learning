@@ -73,6 +73,8 @@ def test_the_verdicts_follow_the_thresholds():
 
 
 def test_too_many_undefined_fails_with_good_separation():
-    rows = pd.concat([_results([0.10, 0.10], [0.10] * 2),
-                      _results([0.0, 0.0], [0.10] * 2, undefined=True)])
+    # 300c: built in one step (concatenating an all-empty "D" column warned).
+    rows = _results([0.10, 0.10, 0.0, 0.0], [0.10] * 4)
+    rows.loc[2:, "D"] = None
+    rows.loc[2:, "undefined"] = True
     assert summarise(rows)["verdict"].iloc[0] == "fail"

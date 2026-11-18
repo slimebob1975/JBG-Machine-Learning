@@ -1,6 +1,7 @@
 # Validation of JBG 1.2 against a known truth – protocol
 
-Status: **proposed 2026-11-16, to be approved before the study is run.** The
+Status: **approved 2026-11-16, run 2026-11-18** (results in
+`DN-06_v12_validation_report.md`). The
 thresholds and decision rules below are fixed before any result is seen, so
 that the method cannot be judged by numbers chosen afterwards. Agreed
 2026-11-16: validate the current method first (a small version of DN-06),

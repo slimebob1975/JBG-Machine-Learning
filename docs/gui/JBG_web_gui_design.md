@@ -523,6 +523,7 @@ The map above is the target. What exists after revision 285m3:
 | (no GUI change) | 299z | A validation study of JBG 1.2 against synthetic data with a known hidden share: protocol and runner |
 | `/ui/run`, `/ui/prediction` | 300a | The run lists show each run's dataset with its configuration |
 | `/ui/projects` | 300b | The order by last change counts every change inside the project (datasets, configurations, runs started, deletions) |
+| `/ui/dataset` (copy roles) | 300c | Copying roles into an SQL dataset translates SQL types (it flagged every numeric column); the message names each column's type. The validation study's report |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

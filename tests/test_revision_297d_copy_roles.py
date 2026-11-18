@@ -100,7 +100,8 @@ def test_filling_in_copies_the_roles_without_saving(tmp_path):
         "id", "numeric", "categorical", "ignored", "class", "ignored"]
     assert 'name="categorical_limit" value="12"' in page          # the source's limit
     assert re.search(r'class="message warn">[^<]*kopierades inte:\s*petal</p>', page)
-    assert re.search(r'class="message warn">[^<]*Välj en annan roll:\s*sepal</p>', page)
+    # 300c: the message says why, with the column's type in this dataset.
+    assert re.search(r'class="message warn">[^<]*till exempel kategorisk eller text:\s*sepal \(text\)</p>', page)
     assert "Inga kolumnroller ännu" in later                        # nothing saved
 
 

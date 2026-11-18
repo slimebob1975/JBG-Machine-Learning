@@ -209,7 +209,7 @@
               <p class="message ok">{{ _("Copied from the dataset") }} “{{ roles_copied_from }}”. {{ _("Review the roles and save to keep them.") }}</p>
               {% if roles_missing %}<p class="message warn">{{ _("Not in this dataset, so their roles were not copied:") }}
                 {{ roles_missing[:20] | join(", ") }}{% if roles_missing | length > 20 %} (+{{ roles_missing | length - 20 }}){% endif %}</p>{% endif %}
-              {% if roles_not_numeric %}<p class="message warn">{{ _("Numeric in the other dataset but not numbers here; choose another role:") }}
+              {% if roles_not_numeric %}<p class="message warn">{{ _("Numeric variables in the other dataset, but stored as text in this one, so they cannot be numeric variables here. Choose another role, for example categorical or text:") }}
                 {{ roles_not_numeric[:20] | join(", ") }}{% if roles_not_numeric | length > 20 %} (+{{ roles_not_numeric | length - 20 }}){% endif %}</p>{% endif %}
             {% elif roles_suggested_from %}
               <p class="message ok">{{ _("Suggested from the configuration") }} “{{ roles_suggested_from }}”. {{ _("Review the roles and save to keep them.") }}</p>
