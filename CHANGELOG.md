@@ -1,3 +1,22 @@
+## Revision 299z - A validation study of JBG 1.2 against a known truth (2026-11-16)
+
+- Agreed 2026-11-16: validate the current method before building v2. Nobody
+  knows how close the Dark Number comes to the truth, and real data cannot
+  tell; synthetic data with a known hidden share can. The result decides how
+  much of the plan's DN-03 to DN-05 is needed.
+- `docs/dark_numbers/DN-06_v12_validation_protocol.md`: what is measured (each
+  estimate against the true hidden share in its own part of the data), how the
+  populations are generated (exact hidden share; one-sided hiding, and two
+  broken mechanisms), the matrix (60 main cells, 8 with broken assumptions,
+  10 repeats each), the measures, the pre-registered thresholds and what
+  follows from the result. Proposed, to be approved before the study is run.
+- `src/JBGDarkNumberStudy.py` (outside the normal flow; `python -m
+  JBGDarkNumberStudy --repeats 10 --out …`): generates the populations, trains
+  logistic regression and an MLP on the registered labels, runs the engine's
+  own Dark Number computation with the JBG 1.2 defaults, and writes
+  `results.csv`, `summary.csv` (with verdicts) and `thresholds.json`.
+- Tests: `tests/test_revision_299z_v12_validation_study.py`.
+
 ## Revision 299y - DN-02: sampling in the Dark Number correction test (2026-11-16)
 
 - DN-02, settled 2026-11-16: the flip test behind `c` has its own sampling

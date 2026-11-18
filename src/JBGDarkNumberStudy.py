@@ -1,0 +1,249 @@
+"""Validation study of the Dark Number method JBG 1.2 against a known truth
+(revision 299z, agreed 2026-11-16).
+
+Outside the normal training and prediction flow. Synthetic populations with a
+chosen true hidden share H (of the rows registered as another class, the share
+that really are the target class) are generated; models are trained on the
+registered labels, as in a real run; the engine's own Dark Number computation
+(PredictionsHandler.get_dark_numbers, the default settings of JBG 1.2) is run;
+and each of the four estimates is compared with the true H in its own part of
+the data (the test part, or all data). The protocol, the thresholds and the
+decision rules are in docs/dark_numbers/DN-06_v12_validation_protocol.md.
+
+Usage (from src/):  python -m JBGDarkNumberStudy --repeats 10 --out ../study
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import time
+import warnings
+from dataclasses import asdict, dataclass
+from itertools import product
+from pathlib import Path
+from types import SimpleNamespace
+
+import numpy as np
+import pandas as pd
+
+TARGET, REST = "T", "R"
+SEPARATIONS = {"weak": 0.5, "medium": 1.0, "strong": 2.0}
+SCOPES = {"D_cv_test": "test", "D_cv_full": "all", "D_retrained_full": "all",
+          "Combined (legacy full-data)": "all"}
+
+
+@dataclass(frozen=True)
+class Cell:
+    hidden_share: float          # true H among the rows registered as REST
+    target_share: float          # true share of TARGET in the population
+    separation: str              # weak, medium, strong
+    mechanism: str = "one_sided"  # one_sided, two_sided, feature_dependent
+    model: str = "logistic"      # logistic, mlp
+    rows: int = 4000
+
+    @property
+    def assumptions_hold(self) -> bool:
+        return self.mechanism == "one_sided"
+
+
+def main_cells(models=("logistic", "mlp")) -> list:
+    """The pilot's main matrix: assumptions hold (one-sided hiding)."""
+    return [Cell(h, q, s, "one_sided", m) for h, q, s, m in product(
+        (0.0, 0.02, 0.05, 0.10, 0.20), (0.15, 0.50, 0.85), ("weak", "strong"), models)]
+
+
+def broken_cells(models=("logistic", "mlp")) -> list:
+    """Assumptions broken: cases also hidden the other way, or by feature."""
+    return [Cell(h, 0.50, "medium", mech, m) for h, mech, m in product(
+        (0.05, 0.10), ("two_sided", "feature_dependent"), models)]
+
+
+def population(cell: Cell, seed: int):
+    """(X, registered labels, true labels) with exactly the cell's true H."""
+    rng = np.random.default_rng(seed)
+    n = cell.rows
+    true = np.where(rng.random(n) < cell.target_share, TARGET, REST)
+    shift = SEPARATIONS[cell.separation] * np.array([1.0, 0.6, 0.3, 0.0, 0.0, 0.0])
+    X = rng.normal(size=(n, 6)) + np.outer(true == TARGET, shift)
+    registered = true.copy()
+    targets = np.flatnonzero(true == TARGET)
+    rests = np.flatnonzero(true == REST)
+    hidden = int(round(cell.hidden_share * len(rests) / (1 - cell.hidden_share))) \
+        if cell.hidden_share < 1 else 0
+    hidden = min(hidden, len(targets) - 2)
+    if hidden > 0:
+        if cell.mechanism == "feature_dependent":
+            # Missing at random, not completely: weaker cases are hidden more often.
+            weight = np.exp(-1.5 * X[targets, 0])
+            chosen = rng.choice(targets, size=hidden, replace=False, p=weight / weight.sum())
+        else:
+            chosen = rng.choice(targets, size=hidden, replace=False)
+        registered[chosen] = REST
+    if cell.mechanism == "two_sided" and hidden > 0:
+        # As many true REST rows registered as TARGET (false registrations).
+        registered[rng.choice(rests, size=min(hidden, len(rests) - 2), replace=False)] = TARGET
+    return pd.DataFrame(X), pd.Series(registered), pd.Series(true)
+
+
+def true_hidden_share(registered: pd.Series, true: pd.Series) -> float:
+    rest = registered == REST
+    return float((true[rest] == TARGET).mean()) if rest.any() else float("nan")
+
+
+def _model(kind: str, seed: int):
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.neural_network import MLPClassifier
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    algorithm = LogisticRegression(max_iter=1000) if kind == "logistic" else \
+        MLPClassifier(hidden_layer_sizes=(32,), max_iter=500, random_state=seed)
+    return Pipeline([("STA", StandardScaler()), ("ALG", algorithm)])
+
+
+class _Log:
+    def __init__(self):
+        self.warnings = []
+
+    def print_warning(self, message):
+        self.warnings.append(str(message))
+
+    def print_info(self, *_args, **_kwargs):
+        return None
+
+
+def _handler(log):
+    from JBGHandler import PredictionsHandler
+    ph = object.__new__(PredictionsHandler)
+    jobs = SimpleNamespace(execute_n_job=lambda operation, estimator, X, y, **kw:
+                           operation(estimator, X, y))
+    ph.handler = SimpleNamespace(
+        logger=log, STANDARD_DESIRED_N_JOBS=1, get_handler=lambda name: jobs,
+        config=SimpleNamespace(
+            get_dark_number_flip_fraction=lambda: 0.2,
+            should_use_experimental_perturbed_dark_number_fallback=lambda: False,
+            mode=SimpleNamespace(dark_number_sampling_policy="PIPELINE")))
+    return ph
+
+
+def run_once(cell: Cell, seed: int) -> list:
+    """One population: the four estimates against the truth in their scope."""
+    X, registered, true = population(cell, seed)
+    n = len(X)
+    order = np.random.default_rng(seed + 1).permutation(n)
+    test = order[: n // 5]
+    train = order[n // 5:]
+    cross = _model(cell.model, seed).fit(X.iloc[train].to_numpy(), registered.iloc[train])
+    final = _model(cell.model, seed).fit(X.to_numpy(), registered)
+    log = _Log()
+    ph = _handler(log)
+    started = time.perf_counter()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        ph.get_dark_numbers(
+            X=X, Y=registered, models=[cross, final], model_names=["Cross", "Final"],
+            target_class=TARGET, type="separated_alpha", random_state=seed,
+            X_validation=X.iloc[test], Y_validation=registered.iloc[test],
+            X_cv_training=X.iloc[train], Y_cv_training=registered.iloc[train])
+    seconds = time.perf_counter() - started
+    frame = ph.dark_numbers.copy()
+    frame["Model type"] = frame["Model type"].replace("", pd.NA).ffill().astype(str)
+    truth = {"test": true_hidden_share(registered.iloc[test], true.iloc[test]),
+             "all": true_hidden_share(registered, true)}
+    memorises = any("memorise" in w for w in log.warnings)
+    rows = []
+    for _, row in frame[frame["target"].astype(str) == TARGET].iterrows():
+        name = row["Model type"]
+        scope = next((s for prefix, s in SCOPES.items() if name.startswith(prefix)), None)
+        if scope is None:
+            continue
+        value = float(row["dark_number"])
+        rows.append({**asdict(cell), "seed": seed,
+                     "estimate": next(p for p in SCOPES if name.startswith(p)),
+                     "true_H": truth[scope],
+                     "D": None if value == -1.0 else value, "undefined": value == -1.0,
+                     "capped": bool(row.get("capped", False)), "c": float(row["corr"]),
+                     "memorisation_warning": memorises, "seconds": seconds})
+    return rows
+
+
+# --- Pre-registered thresholds (docs/dark_numbers/DN-06_v12_validation_protocol.md) --------
+
+THRESHOLDS = {
+    "zero_mean_pp": 1.0,          # H = 0: mean estimate at most 1 percentage point
+    "zero_alarm_pp": 2.0,         # ... and above 2 points in at most 10 % of repeats
+    "zero_alarm_share": 0.10,
+    "bias_pp": 2.0, "bias_rel": 0.25,
+    "mae_pp": 3.0, "mae_rel": 0.35,
+    "undefined_share": 0.20,      # medium and strong separation
+    "stability_rel": 0.5,         # std over seeds at most half the truth (H >= 5 %)
+}
+
+
+def summarise(results: pd.DataFrame) -> pd.DataFrame:
+    """Per cell and estimate: the measures and the verdicts."""
+    keys = ["hidden_share", "target_share", "separation", "mechanism", "model", "estimate"]
+    out = []
+    for key, group in results.groupby(keys, dropna=False):
+        defined = group.dropna(subset=["D"])
+        error_pp = 100 * (defined["D"] - defined["true_H"])
+        truth_pp = 100 * group["true_H"].mean()
+        row = dict(zip(keys, key))
+        row.update(repeats=len(group), truth_pp=truth_pp,
+                   undefined_share=float(group["undefined"].mean()),
+                   capped_share=float(group["capped"].mean()),
+                   mean_pp=float(100 * defined["D"].mean()) if len(defined) else math.nan,
+                   bias_pp=float(error_pp.mean()) if len(defined) else math.nan,
+                   mae_pp=float(error_pp.abs().mean()) if len(defined) else math.nan,
+                   rmse_pp=float(np.sqrt((error_pp ** 2).mean())) if len(defined) else math.nan,
+                   std_pp=float(100 * defined["D"].std(ddof=1)) if len(defined) > 1 else math.nan,
+                   warning_share=float(group["memorisation_warning"].mean()),
+                   seconds=float(group["seconds"].mean()))
+        t = THRESHOLDS
+        if row["mechanism"] != "one_sided":
+            row["verdict"] = "assumptions broken (reported only)"
+        elif row["hidden_share"] == 0:
+            alarm = float((100 * defined["D"] > t["zero_alarm_pp"]).mean()) if len(defined) else 0.0
+            row["verdict"] = "pass" if row["mean_pp"] <= t["zero_mean_pp"] and \
+                alarm <= t["zero_alarm_share"] else "fail"
+        else:
+            bias_ok = abs(row["bias_pp"]) <= max(t["bias_pp"], 100 * t["bias_rel"] * row["truth_pp"] / 100)
+            mae_ok = row["mae_pp"] <= max(t["mae_pp"], t["mae_rel"] * row["truth_pp"])
+            stable = row["truth_pp"] < 5 or row["std_pp"] <= t["stability_rel"] * row["truth_pp"]
+            row["verdict"] = "pass" if (bias_ok and mae_ok and stable) else "fail"
+        if row["separation"] != "weak" and row["undefined_share"] > t["undefined_share"]:
+            row["verdict"] = "fail"
+        out.append(row)
+    return pd.DataFrame(out)
+
+
+def run_study(cells, repeats: int, out: Path, first_seed: int = 1000) -> pd.DataFrame:
+    out.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for index, cell in enumerate(cells):
+        for r in range(repeats):
+            rows.extend(run_once(cell, first_seed + 97 * index + r))
+        pd.DataFrame(rows).to_csv(out / "results.csv", index=False)       # progress kept
+    results = pd.DataFrame(rows)
+    summary = summarise(results)
+    summary.to_csv(out / "summary.csv", index=False)
+    (out / "thresholds.json").write_text(json.dumps(THRESHOLDS, indent=1), encoding="utf-8")
+    return summary
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Validate JBG 1.2 against a known truth.")
+    parser.add_argument("--repeats", type=int, default=10)
+    parser.add_argument("--out", type=Path, default=Path("dark_number_study"))
+    parser.add_argument("--models", default="logistic,mlp")
+    parser.add_argument("--broken", action="store_true", help="also the broken-assumption cells")
+    args = parser.parse_args(argv)
+    models = tuple(args.models.split(","))
+    cells = main_cells(models) + (broken_cells(models) if args.broken else [])
+    summary = run_study(cells, args.repeats, args.out)
+    print(summary.groupby(["estimate", "verdict"]).size())
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

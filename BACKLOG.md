@@ -497,6 +497,10 @@ full SQL regression acceptance remain separately unverified.
     - [ ] Asked 2026-11-16: ratio controls for over- and undersampling (for
       example 1 : 1 or 2 : 1), for both the ordinary pipeline and the Dark
       Number correction test (UNDER is 1 : 1 for now).
+    - [ ] 299z (agreed 2026-11-16, done first): a validation study of JBG 1.2
+      against a known truth (`DN-06_v12_validation_protocol.md`,
+      `JBGDarkNumberStudy`). Thresholds to approve, then run and report. Its
+      result decides how much of DN-03 to DN-05 is needed, and where.
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,
       a tested stopping rule).
     - [ ] DN-04 mislabelling and sensitivity analysis.
