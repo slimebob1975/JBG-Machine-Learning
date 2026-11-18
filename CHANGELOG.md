@@ -1,3 +1,12 @@
+## Revision 300a - The dataset in the run lists (2026-11-18)
+
+- Asked 2026-11-18: the run lists on the Training and Prediction tabs showed
+  only start time, configuration and status, so runs of one configuration on
+  several tables with the same structure could not be told apart. The column
+  is now "Dataset / Konfiguration": the dataset's name, with the
+  configuration below it.
+- Tests: `tests/test_revision_300a_dataset_in_run_lists.py`.
+
 ## Revision 299z2 - The validation study: impossible cells excluded (2026-11-18)
 
 - Found by the first run (2026-11-18): the cell with a hidden share of 20 %

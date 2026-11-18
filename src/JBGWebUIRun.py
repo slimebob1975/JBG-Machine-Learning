@@ -69,6 +69,18 @@ MESSAGES = {
 }
 
 
+def with_dataset_names(items: list, datasets, owner: str, project_id: str) -> list:
+    """300a (asked 2026-11-18): each listed run gets its dataset's name, so runs
+    of one configuration on several tables can be told apart."""
+    try:
+        names = {d["dataset_id"]: d["name"] for d in datasets.list(owner, project_id)}
+    except Exception:
+        names = {}
+    for item in items:
+        item["dataset_name"] = names.get(item.get("dataset_id"), "")
+    return items
+
+
 def add_run_tab(app, *, principal_dependency, render, redirect, active_project, runs,
                 project_runs, datasets, configurations, sessions, inspection,
                 models=None, results=None, logs=None) -> None:
@@ -148,8 +160,10 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
         if project is not None:
             (context["checks"], context["ready"], context["configuration"],
              context["investigate"]) = preflight(request, principal, project)
-            context["recent"] = [r for r in runs.list_project_runs(owner, project["project_id"])
-                                 if r.get("kind", "training") != "prediction"]
+            context["recent"] = with_dataset_names(
+                [r for r in runs.list_project_runs(owner, project["project_id"])
+                 if r.get("kind", "training") != "prediction"],
+                datasets, owner, project["project_id"])
             chosen = run or (context["recent"][0]["run_id"] if context["recent"] else "")
             if chosen and any(r["run_id"] == chosen for r in context["recent"]):
                 try:

@@ -2471,3 +2471,7 @@ msgstr "Målklassen är majoritetsklassen, och pipelinens översampling (till ex
 
 msgid "Another sampling for the correction test can be chosen in the configuration's Dark Numbers section."
 msgstr "En annan sampling för korrektionstestet kan väljas i konfigurationens avsnitt Mörkertal."
+
+# 300a: the dataset in the run lists
+msgid "Dataset / Configuration"
+msgstr "Dataset / Konfiguration"

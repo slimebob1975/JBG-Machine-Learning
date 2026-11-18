@@ -23,12 +23,12 @@
       <h2>{{ _("Training runs") }}</h2>
       {% if recent %}
       <table class="grid">
-        <thead><tr><th>{{ _("Started") }}</th><th>{{ _("Configuration") }}</th><th>{{ _("Status") }}</th></tr></thead>
+        <thead><tr><th>{{ _("Started") }}</th><th>{{ _("Dataset / Configuration") }}</th><th>{{ _("Status") }}</th></tr></thead>
         <tbody>
         {% for item in recent %}
           <tr class="{{ 'hl' if item.run_id == selected_run }}">
             <td class="num"><a href="/ui/run?run={{ item.run_id }}">{{ item.created_at | localtime }}</a></td>
-            <td>{{ item.configuration_name or "–" }}{% if item.configuration_version %} v{{ item.configuration_version }}{% endif %}
+            <td>{% if item.dataset_name %}<b>{{ item.dataset_name }}</b><br>{% endif %}<span class="{{ 'muted' if item.dataset_name }}">{{ item.configuration_name or "–" }}{% if item.configuration_version %} v{{ item.configuration_version }}{% endif %}</span>
               {% if item.kind == "investigation" %}<span class="badge b-neu">{{ _("Feature investigation") }}</span>{% endif %}</td>
             <td data-run-status="{{ item.run_id }}"><span class="badge {{ 'b-ok' if item.status == 'succeeded' else ('b-fail' if item.status in ('failed', 'interrupted') else 'b-neu') }}">{{ _(stages.get(item.status, item.status)) }}</span></td>
           </tr>
