@@ -26,6 +26,7 @@ MESSAGES = {
                        "(int, bigint, smallint or tinyint). Choose another ID column on the "
                        "Dataset tab (Column roles)."),
     "model_missing": ("error", "The model is not available."),
+    "run_in_progress": ("error", "A run is queued or running in the project. Wait until it has finished."),
     "joined_unavailable": ("error", "The predictions could not be joined with the original rows: "
                            "the file the prediction read is no longer available."),
     "signin_needed": ("error", "Sign in to SQL Server first."),
@@ -86,7 +87,10 @@ def add_prediction_tab(app, *, principal_dependency, render, redirect, active_pr
                                        if d["role"] in ("prediction", "mixed")]
             except Exception:
                 context["datasets"] = []
-            from JBGWebUIRun import with_dataset_names                    # 300a
+            from JBGWebUIRun import run_in_progress, with_dataset_names   # 300a, 300d
+            context["busy"] = run_in_progress(runs, owner, project["project_id"])
+            if context["busy"]:
+                context["ready"] = False
             context["recent"] = with_dataset_names(
                 [r for r in runs.list_project_runs(owner, project["project_id"])
                  if r.get("kind") == "prediction"],
@@ -151,6 +155,9 @@ def add_prediction_tab(app, *, principal_dependency, render, redirect, active_pr
         model_id = request.cookies.get("jbg_model", "")
         if project is None or not model_id:
             return redirect("/ui/prediction", message="model_missing")
+        from JBGWebUIRun import run_in_progress
+        if run_in_progress(runs, principal.principal_key, project["project_id"]):
+            return redirect("/ui/prediction", message="run_in_progress")         # 300d
         try:
             created = project_runs.submit_prediction(principal, project["project_id"],
                                                      model_id=model_id,

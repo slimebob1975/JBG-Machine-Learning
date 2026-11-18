@@ -2479,3 +2479,7 @@ msgstr "Dataset / Konfiguration"
 # 300c: copying column roles from an SQL dataset
 msgid "Numeric variables in the other dataset, but stored as text in this one, so they cannot be numeric variables here. Choose another role, for example categorical or text:"
 msgstr "Numeriska variabler i det andra datasetet, men lagrade som text i det här, så de kan inte vara numeriska här. Välj en annan roll, till exempel kategorisk eller text:"
+
+# 300d: one run at a time per project
+msgid "A run is queued or running in the project. Wait until it has finished."
+msgstr "En körning står i kö eller pågår i projektet. Vänta tills den är klar."

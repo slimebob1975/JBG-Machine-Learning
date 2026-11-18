@@ -588,4 +588,7 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    # 300d: a readable run log (timestamp and level per line, no empty lines).
+    from JBGRunLogFormat import install
+    install(sys)
     sys.exit(main())

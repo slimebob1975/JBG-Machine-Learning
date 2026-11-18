@@ -379,10 +379,12 @@ full SQL regression acceptance remain separately unverified.
     algorithms (for example Linear, Non-linear, Tree, Neural networks,
     Ensemble, Special), sorted alphabetically within each group. Propose the
     group of each algorithm and confirm it before coding.
-  - [ ] Asked 2026-11-16: a clearer log: a timestamp and a level (DEBUG,
+  - [x] 300d: one run at a time per project (start buttons and routes); the
+    run log with timestamp and level per line; the hit rate in the study.
+  - [x] Asked 2026-11-16: a clearer log: a timestamp and a level (DEBUG,
     INFO, WARNING, ERROR) on every line, and no empty lines (probably left
     from running in a terminal).
-  - [ ] Asked 2026-11-16: while a run of the project is queued or running,
+  - [x] Asked 2026-11-16: while a run of the project is queued or running,
     "Starta träning" and "Undersök variabler" on the Training tab are
     unavailable (red, with the reason), and probably "Starta prediktion" on
     the Prediction tab.

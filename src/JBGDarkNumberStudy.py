@@ -155,6 +155,14 @@ def _handler(log):
     return ph
 
 
+def _hits(model, X, registered, true):
+    """(flagged rows, the share of them truly the target) for one model."""
+    predicted = pd.Series(model.predict(X.to_numpy()), index=registered.index)
+    flagged = (registered == REST) & (predicted == TARGET)
+    count = int(flagged.sum())
+    return count, (float((true[flagged] == TARGET).mean()) if count else math.nan)
+
+
 def run_once(cell: Cell, seed: int) -> list:
     """One population: the four estimates against the truth in their scope."""
     X, registered, true = population(cell, seed)
@@ -179,6 +187,14 @@ def run_once(cell: Cell, seed: int) -> list:
     frame["Model type"] = frame["Model type"].replace("", pd.NA).ffill().astype(str)
     truth = {"test": true_hidden_share(registered.iloc[test], true.iloc[test]),
              "all": true_hidden_share(registered, true)}
+    # 300d (asked 2026-11-18): the hit rate. Of the rows the model flags
+    # (registered as the rest, predicted as the target), the share that are
+    # truly hidden cases; random selection would hit the true hidden share.
+    flags = {"test": _hits(cross, X.iloc[test], registered.iloc[test], true.iloc[test]),
+             "cross_all": _hits(cross, X, registered, true),
+             "final_all": _hits(final, X, registered, true)}
+    flag_source = {"D_cv_test": "test", "D_cv_full": "cross_all",
+                   "D_retrained_full": "final_all", "Combined (legacy full-data)": "final_all"}
     memorises = any("memorise" in w for w in log.warnings)
     rows = []
     for _, row in frame[frame["target"].astype(str) == TARGET].iterrows():
@@ -187,8 +203,12 @@ def run_once(cell: Cell, seed: int) -> list:
         if scope is None:
             continue
         value = float(row["dark_number"])
-        rows.append({**asdict(cell), "seed": seed,
-                     "estimate": next(p for p in SCOPES if name.startswith(p)),
+        estimate = next(p for p in SCOPES if name.startswith(p))
+        flagged, hit_rate = flags[flag_source[estimate]]
+        rows.append({**asdict(cell), "seed": seed, "estimate": estimate,
+                     "flagged": flagged, "hit_rate": hit_rate,
+                     "lift": hit_rate / truth[scope] if truth[scope] and hit_rate == hit_rate
+                     else math.nan,
                      "true_H": truth[scope],
                      "D": None if value == -1.0 else value, "undefined": value == -1.0,
                      "capped": bool(row.get("capped", False)), "c": float(row["corr"]),
@@ -227,6 +247,11 @@ def summarise(results: pd.DataFrame) -> pd.DataFrame:
                    rmse_pp=float(np.sqrt((error_pp ** 2).mean())) if len(defined) else math.nan,
                    std_pp=float(100 * defined["D"].std(ddof=1)) if len(defined) > 1 else math.nan,
                    warning_share=float(group["memorisation_warning"].mean()),
+                   # 300d: reported only, no threshold (the protocol is unchanged).
+                   hit_rate_pp=float(100 * group["hit_rate"].mean())
+                   if "hit_rate" in group and group["hit_rate"].notna().any() else math.nan,
+                   lift=float(group["lift"].mean())
+                   if "lift" in group and group["lift"].notna().any() else math.nan,
                    seconds=float(group["seconds"].mean()))
         t = THRESHOLDS
         if row["mechanism"] != "one_sided":

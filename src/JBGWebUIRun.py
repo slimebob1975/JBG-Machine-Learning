@@ -57,6 +57,7 @@ MESSAGES = {
     "started": ("ok", "The run has started."),
     "cancel_requested": ("ok", "Cancelling the run."),
     "refused": ("error", "The run could not be started. Check the list above."),
+    "run_in_progress": ("error", "A run is queued or running in the project. Wait until it has finished."),
     "not_fitting": ("error", "The column roles do not fit the dataset."),
     "signin_needed": ("error", "Sign in to SQL Server first."),
     "unavailable": ("error", "The run is no longer available."),
@@ -67,6 +68,20 @@ MESSAGES = {
                        "(int, bigint, smallint or tinyint). Choose another ID column on the "
                        "Dataset tab (Column roles)."),
 }
+
+
+# 300d (asked 2026-11-16): a run of the project is queued, waiting for SQL
+# sign-in or running, so no other run can be started meanwhile.
+BUSY_STATUSES = frozenset({"pending", "awaiting_credentials", "running"})
+BUSY_TEXT = "A run is queued or running in the project. Wait until it has finished."
+
+
+def run_in_progress(runs, owner: str, project_id: str) -> bool:
+    try:
+        return any(r.get("status") in BUSY_STATUSES
+                   for r in runs.list_project_runs(owner, project_id))
+    except Exception:
+        return False
 
 
 def with_dataset_names(items: list, datasets, owner: str, project_id: str) -> list:
@@ -164,6 +179,11 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
                 [r for r in runs.list_project_runs(owner, project["project_id"])
                  if r.get("kind", "training") != "prediction"],
                 datasets, owner, project["project_id"])
+            # 300d: nothing new can start while a run of the project is in progress.
+            context["busy"] = run_in_progress(runs, owner, project["project_id"])
+            if context["busy"]:
+                context["ready"] = False
+                context["investigate"] = {"ready": False, "reason": BUSY_TEXT}
             chosen = run or (context["recent"][0]["run_id"] if context["recent"] else "")
             if chosen and any(r["run_id"] == chosen for r in context["recent"]):
                 try:
@@ -196,6 +216,8 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
         configuration_id = request.cookies.get("jbg_configuration", "")
         if project is None or not configuration_id:
             return redirect("/ui/run", message="refused")
+        if run_in_progress(runs, principal.principal_key, project["project_id"]):
+            return redirect("/ui/run", message="run_in_progress")                # 300d
         try:
             created = project_runs.submit(principal, project["project_id"],
                                           configuration_id=configuration_id)
@@ -217,6 +239,8 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
         configuration_id = request.cookies.get("jbg_configuration", "")
         if project is None or not configuration_id:
             return redirect("/ui/run", message="refused")
+        if run_in_progress(runs, principal.principal_key, project["project_id"]):
+            return redirect("/ui/run", message="run_in_progress")                # 300d
         try:
             created = project_runs.submit(principal, project["project_id"],
                                           configuration_id=configuration_id, investigation=True)

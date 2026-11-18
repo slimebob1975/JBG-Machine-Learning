@@ -200,6 +200,10 @@ SQL, a sign-in. For a point that is not met, **Put right** leads to where it
 is fixed. **Start training** starts the run with the active dataset
 and the chosen configuration.
 
+While a run of the project is queued or running, **Start training** and
+**Investigate features** (and **Start prediction** on the Prediction tab)
+are unavailable until it has finished.
+
 A finished run can be deleted with **Delete the run…** (also on the
 Prediction and Results tabs).
 

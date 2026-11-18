@@ -104,6 +104,6 @@
   {% if ready %}
     <form method="post" action="/ui/run"><button class="btn act ready">{{ _("Start training") }}</button></form>
   {% else %}
-    <button class="btn act blocked" disabled title="{{ _('Not everything is ready yet.') }}">{{ _("Start training") }}</button>
+    <button class="btn act blocked" disabled title="{{ _('A run is queued or running in the project. Wait until it has finished.') if busy else _('Not everything is ready yet.') }}">{{ _("Start training") }}</button>
   {% endif %}
 {% endblock %}

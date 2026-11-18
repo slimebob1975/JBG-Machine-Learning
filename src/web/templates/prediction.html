@@ -94,6 +94,6 @@
   {% if ready %}
     <button class="btn act ready" form="predict-form">{{ _("Start prediction") }}</button>
   {% else %}
-    <button class="btn act blocked" disabled title="{{ _('Not everything is ready yet.') }}">{{ _("Start prediction") }}</button>
+    <button class="btn act blocked" disabled title="{{ _('A run is queued or running in the project. Wait until it has finished.') if busy else _('Not everything is ready yet.') }}">{{ _("Start prediction") }}</button>
   {% endif %}
 {% endblock %}

@@ -1,3 +1,21 @@
+## Revision 300d - One run at a time, the hit rate, a readable run log (2026-11-18)
+
+- Asked 2026-11-16: while a run of the project is queued, waiting for SQL
+  sign-in or running, "Starta träning" and "Undersök variabler" on the
+  Training tab and "Starta prediktion" on the Prediction tab are red with the
+  reason, and the start routes refuse.
+- Asked 2026-11-18: the validation study also measures the hit rate: of the
+  rows the model flags (registered as the rest, predicted as the target), the
+  share that are truly hidden cases, and the lift against random selection
+  (reported only; the protocol's thresholds are unchanged). In a population
+  with a true hidden share of 10 % and strong separation the lift was about 6.
+- Asked 2026-11-16: the web worker's run log has a timestamp and a level
+  (DEBUG, INFO, WARNING, ERROR) on every line and no empty lines
+  (`JBGRunLogFormat`, installed only when the worker runs as its own
+  program; Voilà's output is unchanged).
+- User guides: one run at a time.
+- Tests: `tests/test_revision_300d_busy_hits_log.py`.
+
 ## Revision 300c - The validation study's report; copying roles into SQL datasets (2026-11-18)
 
 - The validation study of JBG 1.2 was run (600 populations, no failed runs):

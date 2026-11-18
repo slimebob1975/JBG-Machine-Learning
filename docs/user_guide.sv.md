@@ -201,6 +201,10 @@ Vid en punkt som inte är uppfylld leder **Åtgärda** dit den rättas till.
 **Starta träning** startar körningen med det aktiva datasetet och den valda
 konfigurationen.
 
+Medan en körning i projektet står i kö eller pågår går det inte att välja
+**Starta träning** eller **Undersök variabler** (eller **Starta prediktion**
+på fliken Prediktion) förrän den är klar.
+
 En avslutad körning kan tas bort med **Ta bort körningen…** (även på flikarna
 Prediktion och Resultat).
 

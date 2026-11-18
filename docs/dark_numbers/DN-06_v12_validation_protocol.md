@@ -61,6 +61,13 @@ Mean estimate, bias, MAE, RMSE (in percentage points of `H`), standard
 deviation over repeats, the share of undefined and of capped estimates, the
 share of runs with a memorisation warning, and running time.
 
+**Added 2026-11-18 (reported only, no threshold):** the hit rate. Of the
+rows the model behind an estimate flags (registered as the rest, predicted as
+the target), the share that are truly hidden cases, and the lift: the hit
+rate divided by the true hidden share, which is what random selection would
+hit. It measures how useful the misclassifications are for finding hidden
+cases, separately from whether `D` estimates their share.
+
 ## 5. Thresholds (assumptions hold)
 
 | Criterion | Threshold |
