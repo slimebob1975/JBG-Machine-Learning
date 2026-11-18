@@ -256,15 +256,15 @@ form.copy-roles { margin-bottom: 10px; }
 .scroll-top > div { height: 1px; }
 .scroll-top[hidden] { display: none; }
 .subtabs { flex-wrap: wrap; }                       /* 298j: more views than fit on one line */
-.dark-range { max-width: 720px; }
+.dark-range { width: 100%; max-width: none; }                       /* 299x: full width */
 
 /* 299a: corrections of mispredicted rows. */
 .correct-cell select { min-width: 110px; }
 .corrected { color: var(--ok); font-weight: 600; white-space: nowrap; }
 
 /* 299b: Dark Number estimates as percentages, with bars on the target's scale. */
-.dark-bar-cell { width: 45%; white-space: nowrap; }
-.dark-track { display: inline-block; width: calc(100% - 84px); min-width: 80px; vertical-align: middle; margin-right: 8px; }
+.dark-bar-cell { width: 34%; white-space: nowrap; }
+.dark-track { display: inline-block; width: 160px; vertical-align: middle; margin-right: 10px; }
 .dark-bar { display: block; height: 10px; min-width: 2px; background: var(--blue); border-radius: 2px; }
 .dark-percent { vertical-align: middle; font-variant-numeric: tabular-nums; }
 
@@ -318,3 +318,7 @@ svg.chart { width: 100%; height: auto; display: block; }
 .equation-parts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 10px 0; font-size: 13px; }
 .equation-parts dt { font-weight: 600; font-family: "Cambria Math", "Times New Roman", serif; }
 .equation-parts dd { margin: 0; }
+/* 299x: the growth view's counts get room; the figures stay on one line */
+.dark-percent { white-space: nowrap; }
+.dark-counts { min-width: 340px; }
+.dark-parameters { font-size: 12px; }

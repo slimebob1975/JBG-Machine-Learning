@@ -2424,3 +2424,25 @@ msgstr "Hur mycket varje målklass skulle växa om de dolda fallen lades till, m
 
 msgid "The estimated share of hidden cases of each target class, for four model variants sorted from the lowest to the highest. Together they form an interval with subintervals."
 msgstr "Den skattade andelen dolda fall för varje målklass, för fyra modellvarianter sorterade från lägst till högst. Tillsammans bildar de ett intervall med delintervall."
+
+# 299x: the Dark Number result record
+msgid "Settings used"
+msgstr "Inställningar som användes"
+
+msgid "flip fraction"
+msgstr "ommärkningsandel"
+
+msgid "flip test"
+msgstr "ommärkningstest"
+
+msgid "memorisation"
+msgstr "memorering"
+
+msgid "seed"
+msgstr "slumpfrö"
+
+msgid "target class"
+msgstr "målklass"
+
+msgid "Computed with an earlier version of the method (before 1.2). The values are shown as they were saved, without the equation of the current version."
+msgstr "Beräknat med en tidigare version av metoden (före 1.2). Värdena visas som de sparades, utan ekvationen för den nuvarande versionen."

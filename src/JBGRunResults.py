@@ -141,6 +141,12 @@ class RunResultsService:
                 "total_rows": len(rows), "page": page, "page_size": page_size}
 
 
+    def dark_number_record(self, owner: str, run_id: str):
+        """299x: the run's Dark Number result record (method, version, parameters,
+        estimates), or None when it was computed with an earlier version."""
+        from JBGDarkNumberRecord import read
+        return read(self._folder(owner, run_id) / "output" / "csvs")
+
     def dark_number_summary(self, owner: str, run_id: str) -> list:
         """298j: per target class, the engine's four Dark Number estimates in
         their expected order, with a status (JBGDarkNumberReporting, as the

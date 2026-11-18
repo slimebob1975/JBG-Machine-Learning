@@ -1,3 +1,23 @@
+## Revision 299x - The Dark Number result record (2026-11-16)
+
+- DN-01 review, result format settled 2026-11-16: every Dark Numbers
+  computation writes a JSON record next to the CSV files (unchanged, for
+  Voilà and older readers), `JBGDarkNumberRecord`: schema version 1, the
+  method and its version (JBG 1.2), the parameters used (calculation type,
+  method, alpha, target class, flip fraction, folds and repeats, the bounds
+  on `c`, the cap, the memorisation rule, the root `k`, the random seed) and
+  one entry per estimate (scope, model, target, estimand `D_JBG`, value,
+  interval, status, reason). v2 adds its estimates to the same list. Writing
+  it never fails a run.
+- Results → Mörkertal: the equation section names the method version from the
+  record and shows the settings used. Runs without a record (computed before
+  1.2) show their values as saved, with a note instead of the equation.
+- Asked 2026-11-16: the estimate table uses the panel's full width; the growth
+  figures stay on one line and the counts get room.
+- User guides and the DN-01 contract: the record.
+- Tests: `tests/test_revision_299x_dark_number_record.py` (a native run writes
+  the record and the page shows "JBG 1.2" with the settings).
+
 ## Revision 299w - Dark Numbers: four model variants, sorted (2026-11-16)
 
 - DN-01 review, F9 settled 2026-11-16: the four estimates are model variants

@@ -341,6 +341,12 @@ Beräkningstabellen visar båda värdena.
 en alfa och de icke-linjära formerna är oförändrade, med samma begränsning
 och samma användning av `c`.
 
+**Version och inställningar.** Ekvationsavsnittet anger metodens version och
+inställningarna som användes (ommärkningsandel, veck och upprepningar,
+gränserna för c, regeln för memorering och slumpfrö). Körningar gjorda före
+version 1.2 saknar sådana uppgifter. Deras värden visas som de sparades, med
+en anmärkning.
+
 **Vad som kommer.** Version 2 mäter ommärkningstestets återfinnande på rader
 som modellen inte tränats på, ger `c` en osäkerhet och lägger till metoder
 som skattar den dolda andelen direkt med intervall. Planen finns i

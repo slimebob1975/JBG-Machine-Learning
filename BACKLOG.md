@@ -487,8 +487,10 @@ full SQL regression acceptance remain separately unverified.
       - [x] 299v (asked 2026-11-16): the Dark Number also as the growth of
         the target class (percentage, factor, counts, missing share).
       - [x] 299w: F9 settled (four model variants sorted, no order check).
-      - [ ] The rest of section 8 (v2 result format, sampling specification,
-        benchmark criteria), one at a time.
+      - [x] 299x: the result format (a JSON record per run with schema
+        version, method version, parameters and estimates; old runs noted).
+      - [ ] The rest of section 8 (sampling specification, benchmark
+        criteria), one at a time.
     - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,

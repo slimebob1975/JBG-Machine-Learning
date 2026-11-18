@@ -129,7 +129,7 @@
         {% if dark_equation %}
           {# 299u (asked 2026-11-16): the equation behind the estimates, each part explained. #}
           <div class="formula-card dark-equation">
-            <h3>{{ _("The equation") }} <span class="muted">· JBG 1.2</span></h3>
+            <h3>{{ _("The equation") }} <span class="muted">· {{ dark_record.method.name }} {{ dark_record.method.version }}</span></h3>
             {% if dark_equation.card.mathml %}{{ dark_equation.card.mathml | safe }}{% else %}<code>{{ dark_equation.card.latex }}</code>{% endif %}
             <p class="formula-note">{{ _("D is capped at 100 %.") }}</p>
             <dl class="equation-parts">
@@ -144,8 +144,13 @@
                 <dd>{{ _("The share of all real cases of the target class that are missing from the register.") }}</dd>
               </dl>
             {% endif %}
+            {% set prm = dark_record.parameters %}
+            <p class="hint dark-parameters">{{ _("Settings used") }}: {{ _("flip fraction") }} {{ prm.flip_fraction | num(language) }} · {{ _("flip test") }} {{ prm.flip_test_folds }} × {{ prm.flip_test_repeats }} · c {{ prm.correction_min | num(language) }}–{{ prm.correction_max | num(language) }} · {{ _("memorisation") }} ≥ {{ prm.memorisation_fit | num(language) }} / {{ prm.memorisation_gap | num(language) }} · {{ _("seed") }} {{ prm.random_state if prm.random_state is not none else "–" }}{% if prm.target_class %} · {{ _("target class") }} {{ prm.target_class }}{% endif %}</p>
             <p class="hint">{{ _("The About tab explains the method in more detail.") }}</p>
           </div>
+        {% elif dark_summary %}
+          {# 299x: computed before the result record existed. #}
+          <p class="message warn">{{ _("Computed with an earlier version of the method (before 1.2). The values are shown as they were saved, without the equation of the current version.") }}</p>
         {% endif %}
         {# 299v (asked 2026-11-16): two readings of the same Dark Number. #}
         <p class="view-toggle">{{ _("Show") }}:

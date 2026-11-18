@@ -355,7 +355,7 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                    "correctable": False, "corrected": {}, "correction_log": [], "review": None,
                    "correction_source": "",
                    "dark_estimates": DARK_ESTIMATES, "dark_reasons": DARK_REASONS,
-                   "dark_equation": None, "dark_view": "share",
+                   "dark_equation": None, "dark_view": "share", "dark_record": None,
                    "dark_columns": DARK_COLUMNS, "investigation": None, "apply": None}
         if project is not None:
             # 296a: results belong to training runs; prediction runs are on the
@@ -425,7 +425,11 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                             counts = {}
                         with_growth(context["dark_summary"], counts, request_language(request))
                         types = [i.get("formula") for i in context["dark_summary"] if i.get("formula")]
-                        if types:
+                        # 299x: the equation only for runs with a result record
+                        # (computed with this version); older runs get a note.
+                        record = results.dark_number_record(owner, chosen)
+                        context["dark_record"] = record
+                        if types and record is not None:
                             context["dark_equation"] = dark_equation(types[0], translate)  # 299u
                         try:
                             context["dark_matrix"] = estimate_first(readable_dark_table(

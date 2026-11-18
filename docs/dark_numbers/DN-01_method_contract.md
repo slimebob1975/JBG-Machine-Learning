@@ -280,3 +280,16 @@ listed. There is no order check: after 299u, `c` corrects the in-sample
 variants, so no order follows from the method. Noted for v2: the
 cross-trained model's estimate on all data is multiplied by `c` also on its
 own unseen test part (about a fifth of its rows), a modest over-correction.
+
+### The result format (299x, settled 2026-11-16)
+
+Every Dark Numbers computation writes a JSON record next to the CSV files,
+which stay unchanged (`dark_numbers_<…>.json`, `JBGDarkNumberRecord`):
+`schema_version` (1), the method and its version (JBG 1.2), the parameters
+used (calculation type, method, alpha, target class, flip fraction, folds and
+repeats, the bounds on `c`, the cap, the memorisation rule, the root `k`, the
+random seed), and one entry per estimate: method, scope (model variant),
+model, target, estimand (`D_JBG`; v2 adds `H`, `U`, `N_hidden`), value,
+interval (none in v1.2), status (ok, capped, undefined) and reason. Runs
+without a record were computed with an earlier version; the Results tab shows
+their values as saved, with a note instead of the equation.

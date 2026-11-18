@@ -340,6 +340,11 @@ calculation table shows both values.
 single-alpha and non-linear forms are kept as they were, with the same cap and
 the same use of `c`.
 
+**Version and settings.** The equation section names the method version and
+the settings used (flip fraction, folds and repeats, the bounds on c, the
+memorisation rule, the random seed). Runs made before version 1.2 have no
+such record: their values are shown as they were saved, with a note.
+
 **What comes next.** Version 2 measures the flip test's recovery on rows the
 model has not been trained on, gives `c` an uncertainty, and adds methods that
 estimate the hidden share directly with intervals. The plan is in

@@ -3192,6 +3192,9 @@ class PredictionsHandler:
         # correction, so it must be included in that model's dependency check.
         reports = []
         full_data_predictions = []
+        # 299x: the settings this computation uses, for the result record.
+        self.__dict__["dark_number_used"] = {"flip_fraction": flip_fraction,
+                                             "random_state": random_state, "root_degree": 3}
         # 299t: class probabilities per estimate, fresh for every computation.
         self.__dict__["dark_number_class_probabilities"] = {}
         self.__dict__["dark_number_combined_parts"] = []
@@ -3489,6 +3492,16 @@ class PredictionsHandler:
             self.dark_numbers,
             dark_numbers_filepath
         )
+        # 299x: the result record (schema version, method and version, the
+        # parameters used, one entry per estimate), next to the CSV files.
+        try:
+            from JBGDarkNumberRecord import write as write_record
+            write_record(self.handler.config, self.dark_numbers,
+                         self.__dict__.get("dark_number_used") or {}, dark_numbers_filepath)
+        except Exception as error:                       # never fail the run for it
+            warn = getattr(self.handler.logger, "print_warning", None)
+            if callable(warn):
+                warn(f"The Dark Number result record could not be written: {type(error).__name__}")
 
         self.handler.logger.print_code("Get dark numbers calculations", Helpers.create_download_link(dark_numbers_filepath, title = ""))
 
