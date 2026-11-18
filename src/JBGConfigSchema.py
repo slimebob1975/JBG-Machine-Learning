@@ -98,11 +98,16 @@ INLINE_OPTIONS = {
     "mode.feature_search_reduction": ("NOR", "PCA"),
     "mode.feature_search_oversampling": ("NOG", "RND", "SME"),
     "mode.feature_search_scaler": ("STA", "MAX"),
+    "mode.dark_number_sampling_policy": ("PIPELINE", "NONE", "SMOTE", "CLEAN_SMOTE", "UNDER"),
     "mode.decision_policy": ("default", "fixed"),            # checked at run time
     "mode.holdout_split_mode": ("stratified_rows", "person_disjoint"),   # run time
 }
 # Words among those values that are interface text, not technical names.
 OPTION_LABELS = {
+    # 299y (DN-02): sampling in the Dark Number correction test.
+    "PIPELINE": "As the pipeline (as before)", "NONE": "None",
+    "SMOTE": "SMOTE", "CLEAN_SMOTE": "SMOTE from unflipped rows (clean SMOTE)",
+    "UNDER": "Undersampling (1 : 1)",
     "manual": "Manual", "assisted": "Assisted search", "reuse": "Reuse a saved result",
     "default": "Default (most likely class)", "fixed": "Fixed probability threshold",
     "stratified_rows": "Stratified rows", "person_disjoint": "Groups kept apart",
@@ -230,6 +235,8 @@ _f("mode.dark_number_alpha", "dark_numbers", "choice", "Alpha", options=_dark("D
 _f("mode.dark_number_target", "dark_numbers", "text", "Target class")
 _f("mode.dark_number_flip_fraction", "dark_numbers", "number", "Flip fraction",
    minimum=0.0, maximum=1.0)
+_f("mode.dark_number_sampling_policy", "dark_numbers", "choice", "Sampling in the correction test",
+   options=_inline("mode.dark_number_sampling_policy"))
 _f("mode.experimental_perturbed_dark_number_fallback", "dark_numbers", "boolean",
    "Experimental fallback", advanced=True)
 _f("connection.class_catalog", "predictions", "text", "Prediction catalog",

@@ -2950,7 +2950,9 @@ class PredictionsHandler:
                 random_state=random_state,
                 positive_class=label,
                 sample_size=1.0,
-                logger=self.handler.logger
+                logger=self.handler.logger,
+                sampling_policy=getattr(getattr(self.handler.config, "mode", None),
+                                        "dark_number_sampling_policy", "PIPELINE"),                          # 299y (DN-02)
             )
 
             direct_error = None
@@ -3115,6 +3117,24 @@ class PredictionsHandler:
             corr, corr_source = bounded, bounded_source
             # 299q, JBG v1.1 (DN-01 F4): the correction model's fit to its own
             # training rows in the flip test, kept beside c for the results.
+            # 299y (DN-02): the flip test's sampling, and the contamination risk
+            # of keeping the pipeline's SMOTE with a majority target.
+            policy = getattr(getattr(self.handler.config, "mode", None),
+                             "dark_number_sampling_policy", "PIPELINE")
+            from JBGDarkNumberSampling import contamination_risk
+            risk = contamination_risk(model, Y, label, policy)
+            info = dict(getattr(locals().get("corr_estimator"), "sampling_info_", None)
+                        or {"policy": policy, "synthetic_rows": 0, "fallback_folds": 0})
+            info["contamination_risk"] = bool(risk)
+            self.__dict__.setdefault("dark_number_sampling", {})[(corr_model, label)] = info
+            if risk:
+                warn = getattr(self.handler.logger, "print_warning", None)
+                if callable(warn):
+                    warn(f"Dark Number correction for {model_name}, target {label}: the target is "
+                         "the majority class and the pipeline's oversampling (e.g. SMOTE) also "
+                         "grows the deliberately relabelled rows in the correction test, so c "
+                         "may be too high. Another sampling policy for the correction test can "
+                         "be chosen in the configuration's Dark Numbers section.")
             fit = getattr(locals().get("corr_estimator"), "train_fit_", None)
             self.__dict__.setdefault("dark_number_train_fits", {})[(corr_model, label)] = fit
             unseen = self._dark_number_unseen_accuracy(corr_model)
@@ -3195,6 +3215,7 @@ class PredictionsHandler:
         # 299x: the settings this computation uses, for the result record.
         self.__dict__["dark_number_used"] = {"flip_fraction": flip_fraction,
                                              "random_state": random_state, "root_degree": 3}
+        self.__dict__["dark_number_sampling"] = {}                              # 299y
         # 299t: class probabilities per estimate, fresh for every computation.
         self.__dict__["dark_number_class_probabilities"] = {}
         self.__dict__["dark_number_combined_parts"] = []
@@ -3496,8 +3517,9 @@ class PredictionsHandler:
         # parameters used, one entry per estimate), next to the CSV files.
         try:
             from JBGDarkNumberRecord import write as write_record
-            write_record(self.handler.config, self.dark_numbers,
-                         self.__dict__.get("dark_number_used") or {}, dark_numbers_filepath)
+            used = dict(self.__dict__.get("dark_number_used") or {})
+            used["sampling"] = self.__dict__.get("dark_number_sampling") or {}      # 299y
+            write_record(self.handler.config, self.dark_numbers, used, dark_numbers_filepath)
         except Exception as error:                       # never fail the run for it
             warn = getattr(self.handler.logger, "print_warning", None)
             if callable(warn):

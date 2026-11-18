@@ -2446,3 +2446,28 @@ msgstr "målklass"
 
 msgid "Computed with an earlier version of the method (before 1.2). The values are shown as they were saved, without the equation of the current version."
 msgstr "Beräknat med en tidigare version av metoden (före 1.2). Värdena visas som de sparades, utan ekvationen för den nuvarande versionen."
+
+# 299y: DN-02, sampling in the correction test
+msgid "As the pipeline (as before)"
+msgstr "Som pipelinen (som tidigare)"
+
+msgid "SMOTE from unflipped rows (clean SMOTE)"
+msgstr "SMOTE från ej ommärkta rader (ren SMOTE)"
+
+msgid "Undersampling (1 : 1)"
+msgstr "Undersampling (1 : 1)"
+
+msgid "SMOTE"
+msgstr "SMOTE"
+
+msgid "Sampling in the correction test"
+msgstr "Sampling i korrektionstestet"
+
+msgid "sampling in the correction test"
+msgstr "sampling i korrektionstestet"
+
+msgid "The target class is the majority class, and the pipeline's oversampling (for example SMOTE) also grows the deliberately relabelled rows in the correction test, so c and the Dark Number may be too high for"
+msgstr "Målklassen är majoritetsklassen, och pipelinens översampling (till exempel SMOTE) förstärker också de avsiktligt ommärkta raderna i korrektionstestet, så c och mörkertalet kan vara för höga för"
+
+msgid "Another sampling for the correction test can be chosen in the configuration's Dark Numbers section."
+msgstr "En annan sampling för korrektionstestet kan väljas i konfigurationens avsnitt Mörkertal."

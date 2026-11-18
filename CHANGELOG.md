@@ -1,3 +1,32 @@
+## Revision 299y - DN-02: sampling in the Dark Number correction test (2026-11-16)
+
+- DN-02, settled 2026-11-16: the flip test behind `c` has its own sampling
+  policy, chosen in the configuration's Dark Numbers section ("Sampling i
+  korrektionstestet", `mode.dark_number_sampling_policy`, in
+  `Config.LATER_KEYS`), `JBGDarkNumberSampling`:
+  - "Som pipelinen" (PIPELINE, default): the winning pipeline's own sampling,
+    as before. With an oversampling pipeline (e.g. SMOTE) and a majority
+    target, the flipped rows become the minority SMOTE grows; the log and
+    Results → Mörkertal warn that `c` may be too high.
+  - "Ingen", "SMOTE", "SMOTE från ej ommärkta rader" (CLEAN_SMOTE: synthetic
+    rows only from rows that were not relabelled; with fewer than 6 clean rows
+    that fold uses none, flagged) and "Undersampling (1 : 1)": the pipeline's
+    sampler steps are switched off in the test's copy and the flipped training
+    part alone is resampled. Ordinary training is not affected.
+  - The policy, synthetic rows, fallback folds and the risk are stored in the
+    result record and shown with the settings used.
+- Tried on synthetic data (86 % majority target, SMOTE in the pipeline,
+  logistic regression): `c` 1.67 as the pipeline, 1.06 with none, 1.52 with
+  clean SMOTE.
+- BACKLOG (asked 2026-11-16): ratio controls for over- and undersampling, for
+  both the ordinary pipeline and the Dark Number correction test.
+- User guides and the DN-01 contract: the sampling policy.
+- Tests: `tests/test_revision_299y_correction_sampling.py`.
+- 299y2 (gate 2026-11-16): the Dark Numbers view crashed ("sampling_labels is
+  undefined") when the GUI server had been started before the patch was
+  applied (new template, old Python code). The template now tolerates the
+  missing values. Restart the GUI server after applying a patch.
+
 ## Revision 299x - The Dark Number result record (2026-11-16)
 
 - DN-01 review, result format settled 2026-11-16: every Dark Numbers

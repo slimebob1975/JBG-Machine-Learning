@@ -293,3 +293,20 @@ model, target, estimand (`D_JBG`; v2 adds `H`, `U`, `N_hidden`), value,
 interval (none in v1.2), status (ok, capped, undefined) and reason. Runs
 without a record were computed with an earlier version; the Results tab shows
 their values as saved, with a note instead of the equation.
+
+### DN-02 (299y, settled 2026-11-16): sampling in the flip test
+
+The flip test has its own sampling policy (`mode.dark_number_sampling_policy`,
+`JBGDarkNumberSampling`): PIPELINE (default, the winning pipeline's own
+sampling, as before), NONE, SMOTE, CLEAN_SMOTE (synthetic rows only from
+unflipped rows, parents and neighbours; with fewer than k + 1 = 6 clean rows
+in a class to oversample, that fold uses NONE and is flagged) and UNDER (1 : 1
+to the smallest class). The other policies switch the pipeline's sampler
+steps off in the copy and resample the flipped training part only. With
+PIPELINE, an oversampling pipeline and a majority target, the log and the
+Results view warn of contamination. The policy, synthetic rows, fallback
+folds and the risk are stored in the result record. Ordinary training is not
+affected. On synthetic data with an 86 % majority target and SMOTE in the
+pipeline (logistic regression), `c` was 1.67 as the pipeline, 1.06 with
+NONE, 1.52 with CLEAN_SMOTE. Which policy should be the recommendation is
+DN-06's benchmark; ratio controls are in the backlog.

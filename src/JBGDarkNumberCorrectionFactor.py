@@ -28,7 +28,8 @@ class NaNValueError(Exception):
     pass
 
 def evaluate_split(estimator, X, y, train_idx, repeat_idx,
-                   flip_fraction, positive_class, predict_mode, random_state, return_fit=False):
+                   flip_fraction, positive_class, predict_mode, random_state, return_fit=False,
+                   sampling_policy="PIPELINE"):
     """
     Top-level evaluation function for Parallel.
     """
@@ -63,7 +64,20 @@ def evaluate_split(estimator, X, y, train_idx, repeat_idx,
         y_train_flipped[flip_indices] = np.asarray(other_class, dtype=object)[drawn]
 
     model = clone(estimator)
-    model.fit(X_train, y_train_flipped)
+    sampling = None
+    if sampling_policy != "PIPELINE":
+        # 299y (DN-02): the pipeline's own samplers off; the chosen policy
+        # resamples the flipped training part only (never the flipped rows'
+        # prediction below, never validation or test rows).
+        from JBGDarkNumberSampling import resample, without_samplers
+        model = without_samplers(model)
+        flip_mask = np.zeros(len(y_train_flipped), dtype=bool)
+        flip_mask[flip_indices] = True
+        seed = None if random_state is None else random_state + repeat_idx
+        X_fit, y_fit, sampling = resample(sampling_policy, X_train, y_train_flipped, flip_mask, seed)
+        model.fit(X_fit, y_fit)
+    else:
+        model.fit(X_train, y_train_flipped)
 
     X_flipped = X_train[flip_indices]
     if predict_mode == 'predict':
@@ -78,6 +92,13 @@ def evaluate_split(estimator, X, y, train_idx, repeat_idx,
 
     if not return_fit:
         return reidentified / n_flip
+    if sampling is not None:
+        # 299y: the fold's sampling (synthetic rows, fallback) goes back too.
+        kept = np.ones(len(y_train_flipped), dtype=bool)
+        kept[flip_indices] = False
+        train_fit = float(np.mean(model.predict(X_train[kept]) == y_train_flipped[kept])) \
+            if kept.any() else None
+        return reidentified / n_flip, train_fit, sampling
     # 299q, JBG v1.1 (DN-01 F4, settled 2026-11-16): how closely the fitted copy
     # reproduces its own unflipped training labels. A value near 1 means the
     # model memorises its training data, so it also tends to reproduce the
@@ -103,7 +124,7 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
                  parallel_backend: str = BACKEND_PROCESSES,
                  logger: JBGLogger = None,
                  progress=None,
-                 isolated_execution: bool = False):
+                 isolated_execution: bool = False, sampling_policy="PIPELINE"):
         self.estimator = estimator
         self.flip_fraction = flip_fraction
         self.n_splits = n_splits
@@ -118,6 +139,8 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
         self.is_valid_for_regression_ = False
         self.recovery_results_ = None
         self.train_fit_ = None                   # 299q
+        self.sampling_policy = sampling_policy    # 299y (DN-02)
+        self.sampling_info_ = None
         self.mean_recovery_ = None
         self.parallel_backend = parallel_backend
         self.logger = logger
@@ -194,7 +217,8 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
             delayed(evaluate_split)(
                 self.estimator, X_sub, y_sub, train_idx, repeat_idx,
                 self.flip_fraction, self.positive_class,
-                self.predict_mode, self.random_state, True               # 299q: training fit
+                self.predict_mode, self.random_state, True,              # 299q: training fit
+                self.sampling_policy                                     # 299y
             )
             for repeat_idx in range(self.n_repeats)
             for train_idx, _ in skf.split(X_sub, y_sub)
@@ -203,7 +227,15 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
         # Try running tasks with retry logic
         results = self._run_parallel(tasks)
         # 299q: each fold returns (recovery, training fit); plain recoveries too.
-        pairs = [value if isinstance(value, tuple) else (value, None) for value in results]
+        # 299y: with a sampling policy also the fold's sampling.
+        samplings = [value[2] for value in results
+                     if isinstance(value, tuple) and len(value) == 3 and value[2]]
+        pairs = [value[:2] if isinstance(value, tuple) else (value, None) for value in results]
+        self.sampling_info_ = {
+            "policy": self.sampling_policy,
+            "synthetic_rows": int(sum(s.get("synthetic", 0) for s in samplings)),
+            "fallback_folds": int(sum(1 for s in samplings if s.get("fallback"))),
+        }
         results = [recovery for recovery, _ in pairs]
         fits = [fit for recovery, fit in pairs if recovery is not None and fit is not None]
         self.train_fit_ = float(np.mean(fits)) if fits else None

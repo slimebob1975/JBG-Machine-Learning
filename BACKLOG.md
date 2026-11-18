@@ -491,8 +491,12 @@ full SQL regression acceptance remain separately unverified.
         version, method version, parameters and estimates; old runs noted).
       - [ ] The rest of section 8 (sampling specification, benchmark
         criteria), one at a time.
-    - [ ] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
-      no leakage, no effect on the ordinary pipeline).
+    - [x] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
+      no leakage, no effect on the ordinary pipeline). 299y: the policy in the
+      configuration (default as the pipeline, with a contamination warning).
+    - [ ] Asked 2026-11-16: ratio controls for over- and undersampling (for
+      example 1 : 1 or 2 : 1), for both the ordinary pipeline and the Dark
+      Number correction test (UNDER is 1 : 1 for now).
     - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,
       a tested stopping rule).
     - [ ] DN-04 mislabelling and sensitivity analysis.

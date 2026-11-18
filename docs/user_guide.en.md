@@ -340,6 +340,16 @@ calculation table shows both values.
 single-alpha and non-linear forms are kept as they were, with the same cap and
 the same use of `c`.
 
+**Sampling in the correction test.** The configuration's Dark Numbers
+section chooses how the test behind c samples the data. "As the pipeline"
+(the default) uses the winning pipeline's own over- and undersampling, as
+before. When the target class is the majority class and the pipeline uses
+SMOTE, the deliberately relabelled rows become the class SMOTE grows, which
+can make c too high; the Dark Numbers view then warns. "None", "SMOTE",
+"SMOTE from unflipped rows" (synthetic rows only from rows that were not
+relabelled) and "Undersampling (1 : 1)" replace the pipeline's sampling in
+the test only. Ordinary training is not affected.
+
 **Version and settings.** The equation section names the method version and
 the settings used (flip fraction, folds and repeats, the bounds on c, the
 memorisation rule, the random seed). Runs made before version 1.2 have no

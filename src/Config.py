@@ -113,7 +113,8 @@ class Config:
     # an older file implies. Agreed 2026-11-05; extend only deliberately.
     # 299b2: date_columns (298h) was missing here, so a configuration saved
     # before 298h could not be loaded (found 2026-11-13 on a CSV run).
-    LATER_KEYS = {"mode": {"categorical_limit": 30, "date_columns": ""}}
+    LATER_KEYS = {"mode": {"categorical_limit": 30, "date_columns": "",
+                           "dark_number_sampling_policy": "PIPELINE"}}       # 299y
     JSON_CONFIG_SCHEMA_VERSION = 2
 
     CLASS_TABLE_SCRIPT = "./sql/CreatePredictionTables.sql.txt"
@@ -400,6 +401,9 @@ class Config:
         dark_number_alpha: DarkNumberAlpha = None
         dark_number_target: str = ""
         dark_number_flip_fraction: float = 0.2
+        # 299y (DN-02): sampling in the flip test behind c. PIPELINE (the
+        # default) keeps the winning pipeline's own sampling, as before.
+        dark_number_sampling_policy: str = "PIPELINE"
         experimental_perturbed_dark_number_fallback: bool = True
         oversampler: Oversampling = field(default_factory=Oversampling.defaultOversampler)
         undersampler: Undersampling = field(default_factory=Undersampling.defaultUndersampler)
@@ -601,6 +605,8 @@ class Config:
                 raise TypeError("Argument dark_number_flip_fraction must be a float between 0 and 1")
             if not 0.0 < self.dark_number_flip_fraction < 1.0:
                 raise ValueError("Argument dark_number_flip_fraction must be greater than 0 and less than 1")
+            if self.dark_number_sampling_policy not in ("PIPELINE", "NONE", "SMOTE", "CLEAN_SMOTE", "UNDER"):
+                raise ValueError("Argument dark_number_sampling_policy is invalid")
 
             if not (isinstance(self.algorithm, AlgorithmTuple)):
                 raise TypeError("Argument algorithm is invalid")
@@ -1234,6 +1240,8 @@ class Config:
             saved_config.mode.dark_number_target = config.mode.dark_number_target
             saved_config.mode.experimental_perturbed_dark_number_fallback = config.mode.experimental_perturbed_dark_number_fallback
             saved_config.mode.dark_number_flip_fraction = config.mode.dark_number_flip_fraction
+            saved_config.mode.dark_number_sampling_policy = getattr(
+                config.mode, "dark_number_sampling_policy", "PIPELINE")                # 299y
             # Saved model metadata deliberately contains no SQL password. Inject the
             # credentials from the current runtime configuration when loading a model.
             saved_config.connection.sql_username = config.connection.sql_username
@@ -1334,6 +1342,7 @@ class Config:
                 grouped_cross_validation=bool(module.mode.get("grouped_cross_validation", False)),
                 excluded_predictor_columns=module.mode.get("excluded_predictor_columns", ""),
                 date_columns=module.mode.get("date_columns", ""),
+                dark_number_sampling_policy=module.mode.get("dark_number_sampling_policy", "PIPELINE"),
                 preprocessor=(PreprocessTuple.from_string(module.mode["preprocessor"])
                               if isinstance(module.mode["preprocessor"], str)
                               else PreprocessTuple(module.mode["preprocessor"])),

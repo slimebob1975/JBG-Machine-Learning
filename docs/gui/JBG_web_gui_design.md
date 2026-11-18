@@ -519,6 +519,7 @@ The map above is the target. What exists after revision 285m3:
 | `/ui/results` (Dark Numbers) | 299v | A switch between the hidden share among the other classes and the growth of the target class (percentage, factor, counts, missing share), from each estimate's confusion matrix |
 | `/ui/results` (Dark Numbers) | 299w | The four model variants sorted from the lowest to the highest, with subintervals listed; no order check |
 | `/ui/results` (Dark Numbers) | 299x | The run's Dark Number result record (JSON beside the CSV files): the method version and settings shown with the equation; older runs noted; the estimate table at full width |
+| `/ui/configuration` (Dark Numbers), `/ui/results` | 299y | DN-02: the sampling policy of the correction test (as the pipeline, none, SMOTE, clean SMOTE, undersampling 1 : 1); a contamination warning; the policy in the record and the settings shown |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

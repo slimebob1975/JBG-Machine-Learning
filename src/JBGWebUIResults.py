@@ -240,6 +240,13 @@ EQUATION_PARTS = (
 )
 
 
+def _sampling_labels() -> dict:
+    """299y: the sampling policies' labels, as on the Configuration tab."""
+    from JBGConfigSchema import OPTION_LABELS
+    from JBGDarkNumberSampling import POLICIES
+    return {policy: OPTION_LABELS.get(policy, policy) for policy in POLICIES}
+
+
 def dark_equation(calculation_type: str, translate):
     """299u: the formula card and its explained parts for one calculation type."""
     from JBGWebUIDarkNumbers import formula_cards
@@ -355,7 +362,9 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                    "correctable": False, "corrected": {}, "correction_log": [], "review": None,
                    "correction_source": "",
                    "dark_estimates": DARK_ESTIMATES, "dark_reasons": DARK_REASONS,
+                   "sampling_labels": _sampling_labels(),                       # 299y
                    "dark_equation": None, "dark_view": "share", "dark_record": None,
+                   "dark_sampling_risks": [],
                    "dark_columns": DARK_COLUMNS, "investigation": None, "apply": None}
         if project is not None:
             # 296a: results belong to training runs; prediction runs are on the
@@ -429,6 +438,11 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                         # (computed with this version); older runs get a note.
                         record = results.dark_number_record(owner, chosen)
                         context["dark_record"] = record
+                        # 299y (DN-02): targets whose correction test kept the
+                        # pipeline's SMOTE with the target in the majority.
+                        context["dark_sampling_risks"] = sorted({
+                            str(e.get("target")) for e in (record or {}).get("estimates", [])
+                            if (e.get("sampling") or {}).get("contamination_risk")})
                         if types and record is not None:
                             context["dark_equation"] = dark_equation(types[0], translate)  # 299u
                         try:

@@ -341,6 +341,16 @@ Beräkningstabellen visar båda värdena.
 en alfa och de icke-linjära formerna är oförändrade, med samma begränsning
 och samma användning av `c`.
 
+**Sampling i korrektionstestet.** Konfigurationens avsnitt Mörkertal väljer
+hur testet bakom c samplar data. "Som pipelinen" (standard) använder den
+vinnande pipelinens egen över- och undersampling, som tidigare. När
+målklassen är majoritetsklassen och pipelinen använder SMOTE blir de
+avsiktligt ommärkta raderna den klass som SMOTE förstärker, vilket kan göra c
+för stor. Vyn Mörkertal varnar då. "Ingen", "SMOTE", "SMOTE från ej
+ommärkta rader" (syntetiska rader bara från rader som inte märktes om) och
+"Undersampling (1 : 1)" ersätter pipelinens sampling enbart i testet. Den
+vanliga träningen påverkas inte.
+
 **Version och inställningar.** Ekvationsavsnittet anger metodens version och
 inställningarna som användes (ommärkningsandel, veck och upprepningar,
 gränserna för c, regeln för memorering och slumpfrö). Körningar gjorda före

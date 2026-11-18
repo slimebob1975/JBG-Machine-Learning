@@ -57,10 +57,12 @@ def parameters(config, used: dict) -> dict:
         "memorisation_threshold": Calc.MEMORISATION_THRESHOLD,
         "root_degree": used.get("root_degree", 3),
         "random_state": used.get("random_state"),
+        # 299y (DN-02): sampling in the flip test behind c.
+        "sampling_policy": getattr(mode, "dark_number_sampling_policy", "PIPELINE"),
     }
 
 
-def estimates(frame) -> list:
+def estimates(frame, sampling: dict = None) -> list:
     """One entry per row of the calculation table (v1.2: estimand D_JBG)."""
     entries, model_type = [], ""
     for _, row in frame.iterrows():
@@ -84,6 +86,8 @@ def estimates(frame) -> list:
             "calculation_type": str(row.get("type")), "value": value, "interval": None,
             "status": status, "reason": reason,
             "corr": _number(row.get("corr")), "corr_source": str(row.get("corr_source", "")),
+            # 299y: the flip test's sampling for this correction model and target.
+            "sampling": (sampling or {}).get((str(row.get("corr_model", "")), str(row.get("target")))),
         })
     return entries
 
@@ -93,7 +97,8 @@ def build(config, frame, used: dict) -> dict:
     return {"schema_version": SCHEMA_VERSION,
             "method": {"name": "JBG", "version": DarkNumberCalculator.METHOD_VERSION},
             "parameters": parameters(config, used),
-            "estimates": estimates(frame)}
+            "estimates": estimates(frame, {(str(m), str(t)): v for (m, t), v in
+                                           (used.get("sampling") or {}).items()})}
 
 
 def record_path(csv_path) -> Path:
