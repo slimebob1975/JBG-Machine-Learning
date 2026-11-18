@@ -168,3 +168,10 @@ class ProjectRepository:
                 self._projects.c.owner == _owner(owner))).rowcount
         if not removed:
             raise KeyError("project unavailable")
+
+    def touch(self, owner: str, project_id: str) -> None:
+        """300b: mark the owner's project as changed (its last change time)."""
+        with self._engine.begin() as connection:
+            connection.execute(update(self._projects).where(
+                self._projects.c.project_id == project_id,
+                self._projects.c.owner == _owner(owner)).values(updated_at=_now()))

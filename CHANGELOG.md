@@ -1,3 +1,16 @@
+## Revision 300b - Every change counts as a project change (2026-11-18)
+
+- Asked 2026-11-18: the Projects list is ordered by each project's last
+  change, which only moved when the project's own details were edited. Now
+  every change inside a project counts (`JBGProjectTouch.touch_project`):
+  - datasets: new, column roles, validation, role, active training dataset,
+    corrections (a new file version), deletion; configurations: new, saved,
+    deleted (inside the same transaction, so a failed change does not count);
+  - a run started (training, prediction, feature investigation) and a
+    deletion of a run, model, configuration or dataset
+    (`ProjectRepository.touch`, `ProjectService.touch`).
+- Tests: `tests/test_revision_300b_project_change_time.py`.
+
 ## Revision 300a - The dataset in the run lists (2026-11-18)
 
 - Asked 2026-11-18: the run lists on the Training and Prediction tabs showed

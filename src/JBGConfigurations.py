@@ -16,6 +16,8 @@ from sqlalchemy import (Column, DateTime, ForeignKeyConstraint,
                         UniqueConstraint, create_engine, delete, insert, select,
                         update)
 from sqlalchemy.engine import Engine
+
+from JBGProjectTouch import touch_project
 from sqlalchemy.exc import IntegrityError
 
 
@@ -179,6 +181,7 @@ class ConfigurationRepository:
         configuration_id = str(uuid4())
         try:
             with self._engine.begin() as connection:
+                touch_project(connection, self._metadata.schema, project_id)   # 300b
                 self._project_owned(connection, owner, project_id)
                 connection.execute(insert(self._configs).values(
                     configuration_id=configuration_id, project_id=project_id,
@@ -218,6 +221,7 @@ class ConfigurationRepository:
         encoded = _snapshot(settings)
         now = datetime.now(timezone.utc)
         with self._engine.begin() as connection:
+            touch_project(connection, self._metadata.schema, project_id)   # 300b
             self._project_owned(connection, owner, project_id)
             changed = connection.execute(update(self._configs).where(
                 self._configs.c.configuration_id == configuration_id,
@@ -240,6 +244,7 @@ class ConfigurationRepository:
         versions there were. Runs keep their own copy of the settings."""
         owner = _text(owner, "owner", 256)
         with self._engine.begin() as connection:
+            touch_project(connection, self._metadata.schema, project_id)   # 300b
             self._project_owned(connection, owner, project_id)
             header = connection.execute(select(self._configs).where(
                 self._configs.c.project_id == project_id,

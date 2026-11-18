@@ -65,6 +65,10 @@ class ProjectService:
         except KeyError:
             raise ProjectUnavailable("project unavailable") from None
 
+    def touch(self, owner: str, project_id: str) -> None:
+        """300b: mark the owner's project as changed (a run started, a deletion)."""
+        self._repository.touch(owner, project_id)
+
     def update(self, owner: str, project_id: str, *, name: str | None = None,
                description: str | None = None) -> dict[str, Any]:
         self.require(owner, project_id)

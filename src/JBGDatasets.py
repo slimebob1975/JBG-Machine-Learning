@@ -15,6 +15,8 @@ from sqlalchemy import (Boolean, Column, DateTime, ForeignKeyConstraint, Index,
                         MetaData, String, Table, Text, UniqueConstraint, create_engine,
                         delete, insert, select, update)
 from sqlalchemy.engine import Engine
+
+from JBGProjectTouch import touch_project
 from sqlalchemy.exc import IntegrityError
 
 from JBGApplicationContracts import DataSourceKind
@@ -202,6 +204,7 @@ class DatasetRepository:
         now, dataset_id = datetime.now(timezone.utc), str(uuid4())
         try:
             with self._engine.begin() as connection:
+                touch_project(connection, self._metadata.schema, project_id)   # 300b
                 source = self._owned_source(connection, owner, project_id)
                 catalog, table, registration_id = _locator(
                     source, catalog=catalog, table=table, registration_id=registration_id)
@@ -234,6 +237,7 @@ class DatasetRepository:
     def activate_training(self, owner, project_id, dataset_id):
         owner = _text(owner, "owner", 256)
         with self._engine.begin() as connection:
+            touch_project(connection, self._metadata.schema, project_id)   # 300b
             row = self._owned_row(connection, owner, project_id, dataset_id)
             if DatasetRole(row.role) is DatasetRole.PREDICTION:
                 raise ValueError("prediction-only dataset cannot be active for training")
@@ -255,6 +259,7 @@ class DatasetRepository:
             raise TypeError("role must be DatasetRole")
         owner = _text(owner, "owner", 256)
         with self._engine.begin() as connection:
+            touch_project(connection, self._metadata.schema, project_id)   # 300b
             row = self._owned_row(connection, owner, project_id, dataset_id)
             if (DatasetRole(row.role) not in self.SWITCHABLE_ROLES
                     or role not in self.SWITCHABLE_ROLES):
@@ -283,6 +288,7 @@ class DatasetRepository:
         owner = _text(owner, "owner", 256)
         now = datetime.now(timezone.utc)
         with self._engine.begin() as connection:
+            touch_project(connection, self._metadata.schema, project_id)   # 300b
             row = self._owned_row(connection, owner, project_id, dataset_id)
             if row.role == DatasetRole.PREDICTION.value:
                 raise ValueError("prediction datasets use the roles of the training dataset")
@@ -303,6 +309,7 @@ class DatasetRepository:
         owner = _text(owner, "owner", 256)
         registration_id = _text(registration_id, "CSV registration ID", 64)
         with self._engine.begin() as connection:
+            touch_project(connection, self._metadata.schema, project_id)   # 300b
             row = self._owned_row(connection, owner, project_id, dataset_id)
             if row.source != DataSourceKind.CSV.value:
                 raise ValueError("only CSV datasets have files")
@@ -322,6 +329,7 @@ class DatasetRepository:
             raise TypeError("state must be DatasetValidationState")
         owner = _text(owner, "owner", 256)
         with self._engine.begin() as connection:
+            touch_project(connection, self._metadata.schema, project_id)   # 300b
             self._owned_row(connection, owner, project_id, dataset_id)
             connection.execute(update(self._datasets).where(
                 self._datasets.c.dataset_id == dataset_id).values(
@@ -333,6 +341,7 @@ class DatasetRepository:
         only; its files, runs and models are removed by JBGDeletion first)."""
         owner = _text(owner, "owner", 256)
         with self._engine.begin() as connection:
+            touch_project(connection, self._metadata.schema, project_id)   # 300b
             self._owned_row(connection, owner, project_id, dataset_id)
             connection.execute(delete(self._roles).where(self._roles.c.dataset_id == dataset_id))
             connection.execute(delete(self._datasets).where(

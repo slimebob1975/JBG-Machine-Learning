@@ -305,6 +305,8 @@ class DeletionService:
                 pass
         if fresh.kind == "project":
             self._projects.delete(owner, fresh.project_id)
+        elif self._projects is not None and callable(getattr(self._projects, "touch", None)):
+            self._projects.touch(owner, fresh.project_id)          # 300b: a deletion is a change
         return fresh
 
     def _remove_files(self, plan: DeletionPlan) -> None:

@@ -455,3 +455,24 @@ def _upload_dataset_id(repository, scope, artifact_id: str) -> str:
         if ref.artifact_id == artifact_id and ref.kind == ArtifactKind.DATASET:
             return ref.dataset_id
     raise FileNotFoundError("registered CSV not found")
+
+
+def _touching(method):
+    """300b: a run that was submitted marks its project as changed."""
+    import functools
+
+    @functools.wraps(method)
+    def wrapper(self, principal, project_id, *args, **kwargs):
+        result = method(self, principal, project_id, *args, **kwargs)
+        touch = getattr(self._projects, "touch", None)
+        if callable(touch):
+            try:
+                touch(principal.principal_key, project_id)
+            except Exception:
+                pass                    # never fail a submitted run for it
+        return result
+    return wrapper
+
+
+ProjectRunService.submit = _touching(ProjectRunService.submit)
+ProjectRunService.submit_prediction = _touching(ProjectRunService.submit_prediction)
