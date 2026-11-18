@@ -310,3 +310,22 @@ affected. On synthetic data with an 86 % majority target and SMOTE in the
 pipeline (logistic regression), `c` was 1.67 as the pipeline, 1.06 with
 NONE, 1.52 with CLEAN_SMOTE. Which policy should be the recommendation is
 DN-06's benchmark; ratio controls are in the backlog.
+
+### DN-03 (300e, settled 2026-11-18): the out-of-fold correction factor
+
+`c` is also measured out-of-fold (`JBGDarkNumberOutOfFold`): the configured
+flip fraction of the target rows is relabelled once (to other classes by
+size), five stratified folds, each relabelled row predicted by a model trained
+on the other folds; `r` the share recovered, `c = 1/r`. At least 3 and at most
+10 repeats, stopping when the 90 % interval of `c` (a t-interval on the
+recoveries) is within ±10 % of `c`. Quality: reliable (1 ≤ c ≤ 10, interval
+within ±25 %), uncertain (wider: used, flagged), not estimable (outside 1–10
+or not computable: undefined). The sampling policy of DN-02 applies here too.
+
+During the transition (agreed 2026-11-18) the Dark Number keeps the in-sample
+`c`. The out-of-fold `c`, its interval and quality, and the Dark Number it
+would give (`dark_number_oof`) are shown beside it, stored in the record, and
+measured by the validation study (`D_oof`, same thresholds). The switch is
+decided from experience and the study. A first look: for logistic regression
+the two `c` are close (about 1.6), so `c` alone does not explain the study's
+in-sample overestimates.

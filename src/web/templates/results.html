@@ -188,6 +188,7 @@
           {% set parts = interval.points | selectattr("percent") | list %}
           {% if parts | length > 1 %}<p class="hint">{{ _("Subintervals") }}: {% for p in parts %}{{ _(dark_estimates.get(p.label, p.label)) }} <b>{{ p.percent }}</b>{{ " → " if not loop.last }}{% endfor %}</p>{% endif %}
           {% endif %}
+          {% if interval.points | selectattr("oof_quality", "equalto", "uncertain") | list %}<p class="message warn">{{ _("The correction factor c measured out-of-fold is uncertain (a wide interval) for this target class. The Dark Number with it is shown, flagged, in the calculation table.") }}</p>{% endif %}
           {% if interval.points | selectattr("capped") | list %}<p class="message warn">{{ _("At least one estimate exceeded 100 % and is shown as 100 %: the estimate has broken down for this target class.") }}</p>{% endif %}
           {% if interval.points | selectattr("memorises") | list %}<p class="message warn">{{ _("The model fits its training rows clearly better than rows it has not seen (a fit of at least 95 % and at least 5 percentage points above its accuracy on unseen rows), so it may memorise them. The correction factor c may then be too large and the Dark Number too high.") }}</p>{% endif %}
           {% if interval.points | selectattr("reason", "equalto", "undefined correction") | list %}<p class="hint">{{ _("The correction factor c must lie between 1 and 10, that is the model must find at least 10 % of the deliberately relabelled rows. Otherwise the Dark Number is undefined.") }}</p>{% endif %}

@@ -203,6 +203,8 @@ def run_once(cell: Cell, seed: int) -> list:
         if scope is None:
             continue
         value = float(row["dark_number"])
+        oof = float(row["dark_number_oof"]) if "dark_number_oof" in row \
+            and row["dark_number_oof"] == row["dark_number_oof"] else value
         estimate = next(p for p in SCOPES if name.startswith(p))
         flagged, hit_rate = flags[flag_source[estimate]]
         rows.append({**asdict(cell), "seed": seed, "estimate": estimate,
@@ -210,6 +212,10 @@ def run_once(cell: Cell, seed: int) -> list:
                      "lift": hit_rate / truth[scope] if truth[scope] and hit_rate == hit_rate
                      else math.nan,
                      "true_H": truth[scope],
+                     # 300e: the Dark Number with the out-of-fold c, and that c.
+                     "D_oof": None if oof == -1.0 else oof,
+                     "c_oof": float(row["corr_oof"]) if "corr_oof" in row else math.nan,
+                     "c_oof_quality": str(row.get("corr_oof_quality", "")),
                      "D": None if value == -1.0 else value, "undefined": value == -1.0,
                      "capped": bool(row.get("capped", False)), "c": float(row["corr"]),
                      "memorisation_warning": memorises, "seconds": seconds})
@@ -229,44 +235,57 @@ THRESHOLDS = {
 }
 
 
+def _measures(group, column: str) -> dict:
+    """Bias, MAE, RMSE, spread and the verdict for one estimate column."""
+    t = THRESHOLDS
+    undefined = group[column].isna()
+    defined = group[~undefined]
+    error_pp = 100 * (defined[column] - defined["true_H"])
+    truth_pp = 100 * group["true_H"].mean()
+    m = dict(undefined_share=float(undefined.mean()),
+             mean_pp=float(100 * defined[column].mean()) if len(defined) else math.nan,
+             bias_pp=float(error_pp.mean()) if len(defined) else math.nan,
+             mae_pp=float(error_pp.abs().mean()) if len(defined) else math.nan,
+             rmse_pp=float(np.sqrt((error_pp ** 2).mean())) if len(defined) else math.nan,
+             std_pp=float(100 * defined[column].std(ddof=1)) if len(defined) > 1 else math.nan)
+    first = group.iloc[0]
+    if first["mechanism"] != "one_sided":
+        verdict = "assumptions broken (reported only)"
+    elif first["hidden_share"] == 0:
+        alarm = float((100 * defined[column] > t["zero_alarm_pp"]).mean()) if len(defined) else 0.0
+        verdict = "pass" if m["mean_pp"] <= t["zero_mean_pp"] and \
+            alarm <= t["zero_alarm_share"] else "fail"
+    else:
+        bias_ok = abs(m["bias_pp"]) <= max(t["bias_pp"], t["bias_rel"] * truth_pp)
+        mae_ok = m["mae_pp"] <= max(t["mae_pp"], t["mae_rel"] * truth_pp)
+        stable = truth_pp < 5 or m["std_pp"] <= t["stability_rel"] * truth_pp
+        verdict = "pass" if (bias_ok and mae_ok and stable) else "fail"
+    if first["mechanism"] == "one_sided" and first["separation"] != "weak" \
+            and m["undefined_share"] > t["undefined_share"]:
+        verdict = "fail"
+    m["verdict"] = verdict
+    return m
+
+
 def summarise(results: pd.DataFrame) -> pd.DataFrame:
-    """Per cell and estimate: the measures and the verdicts."""
+    """Per cell and estimate: the measures and the verdicts (300e: also for the
+    Dark Number with the out-of-fold c, suffix _oof)."""
     keys = ["hidden_share", "target_share", "separation", "mechanism", "model", "estimate"]
     out = []
     for key, group in results.groupby(keys, dropna=False):
-        defined = group.dropna(subset=["D"])
-        error_pp = 100 * (defined["D"] - defined["true_H"])
-        truth_pp = 100 * group["true_H"].mean()
         row = dict(zip(keys, key))
-        row.update(repeats=len(group), truth_pp=truth_pp,
-                   undefined_share=float(group["undefined"].mean()),
-                   capped_share=float(group["capped"].mean()),
-                   mean_pp=float(100 * defined["D"].mean()) if len(defined) else math.nan,
-                   bias_pp=float(error_pp.mean()) if len(defined) else math.nan,
-                   mae_pp=float(error_pp.abs().mean()) if len(defined) else math.nan,
-                   rmse_pp=float(np.sqrt((error_pp ** 2).mean())) if len(defined) else math.nan,
-                   std_pp=float(100 * defined["D"].std(ddof=1)) if len(defined) > 1 else math.nan,
-                   warning_share=float(group["memorisation_warning"].mean()),
+        row.update(repeats=len(group), truth_pp=100 * group["true_H"].mean(),
+                   capped_share=float(group["capped"].mean()))
+        row.update(_measures(group, "D"))
+        if "D_oof" in group:
+            row.update({f"{name}_oof": value for name, value in _measures(group, "D_oof").items()})
+        row.update(warning_share=float(group["memorisation_warning"].mean()),
                    # 300d: reported only, no threshold (the protocol is unchanged).
                    hit_rate_pp=float(100 * group["hit_rate"].mean())
                    if "hit_rate" in group and group["hit_rate"].notna().any() else math.nan,
                    lift=float(group["lift"].mean())
                    if "lift" in group and group["lift"].notna().any() else math.nan,
                    seconds=float(group["seconds"].mean()))
-        t = THRESHOLDS
-        if row["mechanism"] != "one_sided":
-            row["verdict"] = "assumptions broken (reported only)"
-        elif row["hidden_share"] == 0:
-            alarm = float((100 * defined["D"] > t["zero_alarm_pp"]).mean()) if len(defined) else 0.0
-            row["verdict"] = "pass" if row["mean_pp"] <= t["zero_mean_pp"] and \
-                alarm <= t["zero_alarm_share"] else "fail"
-        else:
-            bias_ok = abs(row["bias_pp"]) <= max(t["bias_pp"], 100 * t["bias_rel"] * row["truth_pp"] / 100)
-            mae_ok = row["mae_pp"] <= max(t["mae_pp"], t["mae_rel"] * row["truth_pp"])
-            stable = row["truth_pp"] < 5 or row["std_pp"] <= t["stability_rel"] * row["truth_pp"]
-            row["verdict"] = "pass" if (bias_ok and mae_ok and stable) else "fail"
-        if row["separation"] != "weak" and row["undefined_share"] > t["undefined_share"]:
-            row["verdict"] = "fail"
         out.append(row)
     return pd.DataFrame(out)
 

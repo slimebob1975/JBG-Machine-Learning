@@ -2483,3 +2483,34 @@ msgstr "Numeriska variabler i det andra datasetet, men lagrade som text i det h�
 # 300d: one run at a time per project
 msgid "A run is queued or running in the project. Wait until it has finished."
 msgstr "En körning står i kö eller pågår i projektet. Vänta tills den är klar."
+
+# 300e: DN-03, the out-of-fold correction factor
+msgid "Correction out-of-fold (c)"
+msgstr "Korrektion utanför veckning (c)"
+
+msgid "c out-of-fold, lower (90 %)"
+msgstr "c utanför veckning, nedre (90 %)"
+
+msgid "c out-of-fold, upper (90 %)"
+msgstr "c utanför veckning, övre (90 %)"
+
+msgid "Quality of c out-of-fold"
+msgstr "Kvalitet för c utanför veckning"
+
+msgid "Dark Number with c out-of-fold"
+msgstr "Mörkertal med c utanför veckning"
+
+msgid "Reliable"
+msgstr "Tillförlitlig"
+
+msgid "Uncertain"
+msgstr "Osäker"
+
+msgid "Not estimable"
+msgstr "Ej skattbar"
+
+msgid "Not used (test part)"
+msgstr "Används inte (testdel)"
+
+msgid "The correction factor c measured out-of-fold is uncertain (a wide interval) for this target class. The Dark Number with it is shown, flagged, in the calculation table."
+msgstr "Korrektionsfaktorn c mätt utanför veckning är osäker (ett brett intervall) för den här målklassen. Mörkertalet med den visas, flaggat, i beräkningstabellen."

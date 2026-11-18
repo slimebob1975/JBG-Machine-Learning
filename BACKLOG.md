@@ -523,8 +523,12 @@ full SQL regression acceptance remain separately unverified.
       sex and then age group: the first variable splits the dataset into x
       groups, each with its own complete estimation (D including c), and each
       group's result is divided among the categories of the second variable.
-    - [ ] DN-03 adaptive recovery and a stable c (uncertainty, quality states,
-      a tested stopping rule).
+    - [x] DN-03 adaptive recovery and a stable c (uncertainty, quality states,
+      a tested stopping rule). 300e: `c` out-of-fold beside the in-sample
+      one (the switch decided from experience and the study).
+    - [ ] Asked 2026-11-18: an adaptive flip fraction (adjusted to the class
+      size), settable in the configuration's Dark Numbers section (now a
+      fixed 20 % by default).
     - [ ] DN-04 mislabelling and sensitivity analysis.
     - [ ] DN-05 PU-SCAR / calibrated probabilistic method.
     - [ ] DN-06 common benchmark and method review (decision on what goes on).

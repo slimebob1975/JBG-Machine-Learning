@@ -355,6 +355,12 @@ ommärkta rader" (syntetiska rader bara från rader som inte märktes om) och
 "Undersampling (1 : 1)" ersätter pipelinens sampling enbart i testet. Den
 vanliga träningen påverkas inte.
 
+**c mätt utanför veckning.** Bredvid c visar beräkningstabellen c mätt
+utanför veckning (varje ommärkt rad förutsägs av en modell som inte tränats
+på den), dess 90 %-intervall och en kvalitet (tillförlitlig, osäker, ej
+skattbar), och det mörkertal den skulle ge. Mörkertalet använder fortfarande
+det första c. De två jämförs innan man byter.
+
 **Version och inställningar.** Ekvationsavsnittet anger metodens version och
 inställningarna som användes (ommärkningsandel, veck och upprepningar,
 gränserna för c, regeln för memorering och slumpfrö). Körningar gjorda före

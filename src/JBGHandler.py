@@ -2879,6 +2879,16 @@ class PredictionsHandler:
             [self.dark_number_fallback_events, pd.DataFrame([event])], ignore_index=True
         )
 
+    def _dark_number_oof_for(self, result_name, corr_models, corrs):
+        """300e: per target, the out-of-fold c entry for this estimate's correction
+        model; "not applied" on the unseen test part (c is not used there)."""
+        known = self.__dict__.get("dark_number_oof")
+        if not known:
+            return None
+        if result_name.startswith("D_cv_test"):
+            return {label: "not applied" for label in corrs}
+        return {label: known.get((corr_models.get(label), label)) for label in corrs}
+
     def _dark_number_unseen_accuracy(self, model_name):
         """299q2: the model's accuracy on unseen rows (its own test part, or else
         the cross-trained model's, as the final model has none of its own)."""
@@ -3137,6 +3147,16 @@ class PredictionsHandler:
                          "be chosen in the configuration's Dark Numbers section.")
             fit = getattr(locals().get("corr_estimator"), "train_fit_", None)
             self.__dict__.setdefault("dark_number_train_fits", {})[(corr_model, label)] = fit
+            # 300e (DN-03): the out-of-fold c, beside the in-sample one.
+            try:
+                from JBGDarkNumberOutOfFold import estimate as out_of_fold
+                self.__dict__.setdefault("dark_number_oof", {})[(corr_model, label)] = out_of_fold(
+                    model, X, Y, label, flip_fraction=flip_fraction,
+                    random_state=random_state, sampling_policy=policy)
+            except Exception as error:
+                self.__dict__.setdefault("dark_number_oof", {})[(corr_model, label)] = {
+                    "c": None, "c_low": None, "c_high": None, "repeats": 0, "recoveries": [],
+                    "quality": "not_estimable", "error": type(error).__name__}
             unseen = self._dark_number_unseen_accuracy(corr_model)
             if DarkNumberCalculator.memorises(fit, unseen) \
                     and corr != DarkNumberCalculator.UNDEFINED:
@@ -3216,6 +3236,7 @@ class PredictionsHandler:
         self.__dict__["dark_number_used"] = {"flip_fraction": flip_fraction,
                                              "random_state": random_state, "root_degree": 3}
         self.__dict__["dark_number_sampling"] = {}                              # 299y
+        self.__dict__["dark_number_oof"] = {}                                   # 300e
         # 299t: class probabilities per estimate, fresh for every computation.
         self.__dict__["dark_number_class_probabilities"] = {}
         self.__dict__["dark_number_combined_parts"] = []
@@ -3378,6 +3399,9 @@ class PredictionsHandler:
                     corr_models_by_model[correction_owner], targets=target_labels,
                     class_probabilities=(self.__dict__.get("dark_number_class_probabilities")
                                          or {}).get(result_name),                 # 299t
+                    oof=self._dark_number_oof_for(result_name,
+                                                  corr_models_by_model[correction_owner],
+                                                  corrs),                         # 300e
                 )
 
         return None
@@ -3435,6 +3459,7 @@ class PredictionsHandler:
         corr_models=None,
         targets=None,
         class_probabilities=None,
+        oof=None,
     ):
         
         # Compute dark numbers
@@ -3470,6 +3495,25 @@ class PredictionsHandler:
                 [self._dark_number_unseen_accuracy(corr_models.get(target))
                  for target in model_dark_numbers["target"]],
             )
+        if oof is not None:
+            # 300e (DN-03): the out-of-fold c, its 90 % interval and quality, and
+            # the Dark Number it would give (shown beside the in-sample one
+            # during the transition). oof: target -> entry, or "not applied".
+            entries = [oof.get(target) for target in model_dark_numbers["target"]]
+            usable = {t: (e["c"] if isinstance(e, dict) and e.get("quality") != "not_estimable"
+                          else (1.0 if e == "not applied" else DarkNumberCalculator.UNDEFINED))
+                      for t, e in zip(model_dark_numbers["target"], entries)}
+            alternative = DarkNumberCalculator().compute_dark_numbers(
+                Y, Y_pred, Y_prob_pred, type=type, corrs=usable, targets=targets,
+                class_probabilities=class_probabilities)
+            def field(entry, name):
+                return entry.get(name) if isinstance(entry, dict) else None
+            model_dark_numbers["corr_oof"] = [usable[t] for t in model_dark_numbers["target"]]
+            model_dark_numbers["corr_oof_low"] = [field(e, "c_low") for e in entries]
+            model_dark_numbers["corr_oof_high"] = [field(e, "c_high") for e in entries]
+            model_dark_numbers["corr_oof_quality"] = [
+                e.get("quality") if isinstance(e, dict) else (e or "") for e in entries]
+            model_dark_numbers["dark_number_oof"] = list(alternative["dark_number"])
         
         # Put together the results for the dark numbers
         model_name_col = pd.Series([model_name]+["" for i in range(model_dark_numbers.shape[0]-1)], name="Model type")

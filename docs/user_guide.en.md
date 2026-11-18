@@ -354,6 +354,12 @@ can make c too high; the Dark Numbers view then warns. "None", "SMOTE",
 relabelled) and "Undersampling (1 : 1)" replace the pipeline's sampling in
 the test only. Ordinary training is not affected.
 
+**c measured out-of-fold.** Beside c, the calculation table shows c measured
+out-of-fold (each relabelled row predicted by a model that has not been
+trained on it), its 90 % interval and a quality (reliable, uncertain, not
+estimable), and the Dark Number it would give. The Dark Number itself still
+uses the first c; the two are compared before switching.
+
 **Version and settings.** The equation section names the method version and
 the settings used (flip fraction, folds and repeats, the bounds on c, the
 memorisation rule, the random seed). Runs made before version 1.2 have no

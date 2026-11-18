@@ -33,7 +33,13 @@ DARK_COLUMNS = {"Model type": "Estimate", "type": "Calculation", "target": "Targ
                 "alphas": "Alpha", "corr": "Correction (c)", "corr_model": "Correction from",
                 "corr_source": "Basis of the correction", "dark_number": "Dark Number",
                 "corr_train_fit": "Training fit (correction model)",           # 299q
-                "corr_unseen_accuracy": "Accuracy on unseen rows"}             # 299q2
+                "corr_unseen_accuracy": "Accuracy on unseen rows",             # 299q2
+                # 300e (DN-03): the out-of-fold c beside the in-sample one.
+                "corr_oof": "Correction out-of-fold (c)",
+                "corr_oof_low": "c out-of-fold, lower (90 %)",
+                "corr_oof_high": "c out-of-fold, upper (90 %)",
+                "corr_oof_quality": "Quality of c out-of-fold",
+                "dark_number_oof": "Dark Number with c out-of-fold"}
 
 
 # 299a2 (asked 2026-11-12): the engine's English column names in the result
@@ -258,6 +264,11 @@ def dark_equation(calculation_type: str, translate):
     return {"type": calculation_type, "card": card, "parts": parts}
 
 
+# 300e: the out-of-fold c's quality states.
+OOF_QUALITY = {"reliable": "Reliable", "uncertain": "Uncertain",
+               "not_estimable": "Not estimable", "not applied": "Not used (test part)"}
+
+
 def _share_text(value, language: str) -> str:
     """299q: a share 0..1 as a percentage with one decimal, or "–"."""
     try:
@@ -293,7 +304,10 @@ def readable_dark_table(detail: dict, translate, language: str = "sv") -> dict:
                 row[index] = translate(_CORRECTION_MODELS[value])
             elif column == "type" and isinstance(value, str):
                 row[index] = value.replace("_", " ")
-            elif column in ("corr", "dark_number") and _is_undefined(value):
+            elif column == "corr_oof_quality":
+                row[index] = translate(OOF_QUALITY.get(str(value), str(value or "")))  # 300e
+            elif column in ("corr", "dark_number", "corr_oof", "dark_number_oof") \
+                    and _is_undefined(value):
                 row[index] = translate("Undefined")                         # 299o
             elif column in ("corr_train_fit", "corr_unseen_accuracy"):
                 row[index] = _share_text(value, language)                   # 299q

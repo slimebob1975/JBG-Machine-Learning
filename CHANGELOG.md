@@ -1,3 +1,24 @@
+## Revision 300e - DN-03: the correction factor measured out-of-fold (2026-11-18)
+
+- DN-03, settled 2026-11-18: `c` is also measured out-of-fold
+  (`JBGDarkNumberOutOfFold`): the target rows are relabelled once, five
+  folds, each relabelled row predicted by a model not trained on it; at least
+  3 and at most 10 repeats, stopping when the 90 % interval is within ±10 % of
+  `c`; quality reliable (interval within ±25 %), uncertain (used, flagged) or
+  not estimable (outside 1–10: undefined). The sampling policy applies.
+- Agreed 2026-11-18, the transition: the Dark Number keeps the in-sample `c`.
+  The out-of-fold `c`, its interval and quality, and the Dark Number it would
+  give are new columns in the calculation table and in the result record; an
+  uncertain one is flagged on Results → Mörkertal. The switch is decided from
+  experience and the validation study, which now measures both (`D_oof`,
+  judged by the same thresholds).
+- A first look: for logistic regression the two `c` are close (about 1.6);
+  for a decision tree the in-sample recovery is 0 (`c` infinite) while the
+  out-of-fold recovery is positive.
+- BACKLOG (asked 2026-11-18): an adaptive flip fraction, settable in the GUI.
+- User guides and the DN-01 contract: the out-of-fold `c`.
+- Tests: `tests/test_revision_300e_out_of_fold_c.py`.
+
 ## Revision 300d - One run at a time, the hit rate, a readable run log (2026-11-18)
 
 - Asked 2026-11-16: while a run of the project is queued, waiting for SQL

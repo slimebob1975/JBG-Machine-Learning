@@ -59,6 +59,9 @@ def parameters(config, used: dict) -> dict:
         "random_state": used.get("random_state"),
         # 299y (DN-02): sampling in the flip test behind c.
         "sampling_policy": getattr(mode, "dark_number_sampling_policy", "PIPELINE"),
+        # 300e (DN-03): the out-of-fold c (shown beside the in-sample one).
+        "oof_folds": 5, "oof_repeats": [3, 10], "oof_stop_halfwidth": 0.10,
+        "oof_reliable_halfwidth": 0.25,
     }
 
 
@@ -86,6 +89,15 @@ def estimates(frame, sampling: dict = None) -> list:
             "calculation_type": str(row.get("type")), "value": value, "interval": None,
             "status": status, "reason": reason,
             "corr": _number(row.get("corr")), "corr_source": str(row.get("corr_source", "")),
+            # 300e (DN-03): the out-of-fold c and the Dark Number it would give.
+            "corr_oof": _number(row.get("corr_oof")),
+            "corr_oof_interval": [_number(row.get("corr_oof_low")),
+                                  _number(row.get("corr_oof_high"))]
+            if row.get("corr_oof_low") is not None else None,
+            "corr_oof_quality": (str(row.get("corr_oof_quality"))
+                                 if row.get("corr_oof_quality") is not None else None),
+            "value_oof": (lambda v: None if v in (None, -1.0) else v)(
+                _number(row.get("dark_number_oof"))),
             # 299y: the flip test's sampling for this correction model and target.
             "sampling": (sampling or {}).get((str(row.get("corr_model", "")), str(row.get("target")))),
         })
