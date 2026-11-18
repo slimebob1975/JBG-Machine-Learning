@@ -1,3 +1,16 @@
+## Revision 299z2 - The validation study: impossible cells excluded (2026-11-18)
+
+- Found by the first run (2026-11-18): the cell with a hidden share of 20 %
+  and a target share of 15 % is impossible. The hidden share among the rows
+  registered as the rest cannot exceed about the target share (all target
+  rows hidden); the generator then left 2 target rows and the test part had
+  none, so the engine refused. A cell is now feasible only when at most half
+  of the true target rows must be hidden: 8 of the 60 main cells (hidden share
+  10 % and 20 % at a 15 % target share) are excluded and listed in
+  `excluded_cells.csv`. A design correction before any result was seen; the
+  thresholds are unchanged.
+- The runner records a failed run in `errors.csv` and continues.
+
 ## Revision 299z - A validation study of JBG 1.2 against a known truth (2026-11-16)
 
 - Agreed 2026-11-16: validate the current method before building v2. Nobody

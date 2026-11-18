@@ -9,12 +9,20 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from JBGDarkNumberStudy import (REST, TARGET, THRESHOLDS, Cell, broken_cells, main_cells,
-                                population, run_once, summarise, true_hidden_share)
+from JBGDarkNumberStudy import (REST, TARGET, THRESHOLDS, Cell, broken_cells, excluded_cells,
+                                feasible, main_cells, population, run_once, summarise,
+                                true_hidden_share)
 
 
 def test_the_matrix():
-    assert len(main_cells()) == 60 and all(c.assumptions_hold for c in main_cells())
+    # 299z2: H = 10 % and 20 % with a 15 % target share are impossible or extreme
+    # (63 % / all of the target rows hidden): 8 of 60 cells excluded.
+    assert len(main_cells()) == 52 and all(c.assumptions_hold for c in main_cells())
+    assert {(c.hidden_share, c.target_share) for c in excluded_cells()} == \
+        {(0.10, 0.15), (0.20, 0.15)}
+    assert feasible(Cell(0.05, 0.15, "weak")) and feasible(Cell(0.20, 0.50, "weak"))
+    with pytest.raises(ValueError, match="infeasible"):
+        population(Cell(0.20, 0.15, "weak"), 1)
     assert len(broken_cells()) == 8 and not any(c.assumptions_hold for c in broken_cells())
 
 

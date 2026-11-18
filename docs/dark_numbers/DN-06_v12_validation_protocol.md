@@ -41,7 +41,14 @@ three with `H` over all data.
 ## 3. The matrix
 
 - **Main** (assumptions hold): `H` ∈ {0, 2, 5, 10, 20 %} × `q` ∈ {15, 50, 85 %}
-  × separation ∈ {weak, strong} × model ∈ {logistic, MLP}: 60 cells.
+  × separation ∈ {weak, strong} × model ∈ {logistic, MLP}: 60 cells, of which
+  52 are feasible. Correction 2026-11-18 (the first run stopped on it): `H`
+  cannot exceed about the target share, since it is reached when every
+  target row is hidden. A cell is feasible when at most half of the true
+  target rows must be hidden; `H` = 10 % and 20 % with `q` = 15 % (63 % and
+  all of the target rows) are excluded and listed in `excluded_cells.csv`.
+  This is a design correction, made before any result was seen; the
+  thresholds are unchanged.
 - **Broken assumptions**: `H` ∈ {5, 10 %}, `q` = 50 %, medium separation,
   mechanism ∈ {two-sided, feature-dependent} × both models: 8 cells.
 - **10 repeats per cell**, each with its own population and seed (fixed and

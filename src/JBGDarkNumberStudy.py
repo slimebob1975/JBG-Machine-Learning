@@ -47,10 +47,38 @@ class Cell:
         return self.mechanism == "one_sided"
 
 
-def main_cells(models=("logistic", "mlp")) -> list:
-    """The pilot's main matrix: assumptions hold (one-sided hiding)."""
+# 299z2: at most this share of the true target rows may be hidden. The hidden
+# share H among the rows registered as the rest cannot exceed about the target
+# share (all target rows hidden), so H = 20 % with a 15 % target share is
+# impossible, and H = 10 % would hide 63 % of the target rows.
+MAX_HIDDEN_TARGET_SHARE = 0.5
+
+
+def hidden_fraction_of_targets(cell: "Cell") -> float:
+    """The share of the true target rows that must be hidden for the cell's H."""
+    if cell.hidden_share <= 0:
+        return 0.0
+    hidden = cell.hidden_share * (1 - cell.target_share) / (1 - cell.hidden_share)
+    return hidden / cell.target_share
+
+
+def feasible(cell: "Cell") -> bool:
+    return hidden_fraction_of_targets(cell) <= MAX_HIDDEN_TARGET_SHARE
+
+
+def all_main_cells(models=("logistic", "mlp")) -> list:
     return [Cell(h, q, s, "one_sided", m) for h, q, s, m in product(
         (0.0, 0.02, 0.05, 0.10, 0.20), (0.15, 0.50, 0.85), ("weak", "strong"), models)]
+
+
+def main_cells(models=("logistic", "mlp")) -> list:
+    """The main matrix: assumptions hold (one-sided hiding), feasible cells."""
+    return [cell for cell in all_main_cells(models) if feasible(cell)]
+
+
+def excluded_cells(models=("logistic", "mlp")) -> list:
+    """Cells left out because they are impossible by construction (299z2)."""
+    return [cell for cell in all_main_cells(models) if not feasible(cell)]
 
 
 def broken_cells(models=("logistic", "mlp")) -> list:
@@ -71,7 +99,8 @@ def population(cell: Cell, seed: int):
     rests = np.flatnonzero(true == REST)
     hidden = int(round(cell.hidden_share * len(rests) / (1 - cell.hidden_share))) \
         if cell.hidden_share < 1 else 0
-    hidden = min(hidden, len(targets) - 2)
+    if hidden > MAX_HIDDEN_TARGET_SHARE * len(targets):
+        raise ValueError("infeasible cell: too many target rows would have to be hidden")
     if hidden > 0:
         if cell.mechanism == "feature_dependent":
             # Missing at random, not completely: weaker cases are hidden more often.
@@ -219,11 +248,17 @@ def summarise(results: pd.DataFrame) -> pd.DataFrame:
 
 def run_study(cells, repeats: int, out: Path, first_seed: int = 1000) -> pd.DataFrame:
     out.mkdir(parents=True, exist_ok=True)
-    rows = []
+    rows, errors = [], []
     for index, cell in enumerate(cells):
         for r in range(repeats):
-            rows.extend(run_once(cell, first_seed + 97 * index + r))
+            seed = first_seed + 97 * index + r
+            try:
+                rows.extend(run_once(cell, seed))
+            except Exception as error:                 # 299z2: recorded, the study goes on
+                errors.append({**asdict(cell), "seed": seed,
+                               "error": f"{type(error).__name__}: {error}"})
         pd.DataFrame(rows).to_csv(out / "results.csv", index=False)       # progress kept
+        pd.DataFrame(errors).to_csv(out / "errors.csv", index=False)
     results = pd.DataFrame(rows)
     summary = summarise(results)
     summary.to_csv(out / "summary.csv", index=False)
@@ -240,6 +275,10 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     models = tuple(args.models.split(","))
     cells = main_cells(models) + (broken_cells(models) if args.broken else [])
+    args.out.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame([{**asdict(c), "hidden_fraction_of_targets": hidden_fraction_of_targets(c)}
+                  for c in excluded_cells(models)]).to_csv(args.out / "excluded_cells.csv",
+                                                           index=False)
     summary = run_study(cells, args.repeats, args.out)
     print(summary.groupby(["estimate", "verdict"]).size())
     return 0
