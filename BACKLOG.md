@@ -19,6 +19,8 @@ down are kept as history and are current only where they are listed here.
 - [x] 300f: the native test 285c gives a worker 60 seconds (was 10) to exit
   after its run; it failed once on a busy machine.
 - [x] 300f: 27 texts that no longer appear anywhere are removed from `sv.po`.
+- [x] 300h (reported 2026-11-19): the completion e-mail with an address set
+  in the configuration, in CSV projects.
 - [ ] Bugs reported in use: added here as they are found.
 
 ### Deferred: future development (in rough order)

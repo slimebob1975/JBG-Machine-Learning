@@ -43,11 +43,12 @@ class CSVRunConfigurationValidator:
         _roles(conn.id_column, conn.class_column,
                conn.data_numerical_columns, conn.data_text_columns)
         # Do not permit a CSV job to inherit SQL connection identity.
+        # 300h: the completion e-mail address is allowed in a CSV run (it is
+        # still kept out of the saved model artifact); SQL identity is not.
         if (conn.host or conn.data_catalog or conn.data_table or
                 conn.class_catalog or conn.class_table or
-                conn.sql_username or conn.sql_password or
-                configuration.mail.notification_email):
-            raise ValueError('CSV configuration retains SQL or email identity')
+                conn.sql_username or conn.sql_password):
+            raise ValueError('CSV configuration retains SQL identity')
 
 
 class SQLRunConfigurationValidator:

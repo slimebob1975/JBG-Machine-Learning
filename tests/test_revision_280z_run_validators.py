@@ -45,7 +45,7 @@ def test_csv_wrong_artifact_and_dataset_fail_closed():
 def test_csv_sql_identity_and_invalid_roles_rejected():
     config, ref = _csv_config()
     config.connection.host = 'sql.example'
-    with pytest.raises(ValueError, match='SQL or email'):
+    with pytest.raises(ValueError, match='SQL identity'):        # 300h: the address is allowed
         CSVRunConfigurationValidator().validate(config, ref)
     config.connection.host = ''
     config.connection.data_numerical_columns = ['id']

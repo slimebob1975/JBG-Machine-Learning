@@ -1,3 +1,15 @@
+## Revision 300h - The completion e-mail in CSV projects (2026-11-19)
+
+- Reported 2026-11-19: an address set in the configuration did not get a
+  mail. In CSV projects the run preparation clears the address (so the saved,
+  shared model artifact never carries it) and the run kept that cleared copy,
+  together with the engine's built-in SMTP server; the worker's CSV check also
+  refused any address. The run now keeps the e-mail settings (the address and
+  the server's SMTP server, 300f); the artifact still carries no address, and
+  SQL identity in a CSV run is still refused.
+- Tests: `tests/test_revision_300h_csv_completion_mail.py`; 280z follows the
+  new message.
+
 ## Revision 300g - The out-of-fold c without extra fits (2026-11-19)
 
 - Found 2026-11-19: a large run stood for hours after "Estimating Dark Number

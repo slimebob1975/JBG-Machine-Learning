@@ -447,12 +447,17 @@ class ProjectRunService:
             # Voila's model folders are replaced below (decision 3); a temporary
             # root keeps them from being created.
             with tempfile.TemporaryDirectory(prefix="jbg_models_") as unused_root:
+                mail = copy.deepcopy(base.mail)
                 runtime, record = prepare_csv_gui_training_config(
                     base, repository, scope, artifact_id, id_column=connection.id_column,
                     class_column=connection.class_column, data_columns=data_columns,
                     text_columns=text_columns, csv_format=csv_format,
                     model_root=Path(unused_root), predict=bool(base.mode.predict),
                     mispredicted=bool(base.mode.mispredicted))
+                # 300h (reported 2026-11-19): the preparation clears the address
+                # so the saved, shared model artifact never carries it; the run
+                # itself keeps the completion e-mail settings, as SQL runs do.
+                runtime.mail = mail
         except (ValueError, TypeError, KeyError):
             # Missing or wrongly typed columns; details stay server-side.
             raise RunDoesNotMatchDataset("the column roles do not fit the dataset") from None
