@@ -23,6 +23,9 @@ down are kept as history and are current only where they are listed here.
   in the configuration, in CSV projects.
 - [x] 300i (asked 2026-11-19): Swedish terms for folds ("osedd del",
   "delar" instead of "veck"/"veckning").
+- [x] 300j: a systematic GUI sweep (every page and view, both languages,
+  links, a real browser) kept as a native test; it found the font loaded
+  from Google Fonts, now served by the server itself.
 - [ ] Bugs reported in use: added here as they are found.
 
 ### Deferred: future development (in rough order)

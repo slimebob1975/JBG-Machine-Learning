@@ -1,3 +1,25 @@
+## Revision 300j - A systematic GUI sweep; the font served locally (2026-11-19)
+
+- Agreed 2026-11-19 (stabilisation): a sweep of the web GUI as a native test
+  (`tests/test_revision_300j_gui_sweep.py`, helper `tests/gui_sweep.py`).
+  After a real training run with Dark Numbers, a chosen model and a feature
+  investigation, it visits every tab and view (Projects, Dataset's four
+  views, Configuration, Training, the run log, Results' five views and the
+  growth view, Models, Prediction, About, every delete confirmation), in
+  Swedish and English, with and without an open project. It fails on a server
+  error, an untranslated text on a Swedish page, an internal link that leads
+  nowhere, and (where Playwright is installed) a script error or a failed
+  request in a real browser. Two static checks run in every gate: every text
+  sent for translation has a Swedish one, and nothing is loaded from outside
+  the server.
+- Found by the sweep: every page loaded the Open Sans font from Google Fonts,
+  which sent each visitor's address to Google and failed without internet
+  access. The font is now served by the server itself
+  (`src/web/static/fonts/`, Open Sans 5.3.0 from @fontsource, SIL Open Font
+  License in `OFL.txt`; Latin and Latin Extended, weights 400, 600, 700).
+- Otherwise the sweep found no server errors, untranslated texts or broken
+  links.
+
 ## Revision 300i - Swedish terms for folds (2026-11-19)
 
 - Asked 2026-11-19: "veck"/"veckning" was a too literal translation of
