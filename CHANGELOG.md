@@ -1,3 +1,15 @@
+## Revision 300i - Swedish terms for folds (2026-11-19)
+
+- Asked 2026-11-19: "veck"/"veckning" was a too literal translation of
+  "fold". The Dark Numbers area now says "osedd del": "Korrektion på osedd del
+  (c)", its lower and upper bounds, "Kvalitet för c på osedd del", "Mörkertal
+  med c på osedd del", "Träffsäkerhet på osedd del" and the memorisation
+  warning; the flip test's progress "Korrektionsfaktor: klara delar"; the
+  feature investigation "Inre delar", "Yttre delar" and "yttre delar"; and the
+  Swedish guide ("4 delar och 2 upprepningar").
+- Tests: `tests/test_revision_300i_swedish_fold_terms.py`; 299q2 follows the
+  new column name.
+
 ## Revision 300h - The completion e-mail in CSV projects (2026-11-19)
 
 - Reported 2026-11-19: an address set in the configuration did not get a

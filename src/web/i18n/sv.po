@@ -252,7 +252,7 @@ msgid "ID column"
 msgstr "ID-kolumn"
 
 msgid "Inner folds"
-msgstr "Inre veck"
+msgstr "Inre delar"
 
 msgid "Inverse regularization (C)"
 msgstr "Invers regularisering (C)"
@@ -336,7 +336,7 @@ msgid "Out-of-fold benchmark"
 msgstr "Out-of-fold-jämförelse"
 
 msgid "Outer folds"
-msgstr "Yttre veck"
+msgstr "Yttre delar"
 
 msgid "Oversampling"
 msgstr "Översampling"
@@ -2086,13 +2086,13 @@ msgid "subsets evaluated"
 msgstr "prövade delmängder"
 
 msgid "outer folds"
-msgstr "yttre veck"
+msgstr "yttre delar"
 
 msgid "training rows"
 msgstr "träningsrader"
 
 msgid "The MCC values come from nested cross-validation on the training part: the whole search is repeated in each outer fold, so they are not optimistic about the search. The test part is not used."
-msgstr "MCC-värdena kommer från nästlad korsvalidering på träningsdelen. Hela sökningen upprepas i varje yttre veck, så värdena är inte för optimistiska om sökningen. Testdelen används inte."
+msgstr "MCC-värdena kommer från nästlad korsvalidering på träningsdelen. Hela sökningen upprepas i varje yttre del, så värdena är inte för optimistiska om sökningen. Testdelen används inte."
 
 msgid "Recommended variables"
 msgstr "Rekommenderade variabler"
@@ -2258,10 +2258,10 @@ msgid "Training fit (correction model)"
 msgstr "Anpassning till träningsdata (korrektionsmodell)"
 
 msgid "The model fits its training rows clearly better than rows it has not seen (a fit of at least 95 % and at least 5 percentage points above its accuracy on unseen rows), so it may memorise them. The correction factor c may then be too large and the Dark Number too high."
-msgstr "Modellen passar sina träningsrader tydligt bättre än rader den inte har sett (en anpassning på minst 95 % och minst 5 procentenheter över träffsäkerheten på osedda rader), så den kan memorera dem. Korrektionsfaktorn c kan då vara för stor och mörkertalet för högt."
+msgstr "Modellen passar sina träningsrader tydligt bättre än rader den inte har sett (en anpassning på minst 95 % och minst 5 procentenheter över träffsäkerheten på den osedda delen), så den kan memorera dem. Korrektionsfaktorn c kan då vara för stor och mörkertalet för högt."
 
 msgid "Accuracy on unseen rows"
-msgstr "Träffsäkerhet på osedda rader"
+msgstr "Träffsäkerhet på osedd del"
 
 # 299u: JBG v1.2, the equation on the Results tab
 msgid "The equation"
@@ -2405,19 +2405,19 @@ msgstr "En körning står i kö eller pågår i projektet. Vänta tills den är 
 
 # 300e: DN-03, the out-of-fold correction factor
 msgid "Correction out-of-fold (c)"
-msgstr "Korrektion utanför veckning (c)"
+msgstr "Korrektion på osedd del (c)"
 
 msgid "c out-of-fold, lower (90 %)"
-msgstr "c utanför veckning, nedre (90 %)"
+msgstr "c på osedd del, nedre (90 %)"
 
 msgid "c out-of-fold, upper (90 %)"
-msgstr "c utanför veckning, övre (90 %)"
+msgstr "c på osedd del, övre (90 %)"
 
 msgid "Quality of c out-of-fold"
-msgstr "Kvalitet för c utanför veckning"
+msgstr "Kvalitet för c på osedd del"
 
 msgid "Dark Number with c out-of-fold"
-msgstr "Mörkertal med c utanför veckning"
+msgstr "Mörkertal med c på osedd del"
 
 msgid "Reliable"
 msgstr "Tillförlitlig"
@@ -2432,8 +2432,8 @@ msgid "Not used (test part)"
 msgstr "Används inte (testdel)"
 
 msgid "The correction factor c measured out-of-fold is uncertain (a wide interval) for this target class. The Dark Number with it is shown, flagged, in the calculation table."
-msgstr "Korrektionsfaktorn c mätt utanför veckning är osäker (ett brett intervall) för den här målklassen. Mörkertalet med den visas, flaggat, i beräkningstabellen."
+msgstr "Korrektionsfaktorn c mätt på osedd del är osäker (ett brett intervall) för den här målklassen. Mörkertalet med den visas, flaggat, i beräkningstabellen."
 
 # 300g: progress of the Dark Number flip test
 msgid "Correction factor: folds done"
-msgstr "Korrektionsfaktor: klara veck"
+msgstr "Korrektionsfaktor: klara delar"

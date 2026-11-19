@@ -65,5 +65,5 @@ def test_the_texts():
     from JBGWebUI import _load_catalog
     from JBGWebUIResults import DARK_COLUMNS
     catalog = _load_catalog("sv")
-    assert catalog[DARK_COLUMNS["corr_unseen_accuracy"]] == "Träffsäkerhet på osedda rader"
+    assert catalog[DARK_COLUMNS["corr_unseen_accuracy"]] == "Träffsäkerhet på osedd del"   # 300i
     assert ";" not in "".join(catalog.values()).replace("charset=UTF-8", "")

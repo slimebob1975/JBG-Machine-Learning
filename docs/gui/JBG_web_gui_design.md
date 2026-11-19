@@ -529,6 +529,7 @@ The map above is the target. What exists after revision 285m3:
 | (runs) | 300f | The completion e-mail of web runs uses the server's SMTP server and default address, as Voilà does |
 | `/ui/run` (progress), Dark Numbers | 300g | The out-of-fold `c` from the flip test's own folds (no extra fits); the flip test's progress fold by fold |
 | (runs, CSV) | 300h | A CSV run keeps the completion e-mail settings (the artifact still carries no address) |
+| (Swedish texts) | 300i | "osedd del" and "delar" for folds, instead of "veck"/"veckning" |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

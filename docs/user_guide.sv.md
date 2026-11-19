@@ -271,7 +271,7 @@ mörkertal för den målklassen.
 
 En varning visas när modellen bakom c passar sina egna träningsrader tydligt
 bättre än rader den inte har sett (en anpassning på minst 95 %, minst 5
-procentenheter över träffsäkerheten på osedda rader). En sådan modell
+procentenheter över träffsäkerheten på den osedda delen). En sådan modell
 tenderar att lära sig de avsiktligt fel märkta raderna i testet bakom c, så c
 och mörkertalet kan då vara för höga.
 
@@ -306,7 +306,7 @@ målklass för sig, målklassen mot alla de övriga.
   lär sig träningsdata utantill återger de registrerade, felaktiga
   etiketterna och hittar få dolda fall bland raderna den tränats på. `c`
   korrigerar för det. I praktiken är den stor för modeller som lätt
-  övertränas och nära 1 för de andra. Testet använder 4 veck och 2
+  övertränas och nära 1 för de andra. Testet använder 4 delar och 2
   upprepningar på alla datorer.
 - Resultatet begränsas till 100 %. Ett värde över det betyder att
   skattningen har brutit samman för den målklassen, och vyn säger det.
@@ -355,14 +355,14 @@ ommärkta rader" (syntetiska rader bara från rader som inte märktes om) och
 "Undersampling (1 : 1)" ersätter pipelinens sampling enbart i testet. Den
 vanliga träningen påverkas inte.
 
-**c mätt utanför veckning.** Bredvid c visar beräkningstabellen c mätt
-utanför veckning (från samma test: hur ofta varje vecks modell ändå känner
+**c mätt på osedd del.** Bredvid c visar beräkningstabellen c mätt på
+osedd del (från samma test: hur ofta varje dels modell ändå känner
 igen målklassens rader som den inte tränats på), dess 90 %-intervall och en kvalitet (tillförlitlig, osäker, ej
 skattbar), och det mörkertal den skulle ge. Mörkertalet använder fortfarande
 det första c. De två jämförs innan man byter.
 
 **Version och inställningar.** Ekvationsavsnittet anger metodens version och
-inställningarna som användes (ommärkningsandel, veck och upprepningar,
+inställningarna som användes (ommärkningsandel, delar och upprepningar,
 gränserna för c, regeln för memorering och slumpfrö). Körningar gjorda före
 version 1.2 saknar sådana uppgifter. Deras värden visas som de sparades, med
 en anmärkning.

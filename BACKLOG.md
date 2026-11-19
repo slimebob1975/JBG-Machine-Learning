@@ -21,6 +21,8 @@ down are kept as history and are current only where they are listed here.
 - [x] 300f: 27 texts that no longer appear anywhere are removed from `sv.po`.
 - [x] 300h (reported 2026-11-19): the completion e-mail with an address set
   in the configuration, in CSV projects.
+- [x] 300i (asked 2026-11-19): Swedish terms for folds ("osedd del",
+  "delar" instead of "veck"/"veckning").
 - [ ] Bugs reported in use: added here as they are found.
 
 ### Deferred: future development (in rough order)
