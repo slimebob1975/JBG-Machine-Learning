@@ -356,8 +356,8 @@ ommärkta rader" (syntetiska rader bara från rader som inte märktes om) och
 vanliga träningen påverkas inte.
 
 **c mätt utanför veckning.** Bredvid c visar beräkningstabellen c mätt
-utanför veckning (varje ommärkt rad förutsägs av en modell som inte tränats
-på den), dess 90 %-intervall och en kvalitet (tillförlitlig, osäker, ej
+utanför veckning (från samma test: hur ofta varje vecks modell ändå känner
+igen målklassens rader som den inte tränats på), dess 90 %-intervall och en kvalitet (tillförlitlig, osäker, ej
 skattbar), och det mörkertal den skulle ge. Mörkertalet använder fortfarande
 det första c. De två jämförs innan man byter.
 

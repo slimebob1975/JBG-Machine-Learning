@@ -1,3 +1,25 @@
+## Revision 300g - The out-of-fold c without extra fits (2026-11-19)
+
+- Found 2026-11-19: a large run stood for hours after "Estimating Dark Number
+  correction factors" without any sign in the GUI. 300e computed the
+  out-of-fold `c` on its own, with 15-50 model fits one after another per
+  target class and model; with one fit taking close to an hour, that meant
+  many hours. Agreed 2026-11-19: measure it inside the existing flip test.
+- Each of the flip test's 4 × 2 folds trains a copy on 75 % of the rows with
+  some target rows relabelled; that copy now also predicts the fold's unseen
+  target rows, and the share predicted as the target is the out-of-fold
+  recovery. The same 8 fits, in parallel, as before 300e: one extra
+  prediction per fold. `c = 1/r` over the 8 values, with a 90 % interval and
+  the same quality states (`JBGDarkNumberOutOfFold.summarise`). The in-sample
+  `c` and the Dark Number are unchanged (the 299n pins hold).
+- The flip test reports its progress fold by fold ("Korrektionsfaktor: klara
+  veck"), each fold also a cancel check, so the step no longer looks frozen.
+  Web worker only; Voilà unchanged.
+- The BACKLOG's question whether the out-of-fold `c` should be opt-in is
+  closed: it no longer costs extra time.
+- Tests: `tests/test_revision_300g_oof_in_the_flip_test.py`;
+  `tests/test_revision_300e_out_of_fold_c.py` follows the new measurement.
+
 ## Revision 300f - Stabilisation first; the completion e-mail of web runs (2026-11-18)
 
 - Decided 2026-11-18: stabilise before new development. BACKLOG.md starts with

@@ -125,6 +125,7 @@ class StoreProgressLogger:
     # --- 297a: inner progress (Voilà's inner bars), for the web interface ---------------
 
     INNER_INTERVAL = 1.0                    # seconds between recorded steps of one bar
+    reports_correction_progress = True       # 300g: the flip test's folds as a bar
     CHECK_INTERVAL = 1.0                    # 299g: seconds between cancel checks in inner steps
 
     def _inner_checkpoint(self) -> None:

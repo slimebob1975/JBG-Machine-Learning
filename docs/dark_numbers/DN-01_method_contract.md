@@ -329,3 +329,15 @@ measured by the validation study (`D_oof`, same thresholds). The switch is
 decided from experience and the study. A first look: for logistic regression
 the two `c` are close (about 1.6), so `c` alone does not explain the study's
 in-sample overestimates.
+
+### DN-03 revised (300g, 2026-11-19): measured inside the flip test
+
+300e's separate computation (5 folds, 3–10 repeats, one fit after another)
+took many hours on large data. The out-of-fold `c` is now measured inside the
+existing flip test at no extra fit: each of its 4 × 2 folds trains a copy on
+75 % of the rows with some target rows relabelled, and that copy also predicts
+the fold's unseen target rows. A model cannot see the label of a row it was
+not trained on, so the share it still predicts as the target is the recovery a
+relabelled row would have had. `c = 1/r` over the 8 fold values, with a 90 %
+t-interval and the same quality states. The in-sample `c`, and so the v1.2
+Dark Number, are unchanged. The flip test shows its progress fold by fold.

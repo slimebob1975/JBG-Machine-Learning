@@ -2433,3 +2433,7 @@ msgstr "Används inte (testdel)"
 
 msgid "The correction factor c measured out-of-fold is uncertain (a wide interval) for this target class. The Dark Number with it is shown, flagged, in the calculation table."
 msgstr "Korrektionsfaktorn c mätt utanför veckning är osäker (ett brett intervall) för den här målklassen. Mörkertalet med den visas, flaggat, i beräkningstabellen."
+
+# 300g: progress of the Dark Number flip test
+msgid "Correction factor: folds done"
+msgstr "Korrektionsfaktor: klara veck"

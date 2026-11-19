@@ -29,7 +29,7 @@ class NaNValueError(Exception):
 
 def evaluate_split(estimator, X, y, train_idx, repeat_idx,
                    flip_fraction, positive_class, predict_mode, random_state, return_fit=False,
-                   sampling_policy="PIPELINE"):
+                   sampling_policy="PIPELINE", test_idx=None):
     """
     Top-level evaluation function for Parallel.
     """
@@ -92,6 +92,21 @@ def evaluate_split(estimator, X, y, train_idx, repeat_idx,
 
     if not return_fit:
         return reidentified / n_flip
+    if test_idx is not None:
+        # 300g (DN-03 revised 2026-11-19): the out-of-fold recovery, from the
+        # same fitted copy, at no extra fit. A model cannot see the label of a
+        # row it was not trained on, so the share of the fold's unseen target
+        # rows it still predicts as the target is the recovery a relabelled row
+        # would have had. Returned as a dict with the training fit and sampling.
+        kept = np.ones(len(y_train_flipped), dtype=bool)
+        kept[flip_indices] = False
+        train_fit = float(np.mean(model.predict(X_train[kept]) == y_train_flipped[kept])) \
+            if kept.any() else None
+        unseen = np.asarray(test_idx)[np.asarray(y)[test_idx] == positive_class]
+        oof = float(np.mean(np.asarray(model.predict(X[unseen])) == positive_class)) \
+            if len(unseen) else None
+        return {"recovery": reidentified / n_flip, "train_fit": train_fit,
+                "sampling": sampling, "oof": oof}
     if sampling is not None:
         # 299y: the fold's sampling (synthetic rows, fallback) goes back too.
         kept = np.ones(len(y_train_flipped), dtype=bool)
@@ -139,6 +154,7 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
         self.is_valid_for_regression_ = False
         self.recovery_results_ = None
         self.train_fit_ = None                   # 299q
+        self.oof_recoveries_ = []                # 300g
         self.sampling_policy = sampling_policy    # 299y (DN-02)
         self.sampling_info_ = None
         self.mean_recovery_ = None
@@ -218,16 +234,23 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
                 self.estimator, X_sub, y_sub, train_idx, repeat_idx,
                 self.flip_fraction, self.positive_class,
                 self.predict_mode, self.random_state, True,              # 299q: training fit
-                self.sampling_policy                                     # 299y
+                self.sampling_policy,                                    # 299y
+                test_idx,                                                # 300g: out-of-fold
             )
             for repeat_idx in range(self.n_repeats)
-            for train_idx, _ in skf.split(X_sub, y_sub)
+            for train_idx, test_idx in skf.split(X_sub, y_sub)
         ]
 
         # Try running tasks with retry logic
         results = self._run_parallel(tasks)
         # 299q: each fold returns (recovery, training fit); plain recoveries too.
         # 299y: with a sampling policy also the fold's sampling.
+        # 300g: folds return a dict with the out-of-fold recovery too.
+        self.oof_recoveries_ = [value["oof"] for value in results
+                                if isinstance(value, dict) and value.get("recovery") is not None
+                                and value.get("oof") is not None]
+        results = [(value["recovery"], value["train_fit"], value["sampling"])
+                   if isinstance(value, dict) else value for value in results]
         samplings = [value[2] for value in results
                      if isinstance(value, tuple) and len(value) == 3 and value[2]]
         pairs = [value[:2] if isinstance(value, tuple) else (value, None) for value in results]
@@ -280,6 +303,22 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
 
         return self
 
+    def _run_with_progress(self, tasks):
+        """300g (2026-11-19): the folds in parallel as before, with a progress
+        bar that moves as each fold finishes (each one also a cancel check);
+        the step went silent for hours on large data."""
+        key = "dark_number_correction_folds"
+        self.logger.start_inline_progress(key, "Correction-factor folds", len(tasks), "")
+        results = []
+        runner = Parallel(n_jobs=self.n_jobs, prefer=self.parallel_backend,
+                          pre_dispatch="2*n_jobs", batch_size="auto", max_nbytes=None,
+                          return_as="generator")
+        for done, value in enumerate(runner(tasks), start=1):
+            results.append(value)
+            self.logger.update_inline_progress(key, done, "")
+        self.logger.end_inline_progress(key)
+        return results
+
     def _run_parallel(self, tasks):
         """
         Run tasks with retry logic, reusing the same task list.
@@ -295,6 +334,8 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
             try:
                 if DEBUG_LOGGING:
                     self.logger.print_info(f"[DEBUG] Running Parallel with backend={self.parallel_backend}, n_jobs={self.n_jobs}")
+                if getattr(self.logger, "reports_correction_progress", False):
+                    return self._run_with_progress(tasks)                 # 300g
                 return Parallel(
                     n_jobs=self.n_jobs,
                     prefer=self.parallel_backend,

@@ -25,6 +25,7 @@ INNER_PROGRESS = {
     "Feature importance": "feature_importance",
     "Shadow fits": "shadow_fits",
     "Feature subsets": "feature_subsets",       # 299i: a feature investigation
+    "Correction-factor folds": "correction_folds",  # 300g: the Dark Number flip test
 }
 INNER_KINDS = frozenset(INNER_PROGRESS.values())
 

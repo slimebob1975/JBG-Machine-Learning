@@ -11,8 +11,9 @@ down are kept as history and are current only where they are listed here.
 - [x] 300f (reported 2026-11-18): web runs did not send the completion
   e-mail that Voilà sends (the server's SMTP server and default address were
   never applied).
-- [ ] The out-of-fold `c` (300e): on by default or opt-in. It makes Dark
-  Numbers runs slower; decide from the measured run times.
+- [x] 300g: the out-of-fold `c` is measured inside the flip test at no extra
+  fit (300e took many hours on large data), so it stays on; the flip test
+  shows its progress fold by fold.
 - [ ] Dark Numbers after the validation study: how `D` is presented (a note
   that it is not a validated share; the growth view).
 - [x] 300f: the native test 285c gives a worker 60 seconds (was 10) to exit

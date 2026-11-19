@@ -3147,16 +3147,11 @@ class PredictionsHandler:
                          "be chosen in the configuration's Dark Numbers section.")
             fit = getattr(locals().get("corr_estimator"), "train_fit_", None)
             self.__dict__.setdefault("dark_number_train_fits", {})[(corr_model, label)] = fit
-            # 300e (DN-03): the out-of-fold c, beside the in-sample one.
-            try:
-                from JBGDarkNumberOutOfFold import estimate as out_of_fold
-                self.__dict__.setdefault("dark_number_oof", {})[(corr_model, label)] = out_of_fold(
-                    model, X, Y, label, flip_fraction=flip_fraction,
-                    random_state=random_state, sampling_policy=policy)
-            except Exception as error:
-                self.__dict__.setdefault("dark_number_oof", {})[(corr_model, label)] = {
-                    "c": None, "c_low": None, "c_high": None, "repeats": 0, "recoveries": [],
-                    "quality": "not_estimable", "error": type(error).__name__}
+            # 300e/300g (DN-03): the out-of-fold c, beside the in-sample one,
+            # from the same flip test's folds (no extra fits).
+            from JBGDarkNumberOutOfFold import summarise as out_of_fold
+            self.__dict__.setdefault("dark_number_oof", {})[(corr_model, label)] = out_of_fold(
+                getattr(locals().get("corr_estimator"), "oof_recoveries_", None) or [])
             unseen = self._dark_number_unseen_accuracy(corr_model)
             if DarkNumberCalculator.memorises(fit, unseen) \
                     and corr != DarkNumberCalculator.UNDEFINED:
