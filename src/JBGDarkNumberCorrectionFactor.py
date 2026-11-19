@@ -155,6 +155,7 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
         self.recovery_results_ = None
         self.train_fit_ = None                   # 299q
         self.oof_recoveries_ = []                # 300g
+        self.fold_pairs_ = []                     # 300k
         self.sampling_policy = sampling_policy    # 299y (DN-02)
         self.sampling_info_ = None
         self.mean_recovery_ = None
@@ -249,6 +250,11 @@ class DarkNumberCorrectionFactorEstimator(BaseEstimator):
         self.oof_recoveries_ = [value["oof"] for value in results
                                 if isinstance(value, dict) and value.get("recovery") is not None
                                 and value.get("oof") is not None]
+        # 300k: each fold's (in-sample, out-of-fold) recovery, for the
+        # overtraining factor c / c_unseen = r_unseen / r_in.
+        self.fold_pairs_ = [(value["recovery"], value["oof"]) for value in results
+                            if isinstance(value, dict) and value.get("recovery") is not None
+                            and value.get("oof") is not None]
         results = [(value["recovery"], value["train_fit"], value["sampling"])
                    if isinstance(value, dict) else value for value in results]
         samplings = [value[2] for value in results

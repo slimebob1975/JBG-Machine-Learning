@@ -60,3 +60,33 @@ def summarise(recoveries) -> dict:
         quality = "reliable" if (high - low) / 2 <= RELIABLE_HALFWIDTH * c else "uncertain"
     return {"c": c, "c_low": low, "c_high": high, "repeats": len(values),
             "recoveries": values, "quality": quality}
+
+
+def overtraining_factor(pairs) -> dict:
+    """300k (agreed 2026-11-19, tried in the validation study first): the part
+    of c that comes from overtraining only, c_over = c / c_unseen =
+    r_unseen / r_in, per fold and averaged, at least 1. Both recoveries come
+    from the same models trained with the same relabelled rows, so the model's
+    ordinary misses (class overlap) and the effect of the relabelled labels
+    cancel in the ratio; what is left is the loss on rows the model was trained
+    on, i.e. memorisation. A fold with r_in = 0 makes it infinite."""
+    ratios = []
+    for r_in, r_unseen in pairs:
+        if r_in is None or r_unseen is None:
+            continue
+        ratios.append(math.inf if r_in <= 0 else float(r_unseen) / float(r_in))
+    if not ratios:
+        return {"c": None, "c_low": None, "c_high": None, "folds": 0, "quality": "not_estimable"}
+    if any(math.isinf(r) for r in ratios):
+        return {"c": math.inf, "c_low": None, "c_high": None, "folds": len(ratios),
+                "quality": "not_estimable"}
+    values = np.asarray(ratios, dtype=float)
+    mean = float(values.mean())
+    half = _t90(len(values)) * float(values.std(ddof=1)) / math.sqrt(len(values)) \
+        if len(values) > 1 else math.inf
+    c, low, high = max(1.0, mean), max(1.0, mean - half), max(1.0, mean + half)
+    if not (CORRECTION_MIN <= c <= CORRECTION_MAX):
+        quality = "not_estimable"
+    else:
+        quality = "reliable" if (high - low) / 2 <= RELIABLE_HALFWIDTH * c else "uncertain"
+    return {"c": c, "c_low": low, "c_high": high, "folds": len(ratios), "quality": quality}

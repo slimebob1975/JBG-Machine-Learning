@@ -144,6 +144,7 @@ class _Log:
 def _handler(log):
     from JBGHandler import PredictionsHandler
     ph = object.__new__(PredictionsHandler)
+    ph.__dict__["dark_number_study_over"] = True      # 300k: D with c_over as well
     jobs = SimpleNamespace(execute_n_job=lambda operation, estimator, X, y, **kw:
                            operation(estimator, X, y))
     ph.handler = SimpleNamespace(
@@ -216,6 +217,11 @@ def run_once(cell: Cell, seed: int) -> list:
                      "D_oof": None if oof == -1.0 else oof,
                      "c_oof": float(row["corr_oof"]) if "corr_oof" in row else math.nan,
                      "c_oof_quality": str(row.get("corr_oof_quality", "")),
+                     # 300k: D with the overtraining factor c_over = c / c_unseen.
+                     "D_over": (lambda v: None if v == -1.0 else v)(
+                         float(row["dark_number_over"]) if "dark_number_over" in row
+                         and row["dark_number_over"] == row["dark_number_over"] else value),
+                     "c_over": float(row["corr_over"]) if "corr_over" in row else math.nan,
                      "D": None if value == -1.0 else value, "undefined": value == -1.0,
                      "capped": bool(row.get("capped", False)), "c": float(row["corr"]),
                      "memorisation_warning": memorises, "seconds": seconds})
@@ -279,6 +285,8 @@ def summarise(results: pd.DataFrame) -> pd.DataFrame:
         row.update(_measures(group, "D"))
         if "D_oof" in group:
             row.update({f"{name}_oof": value for name, value in _measures(group, "D_oof").items()})
+        if "D_over" in group:                                                     # 300k
+            row.update({f"{name}_over": value for name, value in _measures(group, "D_over").items()})
         row.update(warning_share=float(group["memorisation_warning"].mean()),
                    # 300d: reported only, no threshold (the protocol is unchanged).
                    hit_rate_pp=float(100 * group["hit_rate"].mean())

@@ -68,6 +68,18 @@ rate divided by the true hidden share, which is what random selection would
 hit. It measures how useful the misclassifications are for finding hidden
 cases, separately from whether `D` estimates their share.
 
+**Added 2026-11-19 (300k, judged by the same thresholds):** the Dark Number
+with the overtraining factor, `D_over`, beside `D` (1.2) and `D_oof`. It uses
+`c_over = max(1, mean over the flip test's folds of r_unseen / r_in)` instead
+of `c`, on the in-sample estimates only:
+
+`D = min(c_over · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`
+
+Both recoveries come from the same models trained with the same relabelled
+rows, so the model's ordinary misses (already counted by
+`1 + α_FN (1 − TP_r)`) and the effect of the relabelled labels cancel in the
+ratio, and only memorisation is left.
+
 ## 5. Thresholds (assumptions hold)
 
 | Criterion | Threshold |

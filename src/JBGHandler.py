@@ -3152,6 +3152,10 @@ class PredictionsHandler:
             from JBGDarkNumberOutOfFold import summarise as out_of_fold
             self.__dict__.setdefault("dark_number_oof", {})[(corr_model, label)] = out_of_fold(
                 getattr(locals().get("corr_estimator"), "oof_recoveries_", None) or [])
+            # 300k: the folds' (in-sample, unseen) recoveries, for the study's
+            # overtraining factor.
+            self.__dict__.setdefault("dark_number_fold_pairs", {})[(corr_model, label)] = list(
+                getattr(locals().get("corr_estimator"), "fold_pairs_", None) or [])
             unseen = self._dark_number_unseen_accuracy(corr_model)
             if DarkNumberCalculator.memorises(fit, unseen) \
                     and corr != DarkNumberCalculator.UNDEFINED:
@@ -3509,6 +3513,26 @@ class PredictionsHandler:
             model_dark_numbers["corr_oof_quality"] = [
                 e.get("quality") if isinstance(e, dict) else (e or "") for e in entries]
             model_dark_numbers["dark_number_oof"] = list(alternative["dark_number"])
+        if oof is not None and self.__dict__.get("dark_number_study_over"):
+            # 300k (the validation study only, not shown in the GUI): D with the
+            # overtraining factor c_over = c / c_unseen instead of c.
+            from JBGDarkNumberOutOfFold import overtraining_factor
+            pairs = self.__dict__.get("dark_number_fold_pairs") or {}
+            over = {}
+            for target in model_dark_numbers["target"]:
+                entry = oof.get(target)
+                if entry == "not applied":
+                    over[target] = 1.0
+                    continue
+                key = ((corr_models or {}).get(target), target)
+                factor = overtraining_factor(pairs.get(key, []))
+                over[target] = factor["c"] if factor["quality"] != "not_estimable" \
+                    else DarkNumberCalculator.UNDEFINED
+            alternative = DarkNumberCalculator().compute_dark_numbers(
+                Y, Y_pred, Y_prob_pred, type=type, corrs=over, targets=targets,
+                class_probabilities=class_probabilities)
+            model_dark_numbers["corr_over"] = [over[t] for t in model_dark_numbers["target"]]
+            model_dark_numbers["dark_number_over"] = list(alternative["dark_number"])
         
         # Put together the results for the dark numbers
         model_name_col = pd.Series([model_name]+["" for i in range(model_dark_numbers.shape[0]-1)], name="Model type")

@@ -1,3 +1,24 @@
+## Revision 300k - The overtraining factor in the validation study (2026-11-19)
+
+- Agreed 2026-11-19: `c` mixes two things, the model's ordinary misses (which
+  `1 + α_FN (1 − TP_r)` already counts, so they were counted twice) and
+  overtraining (what `c` was introduced for). The overtraining part alone is
+  `c_over = c / c_unseen = r_unseen / r_in`: both recoveries come from the same
+  models trained with the same relabelled rows, so the misses and the effect
+  of the relabelled labels cancel in the ratio. Proposed formula:
+  `D = min(c_over · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`, with
+  `c_over = max(1, the folds' mean of r_unseen / r_in)`, on the in-sample
+  estimates.
+- Tried in the validation study first: the flip test keeps each fold's two
+  recoveries (`fold_pairs_`), `JBGDarkNumberOutOfFold.overtraining_factor`
+  forms the factor with a 90 % interval and quality, and the handler computes
+  D with it only when the study asks (the GUI and ordinary runs are
+  unchanged). The study records `D_over` and `c_over` and judges `D_over` by
+  the same thresholds (`*_over` columns in `summary.csv`).
+- A first look (true hidden share 10 %, strong separation): logistic
+  regression `c_over` ≈ 1.01–1.03, D on all data 0.19 → 0.12; MLP 0.19 → 0.15.
+- Tests: `tests/test_revision_300k_overtraining_factor.py`.
+
 ## Revision 300j - A systematic GUI sweep; the font served locally (2026-11-19)
 
 - Agreed 2026-11-19 (stabilisation): a sweep of the web GUI as a native test
