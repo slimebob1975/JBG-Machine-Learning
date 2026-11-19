@@ -1,9 +1,49 @@
 # JBG AutoClassification - Active BACKLOG (revision 272)
 
-## Revision 279ai â€“ verified regression baseline and next development phase (2026-10-30)
+## Current priorities (decided 2026-11-18)
+
+Stabilise before any new development: loose threads and remaining bugs first,
+everything else deferred. This section is the current list; open items further
+down are kept as history and are current only where they are listed here.
+
+### Now: stabilisation
+
+- [x] 300f (reported 2026-11-18): web runs did not send the completion
+  e-mail that Voilà sends (the server's SMTP server and default address were
+  never applied).
+- [ ] The out-of-fold `c` (300e): on by default or opt-in. It makes Dark
+  Numbers runs slower; decide from the measured run times.
+- [ ] Dark Numbers after the validation study: how `D` is presented (a note
+  that it is not a validated share; the growth view).
+- [x] 300f: the native test 285c gives a worker 60 seconds (was 10) to exit
+  after its run; it failed once on a busy machine.
+- [x] 300f: 27 texts that no longer appear anywhere are removed from `sv.po`.
+- [ ] Bugs reported in use: added here as they are found.
+
+### Deferred: future development (in rough order)
+
+- Dark Numbers: mixture-proportion estimation tested on the study bench
+  (DN-05); "Mörkertal: avancerat" (`c_max`, the memorisation rule, the opt-in
+  standard estimator for the whole computation); an adaptive flip fraction in
+  the GUI; ratio controls for over- and undersampling (the pipeline and the
+  correction test); Dark Numbers per subgroup (first version, then several
+  levels); DN-04, DN-07, DN-08; for v2, `c` on the cross-trained model's own
+  test part within its all-data estimate.
+- Runs: run history and rerun (Körhistorik); pausing and resuming a feature
+  investigation; why a run failed shown on the Training tab, if wanted.
+- Configurations and datasets: copy a configuration to another project;
+  rename datasets; switching to or from the prediction role; a second class
+  or ID column in the roles form; durations between date columns and more
+  date formats; general SQL ID handling.
+- Operation: per-project retention; SQL sign-ins kept across a server
+  restart; the language choice stored per user; a live pipeline picture.
+- Platform: htmx and Fluent web components; Microsoft Entra ID and the Azure
+  deployment checks; a replaceable DataLayer contract.
+
+## Revision 279ai – verified regression baseline and next development phase (2026-10-30)
 
 - [x] Windows Python 3.13 full pytest suite: **1,760 passed, 3 skipped, 9 warnings, 0 failed**; exit code 0; 966.67 seconds. This is a synthetic/automated regression baseline, NOT proof of full SQL/CSV feature parity or authorized live SQL acceptance.
-- [x] Revisions 279qâ€“279ah6: current CSV/SQL GUI and test fixtures aligned; Naive Bayes hashability and sparse integer SMOTE/imputation ordering corrected; CatBoost dependency verified; PyTorch fresh-process persistence and CV diagnostics tested.
+- [x] Revisions 279q–279ah6: current CSV/SQL GUI and test fixtures aligned; Naive Bayes hashability and sparse integer SMOTE/imputation ordering corrected; CatBoost dependency verified; PyTorch fresh-process persistence and CV diagnostics tested.
 - [x] Release version **0.19.1**: regression stabilization checkpoint, no claim of completed SQL/CSV functional parity. Git commit/tag/push must be verified separately.
 - [ ] Confirm exact commit hash, release tag and remote push; record them after the Git operation. Do not invent a hash.
 - [ ] Keep the SQL operator-run regression protocol (	ests/SQL_REGRESSION_PROTOCOL_248.md) as a separate acceptance gate. SQL Erase models remains open until verified and repaired.
@@ -371,7 +411,7 @@ full SQL regression acceptance remain separately unverified.
       configurations stay) and projects (everything in them, hidden records
       included; confirmed by typing the project name). SQL tables stay.
     - [ ] Later: per-project retention.
-    - [ ] Feature investigation (assisted feature selection, recommendations,
+    - [x] Feature investigation (assisted feature selection, recommendations,
       pause/resume); first make the Variabelurval section honest: it has no
       effect in web runs today.
     - [ ] Minor: rerun, run history (Körhistorik).
@@ -451,7 +491,7 @@ full SQL regression acceptance remain separately unverified.
     probabilities, positive-unlabelled learning), separate from ordinary
     training. The plan's own gate: no production code before the method
     specification, experiments and acceptance criteria are reviewed.
-    - [ ] DN-01 method contract and baseline (current formulas and code paths,
+    - [x] DN-01 method contract and baseline (current formulas and code paths,
       notation, targets, reproducible baseline cases; reviewed before any
       engine patch). 299n: delivered for review
       (`docs/dark_numbers/DN-01_method_contract.md`, findings F1-F9, frozen
@@ -491,7 +531,7 @@ full SQL regression acceptance remain separately unverified.
       - [x] 299w: F9 settled (four model variants sorted, no order check).
       - [x] 299x: the result format (a JSON record per run with schema
         version, method version, parameters and estimates; old runs noted).
-      - [ ] The rest of section 8 (sampling specification, benchmark
+      - [x] The rest of section 8 (sampling specification, benchmark
         criteria), one at a time.
     - [x] DN-02 a separate sampling engine (NONE, SMOTE, CLEAN_SMOTE, UNDER;
       no leakage, no effect on the ordinary pipeline). 299y: the policy in the
@@ -571,7 +611,7 @@ full SQL regression acceptance remain separately unverified.
     tabs: what the program does and how to use it, from a user guide in the
     repository (`docs/user_guide.sv.md`, `docs/user_guide.en.md`; the README
     is developer-oriented) and the program's version line.
-  - [ ] Later: the rest of the designed Overview (Tab 1 in
+  - [x] Later: the rest of the designed Overview (Tab 1 in
     `docs/gui/JBG_web_gui_design.md`): "Continue working", recent projects
     in the empty state, the activity strip for other projects.
   - [x] 295e: `/ui` lands on the Overview instead of the Projects tab

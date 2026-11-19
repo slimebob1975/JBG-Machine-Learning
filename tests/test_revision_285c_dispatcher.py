@@ -392,7 +392,9 @@ class CSVDispatchedRun285c(revision_281c.CSVApplicationEndToEnd281c):
         self.assertTrue(model_path.is_file(), "dispatched worker did not save a model")
         self.assertTrue(service.result_details(me.principal_key, run)["available"])
         log.read_bytes().decode("utf-8")                 # the worker log is valid UTF-8
-        for _ in range(50):                              # let the dispatcher release the log
+        # 300f: up to 60 s (it was 10 s) for the worker process to exit after its
+        # run; on a busy machine shutting down its helpers took longer.
+        for _ in range(300):                             # let the dispatcher release the log
             dispatcher.poll_once()
             if not dispatcher.active_runs():
                 break

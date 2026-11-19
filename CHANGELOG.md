@@ -1,3 +1,24 @@
+## Revision 300f - Stabilisation first; the completion e-mail of web runs (2026-11-18)
+
+- Decided 2026-11-18: stabilise before new development. BACKLOG.md starts with
+  "Current priorities": what is done now (loose threads and bugs) and what is
+  deferred (all further development, in rough order). Four items that recent
+  revisions finished are checked off (feature investigation, DN-01, the rest
+  of its section 8, the designed Overview).
+- Reported 2026-11-18: web runs did not send the completion e-mail that
+  Voilà sends. The SMTP server stayed at the engine's built-in "localhost" and
+  the address was empty unless filled in. When a run starts (training,
+  prediction, investigation), the server's `DEFAULT_SMTP_SERVER` is used and an
+  empty address takes `DEFAULT_NOTIFICATION_EMAIL`, as Voilà prefills it; an
+  address set in the configuration is kept. Tests never send mail
+  (`tests/conftest.py` blanks both settings).
+- Loose threads: the native test 285c gives a worker 60 seconds (was 10) to
+  exit after its run (it failed once on a busy machine); 27 texts that no
+  longer appear anywhere in the code are removed from `sv.po` (replaced
+  messages, the removed order check, old field labels).
+- Three garbled en dashes ("â€“") in BACKLOG.md and CHANGELOG.md are fixed.
+- Tests: `tests/test_revision_300f_completion_mail.py`.
+
 ## Revision 300e - DN-03: the correction factor measured out-of-fold (2026-11-18)
 
 - DN-03, settled 2026-11-18: `c` is also measured out-of-fold
@@ -2146,7 +2167,7 @@
   JBG-specific role system.
 - Documentation only: no runtime code, defaults or tests changed.
 
-## Version 0.19.1 â€“ verified regression stabilization (2026-10-30)
+## Version 0.19.1 – verified regression stabilization (2026-10-30)
 
 - Windows Python 3.13 full pytest regression: **1,760 passed, 3 skipped, 9 warnings, 0 failed**, exit code 0 (revision 279ai).
 - Stabilized CSV/SQL integration fixtures and GUI contracts; corrected sparse-integer SMOTE pipeline order and a Naive Bayes preflight hashability fault; verified CatBoost and PyTorch fresh-process model load.

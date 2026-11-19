@@ -93,7 +93,30 @@ def _load_config(settings: dict):
     with tempfile.TemporaryDirectory(prefix="jbg_run_") as folder:
         path = Path(folder) / "configuration.json"
         path.write_text(json.dumps(settings), encoding="utf-8")
-        return Config.load_config_from_json(path)
+        config = Config.load_config_from_json(path)
+    apply_mail_settings(config)
+    return config
+
+
+def apply_mail_settings(config, environment: dict | None = None) -> None:
+    """300f (reported 2026-11-18): the completion e-mail of web runs, as in
+    Voila. The SMTP server is the server's (DEFAULT_SMTP_SERVER; it stayed at
+    the engine's built-in "localhost"), and an empty notification address
+    takes the server's default (DEFAULT_NOTIFICATION_EMAIL), as Voila
+    prefills it. An address the configuration sets is kept."""
+    if environment is None:
+        from JBGMetadataStore import ROOT, _environment
+        environment = _environment(ROOT)
+    mail = getattr(config, "mail", None)
+    if mail is None:
+        return
+    server = str(environment.get("DEFAULT_SMTP_SERVER") or "").strip()
+    if server:
+        mail.smtp_server = server
+    if not str(getattr(mail, "notification_email", "") or "").strip():
+        default = str(environment.get("DEFAULT_NOTIFICATION_EMAIL") or "").strip()
+        if default:
+            mail.notification_email = default
 
 
 class ProjectRunService:

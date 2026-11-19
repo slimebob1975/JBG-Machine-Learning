@@ -143,9 +143,6 @@ msgstr "Alpha"
 msgid "Assisted search"
 msgstr "Assisterad sökning"
 
-msgid "Between 2 and 30 classes."
-msgstr "Mellan 2 och 30 klasser."
-
 msgid "Boosting estimators"
 msgstr "Antal boosting-estimatorer"
 
@@ -158,9 +155,6 @@ msgstr "CatBoost: klassviktning"
 msgid "CatBoost: iterations"
 msgstr "CatBoost: iterationer"
 
-msgid "Categorical text columns"
-msgstr "Kategoriska textkolumner"
-
 msgid "Categorize text columns"
 msgstr "Kategorisera textkolumner"
 
@@ -172,9 +166,6 @@ msgstr "Klassviktning"
 
 msgid "Column roles"
 msgstr "Kolumnroller"
-
-msgid "Comma-separated column names that are never used as features."
-msgstr "Kommaseparerade kolumnnamn som aldrig används som variabler."
 
 msgid "Covariance regularization"
 msgstr "Regularisering av kovarians"
@@ -217,9 +208,6 @@ msgstr "Antal estimatorer i ensemblen"
 
 msgid "Estimate Dark Numbers"
 msgstr "Skatta mörkertal"
-
-msgid "Excluded columns"
-msgstr "Uteslutna kolumner"
 
 msgid "Experimental fallback"
 msgstr "Experimentell reservmetod"
@@ -353,9 +341,6 @@ msgstr "Yttre veck"
 msgid "Oversampling"
 msgstr "Översampling"
 
-msgid "Oversampling (single, legacy)"
-msgstr "Översampling (enskild, äldre)"
-
 msgid "Oversampling methods"
 msgstr "Översamplingsmetoder"
 
@@ -394,9 +379,6 @@ msgstr "Återanvänd ett sparat resultat"
 
 msgid "Row limit"
 msgstr "Radgräns"
-
-msgid "Rows of one group stay together when data is split."
-msgstr "Rader i samma grupp hålls ihop när data delas upp."
 
 msgid "Run type"
 msgstr "Körningstyp"
@@ -446,9 +428,6 @@ msgstr "Delmängdsstorlekar"
 msgid "Target class"
 msgstr "Målklass"
 
-msgid "Text feature columns"
-msgstr "Textvariabelkolumner"
-
 msgid "Threshold diagnostics"
 msgstr "Tröskeldiagnostik"
 
@@ -485,20 +464,11 @@ msgstr "Träd"
 msgid "Trials"
 msgstr "Försök"
 
-msgid "Undersampling (single, legacy)"
-msgstr "Undersampling (enskild, äldre)"
-
 msgid "Undersampling methods"
 msgstr "Undersamplingsmetoder"
 
-msgid "Unique and never empty."
-msgstr "Unik och aldrig tom."
-
 msgid "Used with the fixed decision policy (binary classes)."
 msgstr "Används med fast beslutsregel (två klasser)."
-
-msgid "Validation & decision"
-msgstr "Validering & beslut"
 
 msgid "Variance smoothing"
 msgstr "Variansutjämning"
@@ -530,9 +500,6 @@ msgstr "Högst 25 MB, med rubrikrad. Avgränsaren upptäcks automatiskt."
 
 msgid "Catalog"
 msgstr "Katalog"
-
-msgid "Check the column roles of"
-msgstr "Kontrollera kolumnrollerna i"
 
 msgid "Class"
 msgstr "Klass"
@@ -576,9 +543,6 @@ msgstr "Saknas"
 msgid "Mixed"
 msgstr "Blandad"
 
-msgid "More classes exist than are shown."
-msgstr "Det finns fler klasser än de som visas."
-
 msgid "No SQL Server is configured on this server."
 msgstr "Ingen SQL Server är konfigurerad på den här servern."
 
@@ -593,9 +557,6 @@ msgstr "Inte validerat"
 
 msgid "Numeric feature columns contain numbers only."
 msgstr "Numeriska variabelkolumner innehåller bara tal."
-
-msgid "Only the dataset itself"
-msgstr "Bara själva datasetet"
 
 msgid "Open a project in the Projects tab first."
 msgstr "Öppna först ett projekt under fliken Projekt."
@@ -665,9 +626,6 @@ msgstr "Status"
 
 msgid "Table"
 msgstr "Tabell"
-
-msgid "Table (schema.table)"
-msgstr "Tabell (schema.tabell)"
 
 msgid "The ID column exists and is unique."
 msgstr "ID-kolumnen finns och är unik."
@@ -771,9 +729,6 @@ msgstr "Avancerade inställningar"
 
 msgid "Choose one of the options."
 msgstr "Välj ett av alternativen."
-
-msgid "Column names appear as lists when the active training dataset can be read (for SQL: sign in on the Dataset tab)."
-msgstr "Kolumnnamn visas som listor när det aktiva träningsdatasetet kan läsas (för SQL: logga in under fliken Dataset)."
 
 msgid "Configuration created."
 msgstr "Konfigurationen är skapad."
@@ -965,9 +920,6 @@ msgstr "Övriga klasser"
 msgid "All"
 msgstr "Alla"
 
-msgid "More settings"
-msgstr "Fler inställningar"
-
 msgid "Combinations to spot-check"
 msgstr "Kombinationer att jämföra"
 
@@ -1073,9 +1025,6 @@ msgstr "Rader: verklig klass – kolumner: predikterad klass."
 
 msgid "Running"
 msgstr "Körs"
-
-msgid "Runs in this project"
-msgstr "Körningar i projektet"
 
 msgid "Sending the notification"
 msgstr "Skickar aviseringen"
@@ -1268,9 +1217,6 @@ msgstr "Starta prediktion"
 msgid "The predictions are written to the prediction table in SQL Server. A table without a class column is predicted in full."
 msgstr "Prediktionerna skrivs till prediktionstabellen i SQL Server. En tabell utan klasskolumn predikteras i sin helhet."
 
-msgid "Choose a model on the Models tab first."
-msgstr "Välj först en modell under fliken Modeller."
-
 msgid "The predictions were written to the prediction table in SQL Server."
 msgstr "Prediktionerna skrevs till prediktionstabellen i SQL Server."
 
@@ -1298,9 +1244,6 @@ msgstr "Ingen modell är vald (fliken Modeller)."
 
 msgid "The model is available."
 msgstr "Modellen är tillgänglig."
-
-msgid "Predictions for CSV projects come in the next update."
-msgstr "Prediktioner för CSV-projekt kommer i nästa uppdatering."
 
 msgid "Start a prediction, or select one in the list."
 msgstr "Starta en prediktion eller välj en i listan."
@@ -1339,9 +1282,6 @@ msgstr "Prediktionerna visas här för körningar som görs efter den här uppda
 # 295d: Overview and About tabs.
 msgid "About"
 msgstr "Om"
-
-msgid "New to the program? The About tab explains how to use it."
-msgstr "Ny i programmet? Fliken Om beskriver hur det används."
 
 msgid "Training dataset"
 msgstr "Träningsdataset"
@@ -1416,9 +1356,6 @@ msgstr "Kopierade från datasetet"
 
 msgid "Not in this dataset, so their roles were not copied:"
 msgstr "Finns inte i det här datasetet, så deras roller kopierades inte:"
-
-msgid "Numeric in the other dataset but not numbers here; choose another role:"
-msgstr "Numeriska i det andra datasetet men inte tal här. Välj en annan roll:"
 
 # 297e: why a run failed.
 msgid "No model was trained; the log says why."
@@ -1697,18 +1634,6 @@ msgstr "Korrektionens grund"
 
 msgid "Dark Number"
 msgstr "Mörkertal"
-
-msgid "The estimated share of hidden cases of each target class. The four estimates are expected to grow from left to right; together they form a heuristic range. Values are proportions."
-msgstr "Den skattade andelen dolda fall för varje målklass. De fyra skattningarna väntas växa från vänster till höger och bildar tillsammans ett heuristiskt intervall. Värdena är andelar."
-
-msgid "The estimates are in the expected order."
-msgstr "Skattningarna ligger i förväntad ordning."
-
-msgid "The estimates are not in the expected order."
-msgstr "Skattningarna ligger inte i förväntad ordning."
-
-msgid "The order could not be checked: an estimate is missing or cannot be estimated."
-msgstr "Ordningen kunde inte kontrolleras: en skattning saknas eller kan inte skattas."
 
 msgid "No false positives were observed, so no correction was needed."
 msgstr "Inga falska positiva observerades, så ingen korrektion behövdes."
@@ -2089,9 +2014,6 @@ msgstr "Stoppa nu"
 msgid "In the web interface, the variables are chosen through the column roles on the Dataset tab: a column with the role Ignored is not used by the model."
 msgstr "I webbgränssnittet väljs variablerna med kolumnrollerna på fliken Dataset: en kolumn med rollen Ignoreras används inte av modellen."
 
-msgid "An assisted feature investigation is coming, as a run of its own on the Training tab."
-msgstr "En assisterad variabelundersökning kommer, som en egen körning på fliken Träning."
-
 msgid "variables"
 msgstr "variabler"
 
@@ -2399,9 +2321,6 @@ msgstr "Andel bland de övriga"
 
 msgid "Growth of the target class"
 msgstr "Tillväxt för målklassen"
-
-msgid "How much each target class would grow if the hidden cases were added, with the counts behind it. The four estimates are expected to grow from left to right."
-msgstr "Hur mycket varje målklass skulle växa om de dolda fallen lades till, med antalen bakom. De fyra skattningarna väntas växa från vänster till höger."
 
 msgid "Counts"
 msgstr "Antal"

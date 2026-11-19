@@ -1,4 +1,10 @@
 import os
+
+# 300f: web runs now send the completion e-mail with the server's settings
+# (DEFAULT_SMTP_SERVER, DEFAULT_NOTIFICATION_EMAIL from .env, as Voila does).
+# Tests never send mail: the real environment's empty values override .env.
+os.environ["DEFAULT_SMTP_SERVER"] = ""
+os.environ["DEFAULT_NOTIFICATION_EMAIL"] = ""
 from types import SimpleNamespace
 import pytest
 from Config import Config

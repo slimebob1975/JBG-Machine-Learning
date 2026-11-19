@@ -526,6 +526,7 @@ The map above is the target. What exists after revision 285m3:
 | `/ui/dataset` (copy roles) | 300c | Copying roles into an SQL dataset translates SQL types (it flagged every numeric column); the message names each column's type. The validation study's report |
 | `/ui/run`, `/ui/prediction`, run logs | 300d | No new run while one of the project's runs is in progress; run log lines with timestamp and level; the study's hit rate |
 | `/ui/results` (Dark Numbers) | 300e | DN-03: `c` measured out-of-fold beside the in-sample one (interval, quality, the Dark Number it would give); uncertain flagged |
+| (runs) | 300f | The completion e-mail of web runs uses the server's SMTP server and default address, as Voilà does |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |
