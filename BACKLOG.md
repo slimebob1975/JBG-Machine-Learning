@@ -38,6 +38,8 @@ down are kept as history and are current only where they are listed here.
   words.
 - [x] 300o (reported 2026-11-20): older configurations could not be changed
   after new settings were added; they now get the defaults.
+- [x] 300p (2026-11-20): versions from 0, the newest configuration first, the
+  dataset in the Results list, the Dark Number matrices like the Overview's.
 - [ ] Bugs reported in use: added here as they are found.
 
 ### Deferred: future development (in rough order)

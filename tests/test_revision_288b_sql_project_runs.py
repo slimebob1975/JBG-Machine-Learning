@@ -136,7 +136,7 @@ def test_sql_project_run_needs_the_sign_in_and_then_starts(tmp_path):
     assert (connection["class_catalog"], connection["class_table"]) == ("ResultsDb", "dbo.Predictions")
     assert connection["sql_username"] == "" and connection["sql_password"] == ""
     run = spec["project_run"]
-    assert (run["project_id"], run["dataset_id"], run["configuration_version"]) == (project, dataset, 1)
+    assert (run["project_id"], run["dataset_id"], run["configuration_version"]) == (project, dataset, 0)   # 300p: versions from 0
     assert spec["configuration"]["io"] == dict(spec["configuration"]["io"],
                                                 model_path=str(tmp_path / "models" / project),
                                                 model_name=run["model_id"])

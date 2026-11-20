@@ -25,17 +25,17 @@ def test_create_reopen_and_revision_history(tmp_path):
     projects, configs, settings = _repositories(tmp_path)
     project = projects.create("alice", "Iris", DataSourceKind.SQL)
     first = configs.create("alice", project.project_id, "Baseline", _payload())
-    assert first.version == 1 and first.settings == _payload()
+    assert first.version == 0 and first.settings == _payload()   # 300p: versions from 0
     changed = configs.save("alice", project.project_id, first.configuration_id,
-                           _payload(2), expected_version=1)
-    assert changed.version == 2 and changed.settings == _payload(2)
+                           _payload(2), expected_version=0)
+    assert changed.version == 1 and changed.settings == _payload(2)   # 300p: versions from 0
     assert configs.get_owned("alice", project.project_id, first.configuration_id,
-                             version=1).settings == _payload()
+                             version=0).settings == _payload()   # 300p: versions from 0
     configs.close()
     projects.close()
     reopened = open_configuration_repository(settings)
     assert reopened.get_owned("alice", project.project_id,
-                              first.configuration_id).version == 2
+                              first.configuration_id).version == 1   # 300p: versions from 0
     assert len(reopened.list_for_project("alice", project.project_id)) == 1
     reopened.close()
 
@@ -53,8 +53,8 @@ def test_owner_isolation_and_project_scope(tmp_path):
         configs.create("alice", other.project_id, "Steal", _payload())
     with pytest.raises(KeyError):
         configs.save("bob", mine.project_id, cfg.configuration_id,
-                     _payload(2), expected_version=1)
-    assert configs.get_owned("alice", mine.project_id, cfg.configuration_id).version == 1
+                     _payload(2), expected_version=0)
+    assert configs.get_owned("alice", mine.project_id, cfg.configuration_id).version == 0   # 300p: versions from 0
     configs.close()
     projects.close()
 
@@ -66,11 +66,11 @@ def test_duplicate_names_per_project_and_optimistic_locking(tmp_path):
     with pytest.raises(DuplicateConfigurationName):
         configs.create("alice", p.project_id, "original", _payload())
     configs.save("alice", p.project_id, cfg.configuration_id, _payload(2),
-                 expected_version=1)
+                 expected_version=0)
     with pytest.raises(ConfigurationVersionConflict):
         configs.save("alice", p.project_id, cfg.configuration_id, _payload(3),
-                     expected_version=1)
-    assert configs.get_owned("alice", p.project_id, cfg.configuration_id).version == 2
+                     expected_version=0)
+    assert configs.get_owned("alice", p.project_id, cfg.configuration_id).version == 1   # 300p: versions from 0
     configs.close()
     projects.close()
 

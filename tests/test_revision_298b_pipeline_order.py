@@ -121,7 +121,7 @@ def test_a_refused_value_opens_its_section(tmp_path):
     with _client(tmp_path) as client:
         configuration = _configuration(client)
         template = _server_template()
-        form = {"expected_version": "1", "f:mode.train": "on", "f:mode.algorithm": "LRN",
+        form = {"expected_version": "0", "f:mode.train": "on", "f:mode.algorithm": "LRN",
                 "f:mode.test_size": "lots",
                 **{f"f:{key}": str(template[key.split(".")[0]][key.split(".")[1]])
                    for key, entry in FIELDS.items()

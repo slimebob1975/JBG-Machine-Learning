@@ -178,7 +178,9 @@ class DeletionService:
         except KeyError:
             raise DeletionUnavailable("configuration unavailable") from None
         plan = DeletionPlan("configuration", configuration.name, project_id,
-                            configuration=configuration, versions=configuration.version)
+                            configuration=configuration,
+                            versions=self._configurations.revision_count(
+                                owner, project_id, configuration_id))           # 300p
         runs = self._project_runs(owner, project_id)
         training = [r for r in runs if _kind(r) != "prediction"
                     and _meta(r).get("configuration_id") == configuration_id]

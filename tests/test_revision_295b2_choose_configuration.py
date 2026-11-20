@@ -63,7 +63,7 @@ def test_choosing_does_not_create_a_version_and_unblocks_the_run(tmp_path):
         assert "Konfigurationen är vald." in page and "Vald för körning" in page
         assert f'action="/ui/configuration/{configuration}/select"' not in page
         assert re.search(r"<b>From Voila</b></a>\s*<span class=\"badge b-info\">Vald</span>", page)
-        assert client.get(f"/api/projects/{project}/configurations/{configuration}").json()["version"] == 1
+        assert client.get(f"/api/projects/{project}/configurations/{configuration}").json()["version"] == 0   # 300p: versions from 0
         run = client.get("/ui/run").text
         assert "En konfiguration är vald." in run and "Konfigurationen tränar en modell." in run
         assert '<button class="btn act ready">Starta träning</button>' in run

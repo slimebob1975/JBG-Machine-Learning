@@ -158,14 +158,14 @@ def test_create_and_save_through_the_form(tmp_path):
         assert "Kolumnroller anges under fliken Dataset." in page
         current = _current(client, project, configuration)
         form = _form_for(current["settings"], _schema(), **{
-            "f:mode.algorithm": ["LRN"], "expected_version": "1"})
+            "f:mode.algorithm": ["LRN"], "expected_version": "0"})
         saved = client.post(f"/ui/configuration/{configuration}", data=_as_form(form), follow_redirects=False)
         assert saved.status_code == 303 and "message=saved" in saved.headers["location"]
         stored = _current(client, project, configuration)
-        assert stored["version"] == 2 and stored["settings"]["mode"]["algorithm"] == ["LRN"]
+        assert stored["version"] == 1 and stored["settings"]["mode"]["algorithm"] == ["LRN"]   # 300p: versions from 0
         page = client.get(saved.headers["location"]).text
         assert "Inställningar för LRN" in page                          # now shown
-        assert re.search(r"<b>Standard v2</b>", page)                   # context bar
+        assert re.search(r"<b>Standard v1</b>", page)        # 300p: from 0                   # context bar
 
 
 def test_field_errors_keep_the_other_entries(tmp_path):
@@ -174,11 +174,11 @@ def test_field_errors_keep_the_other_entries(tmp_path):
         configuration = _create(client)
         current = _current(client, project, configuration)
         form = _form_for(current["settings"], _schema(), **{
-            "f:debug.data_limit": "abc", "f:mode.max_iterations": "777", "expected_version": "1"})
+            "f:debug.data_limit": "abc", "f:mode.max_iterations": "777", "expected_version": "0"})
         response = client.post(f"/ui/configuration/{configuration}", data=_as_form(form))
         assert response.status_code == 422
         assert "Ange ett heltal." in response.text and 'value="777"' in response.text
-        assert _current(client, project, configuration)["version"] == 1        # nothing saved
+        assert _current(client, project, configuration)["version"] == 0        # nothing saved   # 300p: versions from 0
 
 
 def test_a_refused_configuration_and_a_newer_version(tmp_path):
@@ -193,10 +193,10 @@ def test_a_refused_configuration_and_a_newer_version(tmp_path):
         refused = client.post(f"/ui/configuration/{configuration}", data=_as_form(neither))
         assert refused.status_code == 422 and "Konfigurationen godtogs inte." in refused.text
         client.put(f"/api/projects/{project}/configurations/{configuration}",
-                   json={"settings": {"debug": {"data_limit": 5}}, "expected_version": 1})
+                   json={"settings": {"debug": {"data_limit": 5}}, "expected_version": 0})
         stale = client.post(f"/ui/configuration/{configuration}",
                             data=_as_form(_form_for(current["settings"], _schema(),
-                                                    expected_version="1")))
+                                                    expected_version="0")))  # 300p: stale
         assert stale.status_code == 409 and "Någon har sparat en nyare version." in stale.text
         assert _current(client, project, configuration)["settings"]["debug"]["data_limit"] == 5
 
@@ -217,7 +217,7 @@ def test_other_users_and_cross_site_forms(tmp_path):
     with _client(tmp_path) as mine:
         project = _project_with_dataset(mine)
         configuration = _create(mine)
-        assert mine.post(f"/ui/configuration/{configuration}", data={"expected_version": "1"},
+        assert mine.post(f"/ui/configuration/{configuration}", data={"expected_version": "0"},
                          headers={"origin": "http://evil.example"}).status_code == 403
     with _client(tmp_path, subject="bob") as theirs:
         theirs.cookies.set("jbg_project", project, path="/ui")

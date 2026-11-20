@@ -37,7 +37,7 @@
       <dt>{{ _("Source") }}</dt><dd>{{ selected.source | upper }}</dd>
       <dt>{{ _("Created") }}</dt><dd>{{ selected.created_at | localtime }}</dd>
       <dt>{{ _("Dataset") }}</dt><dd>{{ card.dataset.name if card.dataset else "–" }}</dd>
-      <dt>{{ _("Configuration") }}</dt><dd>{% if card.run %}{{ card.run.configuration_name or "–" }}{% if card.run.configuration_version %} v{{ card.run.configuration_version }}{% endif %}{% else %}–{% endif %}</dd>
+      <dt>{{ _("Configuration") }}</dt><dd>{% if card.run %}{{ card.run.configuration_name or "–" }}{% if card.run.configuration_version is not none %} v{{ card.run.configuration_version }}{% endif %}{% else %}–{% endif %}</dd>
       <dt>{{ _("Run") }}</dt><dd>{% if card.run %}<a href="/ui/results?run={{ selected.run_id }}">{{ card.run.created_at | localtime }}</a>{% elif selected.run_id %}{{ _("Deleted") }}{% else %}–{% endif %}</dd>
     </dl>
     {% set ev = card.evaluation %}

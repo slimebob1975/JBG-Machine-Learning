@@ -76,7 +76,7 @@ def test_a_succeeded_project_run_registers_its_model(tmp_path):
         listed = client.get(f"/api/projects/{project}/models").json()
         assert len(listed) == 1
         model = listed[0]
-        assert model["name"] == f"Standard v1 · {run.key[:8]}"
+        assert model["name"] == f"Standard v0 · {run.key[:8]}"   # 300p: versions from 0
         assert (model["state"], model["source"], model["run_id"], model["dataset_id"]) == (
             "available", "csv", run.key, dataset)
         assert not {"artifact_key", "model_path", "path"} & set(model)

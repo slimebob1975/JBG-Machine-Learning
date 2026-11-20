@@ -88,7 +88,7 @@
       <dd>{% if latest_training %}
         <a href="/ui/{{ 'results' if latest_training.status == 'succeeded' else 'run' }}?run={{ latest_training.run_id }}">{{ latest_training.created_at | localtime }}</a>
         {{ status_badge(latest_training.status) }}
-        {% if latest_training.configuration_name %}<span class="muted"> · {{ latest_training.configuration_name }}{% if latest_training.configuration_version %} v{{ latest_training.configuration_version }}{% endif %}</span>{% endif %}
+        {% if latest_training.configuration_name %}<span class="muted"> · {{ latest_training.configuration_name }}{% if latest_training.configuration_version is not none %} v{{ latest_training.configuration_version }}{% endif %}</span>{% endif %}
       {% else %}–{% endif %}</dd>
       <dt>{{ _("Prediction") }}</dt>
       <dd>{% if latest_prediction %}
@@ -134,7 +134,7 @@
       <tbody>
       {% for r in all.stats.latest %}
         <tr><td class="num"><a href="/ui/{{ 'prediction' if r.kind == 'prediction' else ('results' if r.status == 'succeeded' else 'run') }}?run={{ r.run_id }}">{{ r.created_at.isoformat() | localtime }}</a></td>
-          <td>{{ _("Prediction") if r.kind == "prediction" else (_("Feature investigation") if r.kind == "investigation" else _("Training")) }}{% if r.configuration_name %} <span class="muted">· {{ r.configuration_name }}{% if r.configuration_version %} v{{ r.configuration_version }}{% endif %}</span>{% endif %}</td>
+          <td>{{ _("Prediction") if r.kind == "prediction" else (_("Feature investigation") if r.kind == "investigation" else _("Training")) }}{% if r.configuration_name %} <span class="muted">· {{ r.configuration_name }}{% if r.configuration_version is not none %} v{{ r.configuration_version }}{% endif %}</span>{% endif %}</td>
           <td>{{ status_badge(r.status) }}</td></tr>
       {% endfor %}
       </tbody>

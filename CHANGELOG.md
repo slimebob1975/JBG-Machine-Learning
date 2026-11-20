@@ -1,3 +1,24 @@
+## Revision 300p - Small fixes: versions from 0, list orders, Dark Number matrices (2026-11-20)
+
+- Asked 2026-11-20:
+  1. Configurations count versions from 0: a new configuration is version 0,
+     so the first change makes version 1 (it made version 2). Existing
+     configurations keep their numbers. The delete page counts the stored
+     versions instead of reading the current number
+     (`ConfigurationRepository.revision_count`); templates show "v0".
+  2. The configuration list shows the last created or changed configuration
+     first (it was sorted by name).
+  3. The Results tab's list of finished runs shows the dataset with the
+     configuration ("Dataset / Konfiguration"), as the Training tab does, in
+     the same order.
+  4. The Dark Numbers confusion matrices are drawn one per estimate, like the
+     Overview's (the actual class in rows, the predicted class in columns, the
+     diagonal marked), instead of one long table.
+- User guides: the version numbering and the list order.
+- Tests: `tests/test_revision_300p_small_fixes.py`; tests with fixed version
+  numbers follow (285j, 286c, 288a, 288b, 288c, 292a, 294a, 295b2, 295d,
+  298b, 298c, 298d, 299d, 299h), and 299e follows the new matrices.
+
 ## Revision 300o - Older configurations get the newer settings' defaults (2026-11-20)
 
 - Reported 2026-11-20: after 300n an older configuration could not be

@@ -185,6 +185,8 @@ dina val direkt, och alpha ”Separated” går bara att välja med metoden
 - Rutan **Alla** i en lista markerar alla val. Den markeras också när sista
   valet markeras, och den avmarkeras när ett val avmarkeras.
 - **Spara konfiguration** skapar en ny version, och tidigare versioner sparas.
+  En ny konfiguration är version 0, så den första ändringen ger version 1.
+  Listan visar den senast skapade eller ändrade konfigurationen först.
 - **Välj för körning** gör konfigurationen till den som används vid
   träning. Den är röd när konfigurationen redan är vald.
 - **Ta bort konfigurationen…** tar bort den med alla versioner, de

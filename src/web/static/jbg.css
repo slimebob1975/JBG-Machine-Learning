@@ -337,3 +337,6 @@ svg.chart { width: 100%; height: auto; display: block; }
 .dark-percent { white-space: nowrap; }
 .dark-counts { min-width: 340px; }
 .dark-parameters { font-size: 12px; }
+/* 300p: the Dark Numbers confusion matrices, one per estimate */
+.dark-matrices { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px 24px; }
+.dark-matrix h4 { margin: 6px 0 4px; font-size: 13px; }

@@ -4,7 +4,7 @@
 {# 299e/299f: what a deletion removes and what stays, before it is confirmed. #}
 {% macro run_line(r) %}{% set m = r.spec.project_run or {} %}
   <li>{{ _("Prediction run") if m.kind == "prediction" else _("Training run") }}
-    {{ r.created_at.isoformat() | localtime }}{% if m.configuration_name %} · {{ m.configuration_name }}{% if m.configuration_version %} v{{ m.configuration_version }}{% endif %}{% endif %}</li>
+    {{ r.created_at.isoformat() | localtime }}{% if m.configuration_name %} · {{ m.configuration_name }}{% if m.configuration_version is not none %} v{{ m.configuration_version }}{% endif %}{% endif %}</li>
 {% endmacro %}
 {% set all_runs = plan.runs + plan.hidden_runs %}
 {% block main %}

@@ -185,10 +185,10 @@ class ConfigurationRepository:
                 self._project_owned(connection, owner, project_id)
                 connection.execute(insert(self._configs).values(
                     configuration_id=configuration_id, project_id=project_id,
-                    name=name, name_key=name.casefold(), current_version=1,
+                    name=name, name_key=name.casefold(), current_version=0,  # 300p
                     created_at=now, updated_at=now))
                 connection.execute(insert(self._revisions).values(
-                    configuration_id=configuration_id, version=1,
+                    configuration_id=configuration_id, version=0,
                     settings_json=encoded, created_at=now))
         except IntegrityError as error:
             raise DuplicateConfigurationName("configuration name already exists") from error
@@ -197,8 +197,8 @@ class ConfigurationRepository:
     def get_owned(self, owner: str, project_id: str, configuration_id: str,
                   *, version: int | None = None) -> Configuration:
         owner = _text(owner, "owner", 256)
-        if version is not None and (type(version) is not int or version < 1):
-            raise ValueError("version must be a positive integer")
+        if version is not None and (type(version) is not int or version < 0):
+            raise ValueError("version must be a non-negative integer")
         with self._engine.connect() as connection:
             self._project_owned(connection, owner, project_id)
             return self._load(connection, project_id, configuration_id, version)
@@ -209,15 +209,26 @@ class ConfigurationRepository:
             self._project_owned(connection, owner, project_id)
             headers = connection.execute(select(self._configs).where(
                 self._configs.c.project_id == project_id).order_by(
-                self._configs.c.name_key, self._configs.c.configuration_id)).all()
+                # 300p (asked 2026-11-20): the last created or changed first.
+                self._configs.c.updated_at.desc(), self._configs.c.name_key,
+                self._configs.c.configuration_id)).all()
             return tuple(self._load(connection, project_id, row.configuration_id)
                          for row in headers)
+
+    def revision_count(self, owner: str, project_id: str, configuration_id: str) -> int:
+        """300p: how many versions are stored (versions count from 0 since 300p,
+        from 1 before, so the current version number is not the count)."""
+        from sqlalchemy import func
+        with self._engine.connect() as connection:
+            self._project_owned(connection, owner, project_id)
+            return int(connection.execute(select(func.count()).select_from(self._revisions).where(
+                self._revisions.c.configuration_id == configuration_id)).scalar() or 0)
 
     def save(self, owner: str, project_id: str, configuration_id: str,
              settings: dict, *, expected_version: int) -> Configuration:
         owner = _text(owner, "owner", 256)
-        if type(expected_version) is not int or expected_version < 1:
-            raise ValueError("expected_version must be a positive integer")
+        if type(expected_version) is not int or expected_version < 0:
+            raise ValueError("expected_version must be a non-negative integer")
         encoded = _snapshot(settings)
         now = datetime.now(timezone.utc)
         with self._engine.begin() as connection:

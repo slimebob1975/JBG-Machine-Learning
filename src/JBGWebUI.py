@@ -329,6 +329,7 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
             csv_root=getattr(datasets, "_csv_root", None))
         add_results_tab(app, principal_dependency=principal_dependency, render=render,
                         active_project=active_project, runs=runs, results=results,
+                        datasets=datasets,                                      # 300p
                         reclassification=reclassification, redirect=_redirect,
                         recommendation=_recommendation(runs, results,
                                                        getattr(datasets, "_repository", None)))

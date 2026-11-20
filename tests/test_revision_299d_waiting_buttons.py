@@ -54,7 +54,7 @@ def test_saving_a_configuration_waits_for_a_change_unless_refused(tmp_path):
         cfg = client.post(f"/api/projects/{s.project}/configurations",
                           json={"name": "K", "settings": {}}).json()["configuration_id"]
         page = client.get(f"/ui/configuration?configuration={cfg}").text
-        refused = client.post(f"/ui/configuration/{cfg}", data={"expected_version": "1",
+        refused = client.post(f"/ui/configuration/{cfg}", data={"expected_version": "0",
                                                                 "f:mode.test_size": "lots"})
     saves = _buttons(page, "Spara konfiguration")
     assert len(saves) == 2                                        # footer and its top copy

@@ -353,6 +353,24 @@ def readable_dark_table(detail: dict, translate, language: str = "sv") -> dict:
     return detail
 
 
+def dark_matrices(detail: dict) -> list:
+    """300p (asked 2026-11-20): the Dark Numbers confusion matrices one per
+    estimate, drawn like the Overview's (actual class in rows, predicted class
+    in columns, the diagonal marked). ``detail``: after estimate_first and
+    readable_dark_table (estimate, actual class, one column per class)."""
+    columns = detail.get("columns") or []
+    if len(columns) < 3:
+        return []
+    classes, matrices = [str(c) for c in columns[2:]], []
+    for row in detail.get("rows") or []:
+        if len(row) < 3:
+            continue
+        if str(row[0] or "").strip() or not matrices:
+            matrices.append({"estimate": str(row[0] or ""), "classes": classes, "rows": []})
+        matrices[-1]["rows"].append({"actual": str(row[1]), "values": list(row[2:])})
+    return matrices
+
+
 def estimate_first(detail: dict) -> dict:
     """299e (asked 2026-11-13): in the Dark Numbers confusion matrices the
     estimate ("Model type") comes first, left of the actual class (the
@@ -390,7 +408,8 @@ RECOMMENDATION_REASONS = {
 
 
 def add_results_tab(app, *, principal_dependency, render, active_project, runs, results,
-                    reclassification=None, redirect=None, recommendation=None) -> None:
+                    reclassification=None, redirect=None, recommendation=None,
+                    datasets=None) -> None:
     from fastapi import Form
     from JBGApplicationContracts import RunReference
     from JBGRunResults import RunResultsUnavailable
@@ -410,6 +429,7 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                    "views": VIEWS, "view": view, "overview": None, "labels": [],
                    "detail": None, "detail_missing": False, "available": {},
                    "has_folder": False, "dark_summary": [], "dark_matrix": None,
+                   "dark_matrices": [],
                    "correctable": False, "corrected": {}, "correction_log": [], "review": None,
                    "correction_source": "",
                    "dark_estimates": DARK_ESTIMATES, "dark_reasons": DARK_REASONS,
@@ -421,9 +441,13 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
         if project is not None:
             # 296a: results belong to training runs; prediction runs are on the
             # Prediction tab.
-            context["finished"] = [r for r in runs.list_project_runs(owner, project["project_id"])
-                                   if r["status"] == "succeeded"
-                                   and r.get("kind", "training") in ("training", "investigation")]
+            # 300p (asked 2026-11-20): with the dataset, as on the Training tab.
+            from JBGWebUIRun import with_dataset_names
+            context["finished"] = with_dataset_names(
+                [r for r in runs.list_project_runs(owner, project["project_id"])
+                 if r["status"] == "succeeded"
+                 and r.get("kind", "training") in ("training", "investigation")],
+                datasets, owner, project["project_id"])
             chosen = run or (context["finished"][0]["run_id"] if context["finished"] else "")
             item = next((r for r in context["finished"] if r["run_id"] == chosen), None)
             if item is not None and item.get("kind") == "investigation":
@@ -502,6 +526,7 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                                 results.detail(owner, chosen, "dark_numbers_matrix",
                                                page_size=500), translate,
                                 request_language(request)))
+                            context["dark_matrices"] = dark_matrices(context["dark_matrix"])
                         except RunResultsUnavailable:
                             context["dark_matrix"] = None
                 except RunResultsUnavailable:

@@ -78,7 +78,7 @@ def test_run_records_configuration_version_dataset_and_its_own_model(tmp_path):
         spec = _spec(client, response.json()["run_id"])
     run = spec["project_run"]
     assert (run["project_id"], run["configuration_id"], run["configuration_version"],
-            run["dataset_id"]) == (project, configuration, 1, dataset)
+            run["dataset_id"]) == (project, configuration, 0, dataset)   # 300p
     assert UUID(run["model_id"]).version == 4
     io = spec["configuration"]["io"]
     assert io["model_name"] == run["model_id"]
@@ -92,15 +92,15 @@ def test_a_pinned_version_is_used(tmp_path):
     with _client(tmp_path) as client:
         project, _, configuration = _setup(client)
         url = f"/api/projects/{project}/configurations/{configuration}"
-        client.put(url, json={"settings": {"debug": {"data_limit": 2}}, "expected_version": 1})
+        client.put(url, json={"settings": {"debug": {"data_limit": 2}}, "expected_version": 0})
         latest = client.post(f"/api/projects/{project}/runs",
                              json={"configuration_id": configuration}).json()
         pinned = client.post(f"/api/projects/{project}/runs",
-                             json={"configuration_id": configuration, "version": 1}).json()
+                             json={"configuration_id": configuration, "version": 0}).json()   # 300p: versions from 0
         latest_spec, pinned_spec = _spec(client, latest["run_id"]), _spec(client, pinned["run_id"])
-    assert latest_spec["project_run"]["configuration_version"] == 2
+    assert latest_spec["project_run"]["configuration_version"] == 1   # 300p: versions from 0
     assert latest_spec["configuration"]["debug"]["data_limit"] == 2
-    assert pinned_spec["project_run"]["configuration_version"] == 1
+    assert pinned_spec["project_run"]["configuration_version"] == 0   # 300p: versions from 0
     assert pinned_spec["configuration"]["debug"]["data_limit"] != 2
     assert latest_spec["project_run"]["model_id"] != pinned_spec["project_run"]["model_id"]
 

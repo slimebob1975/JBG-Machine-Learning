@@ -11,12 +11,12 @@
       <h2>{{ _("Finished runs") }}</h2>
       {% if finished %}
       <table class="grid">
-        <thead><tr><th>{{ _("Started") }}</th><th>{{ _("Configuration") }}</th></tr></thead>
+        <thead><tr><th>{{ _("Started") }}</th><th>{{ _("Dataset / Configuration") }}</th></tr></thead>
         <tbody>
         {% for item in finished %}
           <tr class="{{ 'hl' if item.run_id == selected_run }}">
             <td class="num"><a href="/ui/results?run={{ item.run_id }}">{{ item.created_at | localtime }}</a></td>
-            <td>{{ item.configuration_name or "–" }}{% if item.configuration_version %} v{{ item.configuration_version }}{% endif %}
+            <td>{% if item.dataset_name %}<b>{{ item.dataset_name }}</b><br>{% endif %}<span class="{{ 'muted' if item.dataset_name }}">{{ item.configuration_name or "–" }}{% if item.configuration_version is not none %} v{{ item.configuration_version }}{% endif %}</span>
               {% if item.kind == "investigation" %}<span class="badge b-neu">{{ _("Feature investigation") }}</span>{% endif %}</td>
           </tr>
         {% endfor %}
@@ -229,13 +229,22 @@
             <td>{% if entry.undone_at %}<span class="muted">{{ _("undone") }}</span>{% else %}<form method="post" action="/ui/results/{{ selected_run }}/corrections/{{ index }}/undo" class="inline"><button class="btn sub">{{ _("Undo") }}</button></form>{% endif %}</td></tr>{% endfor %}</tbody>
         </table>
       {% endif %}
-      {% if view == "dark_numbers" and dark_matrix %}
+      {% if view == "dark_numbers" and dark_matrices %}
+        {# 300p (asked 2026-11-20): one matrix per estimate, drawn like the Overview's. #}
         <h3>{{ _("Confusion matrices") }}</h3>
         <p class="hint">{{ _("Per estimate: rows are the actual class, columns the predicted class.") }}</p>
-        <div class="scroll"><table class="grid">
-          <thead><tr>{% for c in dark_matrix.columns %}<th>{{ _("Actual class") if c == "" else _(dark_columns.get(c, c)) }}</th>{% endfor %}</tr></thead>
-          <tbody>{% for row in dark_matrix.rows %}<tr>{% for value in row %}<td class="{{ 'num' if value is number }}">{{ value | num(language) }}</td>{% endfor %}</tr>{% endfor %}</tbody>
-        </table></div>
+        <div class="dark-matrices">
+        {% for m in dark_matrices %}
+          <div class="dark-matrix">
+            <h4>{{ m.estimate }}</h4>
+            <div class="scroll"><table class="grid matrix">
+              <thead><tr><th></th>{% for c in m.classes %}<th class="num">{{ c }}</th>{% endfor %}</tr></thead>
+              <tbody>{% for r in m.rows %}<tr><th>{{ r.actual }}</th>
+                {% for value in r["values"] %}<td class="num{{ ' diag' if m.classes[loop.index0] == r.actual }}">{{ value | num(language) }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+            </table></div>
+          </div>
+        {% endfor %}
+        </div>
       {% endif %}
     {% endif %}
   {% else %}

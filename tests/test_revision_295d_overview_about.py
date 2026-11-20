@@ -134,7 +134,7 @@ def test_the_overview_shows_dataset_configuration_runs_and_models(tmp_path):
         client.post(f"/ui/models/{entry.model_id}/choose", follow_redirects=False)
         main = _main(client.get("/ui/overview").text)
     assert f'href="/ui/dataset?dataset={dataset}"' in main and "<b>Iris</b>" in main
-    assert "<b>Standard</b> v1" in main and "Konfigurationer i projektet: 1" in main
+    assert "<b>Standard</b> v0" in main and "Konfigurationer i projektet: 1" in main   # 300p: versions from 0
     assert f'href="/ui/results?run={training.key}"' in main                  # finished: its results
     assert f'href="/ui/prediction?run={prediction.key}"' in main and "Misslyckades" in main
     assert "75,0 %" in main and "62,5 %" in main                              # Swedish decimal comma

@@ -112,7 +112,7 @@ def test_the_single_sampling_fields_are_server_owned(tmp_path):
         project, configuration = _project(client)
         url = f"/api/projects/{project}/configurations/{configuration['configuration_id']}"
         saved = client.put(url, json={"settings": {"mode": {"oversampler": "SMO"}},
-                                      "expected_version": 1}).json()
+                                      "expected_version": 0}).json()
         stored = client.app.state.jbg["configuration_service"].stored_settings(
             *_owner_and_ids(project, configuration))
     assert "oversampler" not in saved["settings"]["mode"]

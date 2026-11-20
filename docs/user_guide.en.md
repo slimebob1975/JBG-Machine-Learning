@@ -183,7 +183,9 @@ only be chosen with the method "Linear".
 
 - The **All** box in a list ticks every choice. It is also ticked when the
   last choice is ticked, and it is unticked when a choice is unticked.
-- **Save configuration** creates a new version; earlier versions are kept.
+- **Save configuration** creates a new version; earlier versions are kept. A
+  new configuration is version 0, so the first change makes version 1. The list
+  shows the last created or changed configuration first.
 - **Choose for runs** makes the configuration the one used for training.
   It is red when the configuration is already chosen.
 - **Delete the configuration…** deletes it with every version, the training

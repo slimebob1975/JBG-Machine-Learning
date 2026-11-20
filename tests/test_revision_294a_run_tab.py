@@ -56,7 +56,7 @@ def _ready(client, *, predict=False):
     configuration = re.search(r"configuration=([0-9a-f-]{36})", created.headers["location"]).group(1)
     if predict:
         client.put(f"/api/projects/{project}/configurations/{configuration}",
-                   json={"settings": settings, "expected_version": 1})
+                   json={"settings": settings, "expected_version": 0})
     return project, dataset, configuration
 
 

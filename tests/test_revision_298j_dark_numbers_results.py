@@ -114,7 +114,9 @@ class DarkNumbersResultsNative298j(revision_281c.CSVApplicationEndToEnd281c):
         self.assertIn("Korstränad modell, testdata", page)
         self.assertRegex(page, r"Målklass: \w+")
         self.assertIn("Förväxlingsmatriser", page)
-        self.assertIn("<th>Faktisk klass</th>", page)
+        # 300p: one matrix per estimate, drawn like the Overview's.
+        self.assertIn('class="dark-matrix"', page)
+        self.assertIn('<table class="grid matrix">', page)
         self.assertIn("<th>Skattning</th>", page)
         self.assertEqual(len(re.findall(r'<table class="grid dark-range">', page)), 3)  # a, b, c
 

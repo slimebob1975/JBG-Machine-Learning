@@ -324,9 +324,13 @@ def test_the_estimate_comes_before_the_actual_class():
     estimate_first(detail)
     assert detail["columns"] == ["Model type", "", "a", "b"]
     assert detail["rows"] == [["Korstränad modell, testdata", "a", 9, 1], ["", "b", 2, 8]]
-    from JBGWebUI import WEB
-    template = (WEB / "templates" / "results.html").read_text(encoding="utf-8")
-    assert '_("Actual class") if c == ""' in template
+    # 300p: drawn one matrix per estimate, like the Overview's.
+    from JBGWebUIResults import dark_matrices
+    matrices = dark_matrices(detail)
+    assert [m["estimate"] for m in matrices] == ["Korstränad modell, testdata"]
+    assert matrices[0]["classes"] == ["a", "b"]
+    assert matrices[0]["rows"] == [{"actual": "a", "values": [9, 1]},
+                                   {"actual": "b", "values": [2, 8]}]
 
 
 def test_the_worker_names_the_engine_log_after_the_run():

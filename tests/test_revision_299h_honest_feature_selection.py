@@ -60,7 +60,7 @@ def test_the_form_neither_shows_nor_resets_the_stored_settings(tmp_path):
         configuration = client.post(f"/api/projects/{project}/configurations",
                                     json={"name": "C"}).json()["configuration_id"]
         service = client.app.state.jbg["configuration_service"]
-        service.save(owner, project, configuration, expected_version=1, settings={"mode": {
+        service.save(owner, project, configuration, expected_version=0, settings={"mode": {
             "feature_selection_mode": "assisted", "feature_search_preset": "Custom",
             "feature_search_trials": 3}})
         page = client.get(f"/ui/configuration?configuration={configuration}").text
@@ -71,14 +71,14 @@ def test_the_form_neither_shows_nor_resets_the_stored_settings(tmp_path):
         schema = _schema()
         values = service.get(owner, project, configuration)["settings"]
         shown = {"fields": [f for f in schema["fields"] if not f.get("inactive")]}
-        form = _form_for(values, shown) + [("expected_version", "2")]
+        form = _form_for(values, shown) + [("expected_version", "1")]
         saved = client.post(f"/ui/configuration/{configuration}", data=_as_form(form),
                             follow_redirects=False)
         errors = re.findall(r"class=\"field-error[^>]*>([^<]*)", saved.text)
         assert saved.status_code == 303, (errors, re.findall(r"message error[^>]*>([^<]*)", saved.text))
         assert "message=saved" in saved.headers["location"]
         stored = service.get(owner, project, configuration)
-        assert stored["version"] == 3
+        assert stored["version"] == 2                                   # 300p: from 0
         assert stored["settings"]["mode"]["feature_selection_mode"] == "assisted"
         assert stored["settings"]["mode"]["feature_search_trials"] == 3
 

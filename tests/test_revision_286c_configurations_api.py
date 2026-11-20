@@ -47,7 +47,7 @@ def test_created_configuration_shows_only_user_settings(tmp_path):
                                json={"name": "Standard", "settings": ROLES})
         assert response.status_code == 201, response.text
         body = response.json()
-        assert body["version"] == 1 and body["name"] == "Standard"
+        assert body["version"] == 0 and body["name"] == "Standard"   # 300p: versions from 0
         settings = body["settings"]
         assert set(settings) == {"connection", "mode", "io", "debug", "mail"}
         assert settings["mode"]["max_iterations"] == 777
@@ -102,16 +102,16 @@ def test_saving_needs_the_current_version(tmp_path):
         created = client.post(url, json={"name": "C", "settings": ROLES}).json()
         item = f"{url}/{created['configuration_id']}"
         saved = client.put(item, json={"settings": {"debug": {"data_limit": 500}},
-                                       "expected_version": 1})
-        assert saved.status_code == 200 and saved.json()["version"] == 2
+                                       "expected_version": 0})
+        assert saved.status_code == 200 and saved.json()["version"] == 1   # 300p: versions from 0
         assert saved.json()["settings"]["debug"]["data_limit"] == 500
         assert saved.json()["settings"]["mode"]["max_iterations"] == 777            # kept
         stale = client.put(item, json={"settings": {"debug": {"data_limit": 1}},
-                                       "expected_version": 1})
+                                       "expected_version": 0})
         assert (stale.status_code, stale.json()) == (
             409, {"detail": "configuration changed; reload before saving"})
-        assert client.get(item, params={"version": 1}).json()["settings"]["debug"]["data_limit"] == 100
-        assert client.get(item).json()["version"] == 2
+        assert client.get(item, params={"version": 0}).json()["settings"]["debug"]["data_limit"] == 100   # 300p: versions from 0
+        assert client.get(item).json()["version"] == 1   # 300p: versions from 0
         assert client.get(item, params={"version": 9}).status_code == 404
 
 
@@ -141,5 +141,5 @@ def test_names_and_ownership(tmp_path):
         for response in (theirs.get(url), theirs.get(f"{url}/{configuration}"),
                          theirs.post(url, json={"name": "Bob's"}),
                          theirs.put(f"{url}/{configuration}",
-                                    json={"settings": {}, "expected_version": 1})):
+                                    json={"settings": {}, "expected_version": 0})):
             assert (response.status_code, response.json()) == (404, {"detail": "project unavailable"})

@@ -41,7 +41,7 @@
         {% for item in recent %}
           <tr class="{{ 'hl' if item.run_id == selected_run }}">
             <td class="num"><a href="/ui/prediction?run={{ item.run_id }}">{{ item.created_at | localtime }}</a></td>
-            <td>{% if item.dataset_name %}<b>{{ item.dataset_name }}</b><br>{% endif %}<span class="{{ 'muted' if item.dataset_name }}">{{ item.configuration_name or "–" }}{% if item.configuration_version %} v{{ item.configuration_version }}{% endif %}</span></td>
+            <td>{% if item.dataset_name %}<b>{{ item.dataset_name }}</b><br>{% endif %}<span class="{{ 'muted' if item.dataset_name }}">{{ item.configuration_name or "–" }}{% if item.configuration_version is not none %} v{{ item.configuration_version }}{% endif %}</span></td>
             <td data-run-status="{{ item.run_id }}"><span class="badge {{ 'b-ok' if item.status == 'succeeded' else ('b-fail' if item.status in ('failed', 'interrupted') else 'b-neu') }}">{{ _(stages.get(item.status, item.status)) }}</span></td>
           </tr>
         {% endfor %}

@@ -536,6 +536,7 @@ The map above is the target. What exists after revision 285m3:
 | (Dark Numbers) | 300m | c as the ratio of the means over the flip test's parts (a part without recognition made c infinite) |
 | `/ui/configuration` (Dark Numbers), `/ui/results` | 300n | Repeats, the upper bound for c and the overtraining warning level as settings; the warning from c; the calculation table in words |
 | `/ui/configuration` | 300o | Older configurations show and save the defaults of settings added later |
+| `/ui/configuration`, `/ui/results` | 300p | Versions from 0; the newest configuration first; the dataset in the Results list; Dark Number matrices one per estimate |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

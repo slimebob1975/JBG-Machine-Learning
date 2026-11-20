@@ -172,7 +172,7 @@ def test_an_unsupported_combination_is_refused_and_explained(tmp_path):
         form = [(k, v) for k, v in form if k not in ("f:mode.dark_number_method",
                                                     "f:mode.dark_number_alpha")]
         form += [("f:mode.dark_number_method", "NON_LINEAR"), ("f:mode.dark_number_alpha", "SEPARATED"),
-                 ("expected_version", "1")]
+                 ("expected_version", "0")]
         response = client.post(f"/ui/configuration/{configuration}", content=_encode(form),
                                headers={"content-type": "application/x-www-form-urlencoded"})
     assert response.status_code == 422
