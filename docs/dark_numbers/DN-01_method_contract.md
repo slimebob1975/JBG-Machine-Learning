@@ -349,7 +349,8 @@ Dark Number, are unchanged. The flip test shows its progress fold by fold.
 introduced for. Since 1.3:
 
 `D = min(c · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`, with
-`c = max(1, mean over the flip test's 8 parts of r_unseen / r_in)`
+`c = max(1, mean(r_unseen) / mean(r_in))` over the flip test's 8 parts (300m:
+the ratio of the means, so one part with `r_in = 0` does not make `c` infinite)
 
 on the estimates on all data (the test part uses no `c`). Both recoveries come
 from the same models trained with the same relabelled rows, so the ordinary

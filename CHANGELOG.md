@@ -1,3 +1,19 @@
+## Revision 300m - JBG 1.3: c as the ratio of the means (2026-11-20)
+
+- Reported 2026-11-20: a real run with a rare target class (about 1 %, about
+  12 relabelled rows per part) and a closely fitting FUT Voting Classifier got
+  `c = inf` for both models, so three of the four Dark Number estimates were
+  undefined although the model's test result was good (MCC 0.76). 300l
+  averaged the flip test's per-part ratios `r_unseen / r_in`; one part where
+  the model recognised none of its relabelled rows made the mean infinite.
+- `c` is now the ratio of the means, `max(1, mean(r_unseen) / mean(r_in))`,
+  which is exactly the quotient of the calculation table's columns "c i
+  träningsraderna" / "c på osedd del". Such a part only lowers the mean; `c`
+  is infinite only when `r_in` is 0 in every part. The 90 % interval comes from
+  resampling the 8 parts (bootstrap, fixed seed); an interval reaching infinity
+  makes `c` uncertain (used, flagged).
+- Tests: `tests/test_revision_300m_ratio_of_means.py`; 300k follows.
+
 ## Revision 300l - JBG 1.3: c is the correction factor for overtraining (2026-11-19)
 
 - Decided 2026-11-19, after the second validation run: `c` mixed the

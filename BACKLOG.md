@@ -31,6 +31,8 @@ down are kept as history and are current only where they are listed here.
 - [ ] Later (less urgent, 2026-11-19): a production-like synthetic data set
   for the validation study, generated from aggregated profiles (the
   generator and summary received 2026-11-19 stay outside the repository).
+- [x] 300m (reported 2026-11-20): `c = inf` when one part of the flip test
+  recognised none of its relabelled rows; `c` is now the ratio of the means.
 - [ ] Bugs reported in use: added here as they are found.
 
 ### Deferred: future development (in rough order)

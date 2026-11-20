@@ -62,31 +62,45 @@ def summarise(recoveries) -> dict:
             "recoveries": values, "quality": quality}
 
 
-def overtraining_factor(pairs) -> dict:
-    """300k (agreed 2026-11-19, tried in the validation study first): the part
-    of c that comes from overtraining only, c_over = c / c_unseen =
-    r_unseen / r_in, per fold and averaged, at least 1. Both recoveries come
-    from the same models trained with the same relabelled rows, so the model's
+def overtraining_factor(pairs, resamples: int = 2000, seed: int = 20261120) -> dict:
+    """The part of c that comes from overtraining only (JBG 1.3):
+    c = max(1, mean(r_unseen) / mean(r_in)) = c_in / c_unseen, the quotient of
+    the two columns shown in the calculation table. Both recoveries come from
+    the same models trained with the same relabelled rows, so the model's
     ordinary misses (class overlap) and the effect of the relabelled labels
     cancel in the ratio; what is left is the loss on rows the model was trained
-    on, i.e. memorisation. A fold with r_in = 0 makes it infinite."""
-    ratios = []
-    for r_in, r_unseen in pairs:
-        if r_in is None or r_unseen is None:
-            continue
-        ratios.append(math.inf if r_in <= 0 else float(r_unseen) / float(r_in))
-    if not ratios:
+    on, i.e. memorisation.
+
+    300m (2026-11-20): the ratio of the means over the flip test's parts. 300k
+    averaged the parts' ratios, so a single part where the model recognised
+    none of its relabelled rows (r_in = 0, likely with few target rows and a
+    closely fitting model) made c infinite and the Dark Number undefined.
+    Now such a part only lowers the mean; c is infinite only when r_in is 0
+    in every part. The 90 % interval comes from resampling the parts
+    (bootstrap, fixed seed)."""
+    pairs = [(float(r_in), float(r_unseen)) for r_in, r_unseen in pairs
+             if r_in is not None and r_unseen is not None]
+    if not pairs:
         return {"c": None, "c_low": None, "c_high": None, "folds": 0, "quality": "not_estimable"}
-    if any(math.isinf(r) for r in ratios):
-        return {"c": math.inf, "c_low": None, "c_high": None, "folds": len(ratios),
+    values = np.asarray(pairs, dtype=float)
+    mean_in, mean_unseen = float(values[:, 0].mean()), float(values[:, 1].mean())
+    if mean_in <= 0:
+        return {"c": math.inf, "c_low": None, "c_high": None, "folds": len(pairs),
                 "quality": "not_estimable"}
-    values = np.asarray(ratios, dtype=float)
-    mean = float(values.mean())
-    half = _t90(len(values)) * float(values.std(ddof=1)) / math.sqrt(len(values)) \
-        if len(values) > 1 else math.inf
-    c, low, high = max(1.0, mean), max(1.0, mean - half), max(1.0, mean + half)
+    c = max(1.0, mean_unseen / mean_in)
+    rng = np.random.default_rng(seed)
+    picks = rng.integers(0, len(values), size=(resamples, len(values)))
+    sample_in = values[:, 0][picks].mean(axis=1)
+    sample_unseen = values[:, 1][picks].mean(axis=1)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        ratios = np.where(sample_in > 0, sample_unseen / np.where(sample_in > 0, sample_in, 1),
+                          np.inf)
+    low = max(1.0, float(np.quantile(ratios, 0.05)))
+    high = max(1.0, float(np.quantile(ratios, 0.95)))
     if not (CORRECTION_MIN <= c <= CORRECTION_MAX):
         quality = "not_estimable"
+    elif math.isinf(high) or (high - low) / 2 > RELIABLE_HALFWIDTH * c:
+        quality = "uncertain"
     else:
-        quality = "reliable" if (high - low) / 2 <= RELIABLE_HALFWIDTH * c else "uncertain"
-    return {"c": c, "c_low": low, "c_high": high, "folds": len(ratios), "quality": quality}
+        quality = "reliable"
+    return {"c": c, "c_low": low, "c_high": high, "folds": len(pairs), "quality": quality}

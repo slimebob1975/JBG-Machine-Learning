@@ -21,7 +21,10 @@ def test_the_factor():
     assert more["c"] == pytest.approx(2.0)
     below = overtraining_factor([(0.7, 0.6)] * 8)                      # not below 1
     assert below["c"] == 1.0 and below["c_low"] == 1.0
-    memorised = overtraining_factor([(0.0, 0.6), (0.3, 0.6)])
+    # 300m: the ratio of the means; one part with r_in = 0 only lowers the mean.
+    one_zero = overtraining_factor([(0.0, 0.6), (0.3, 0.6)])
+    assert one_zero["c"] == pytest.approx(0.6 / 0.15)
+    memorised = overtraining_factor([(0.0, 0.6), (0.0, 0.6)])
     assert math.isinf(memorised["c"]) and memorised["quality"] == "not_estimable"
     assert overtraining_factor([])["quality"] == "not_estimable"
 
