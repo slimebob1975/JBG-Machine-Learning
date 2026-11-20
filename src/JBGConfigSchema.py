@@ -235,6 +235,12 @@ _f("mode.dark_number_alpha", "dark_numbers", "choice", "Alpha", options=_dark("D
 _f("mode.dark_number_target", "dark_numbers", "text", "Target class")
 _f("mode.dark_number_flip_fraction", "dark_numbers", "number", "Flip fraction",
    minimum=0.0, maximum=1.0)
+_f("mode.dark_number_flip_repeats", "dark_numbers", "integer", "Repeats in the correction test",
+   minimum=1, maximum=10)
+_f("mode.dark_number_c_max", "dark_numbers", "number", "Upper bound for c",
+   minimum=1.0, maximum=100.0)
+_f("mode.dark_number_c_warning", "dark_numbers", "number", "Warn of overtraining when c is above",
+   minimum=1.0, maximum=100.0)
 _f("mode.dark_number_sampling_policy", "dark_numbers", "choice", "Sampling in the correction test",
    options=_inline("mode.dark_number_sampling_policy"))
 _f("mode.experimental_perturbed_dark_number_fallback", "dark_numbers", "boolean",

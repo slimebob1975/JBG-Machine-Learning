@@ -56,7 +56,7 @@ class DarkNumberCalculator:
         return fit >= cls.MEMORISATION_FIT and fit - unseen >= cls.MEMORISATION_GAP
 
     @classmethod
-    def bounded_correction(cls, corr, source: str):
+    def bounded_correction(cls, corr, source: str, c_max: float = None):
         """(c, source) with v1.1's bounds: an unestimable or out-of-bounds c is -1."""
         if "unestimable" in str(source):
             return cls.UNDEFINED, "undefined/unestimable"
@@ -64,7 +64,7 @@ class DarkNumberCalculator:
             value = float(corr)
         except (TypeError, ValueError):
             return cls.UNDEFINED, "undefined/unestimable"
-        if not (cls.CORRECTION_MIN <= value <= cls.CORRECTION_MAX):
+        if not (cls.CORRECTION_MIN <= value <= (cls.CORRECTION_MAX if c_max is None else c_max)):
             return cls.UNDEFINED, f"undefined/out_of_bounds ({source})"
         return value, source
 

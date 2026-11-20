@@ -39,7 +39,29 @@ DARK_COLUMNS = {"Model type": "Estimate", "type": "Calculation", "target": "Targ
                 "corr_unseen": "c in the unseen part",
                 "corr_low": "c, lower (90 %)",
                 "corr_high": "c, upper (90 %)",
-                "corr_quality": "Quality of c"}
+                "corr_quality": "Quality of c",
+                # 300n
+                "corr_overtrained": "Overtraining (c above the warning level)",
+                "capped": "Capped at 100 %"}
+
+# 300n (2026-11-20): the basis of the correction, in words.
+CORRECTION_SOURCES = {
+    "direct": "direct (the flip test)",
+    "not applied (test part)": "not used (test part)",
+    "not_needed_zero_fp": "not needed (no false positives)",
+    "undefined/unestimable": "undefined: c cannot be estimated",
+    "regressed_same_model": "fallback (regression)",
+    "perturbed_same_model": "fallback (perturbation)",
+}
+
+
+def _source_text(value, translate) -> str:
+    text = str(value or "")
+    if text.startswith("undefined/out_of_bounds"):
+        return translate("undefined: c is outside the bounds")
+    if text.startswith("fallback/unestimable"):
+        return translate("undefined: c cannot be estimated")
+    return translate(CORRECTION_SOURCES[text]) if text in CORRECTION_SOURCES else text
 
 
 # 299a2 (asked 2026-11-12): the engine's English column names in the result
@@ -238,13 +260,14 @@ EQUATION_PARTS = (
     ("α", "The mean certainty on all errors, the target class against the rest.",
      {"single_alpha", "non_linear_alpha"}),
     ("k", "The root of the non-linear form.", {"non_linear", "non_linear_alpha"}),
-    ("c", "The correction factor for overtraining, from the flip test: how much worse the "
-          "model recognises deliberately relabelled rows it was trained on than rows it has "
-          "not seen (c = c in the training rows / c in the unseen part). It is about 1 when "
-          "the model does not overtrain, and large when it learns wrong labels by heart. The "
-          "model's ordinary misses are already counted by the second factor. It is used for "
-          "the estimates on all data and not for the unseen test part, and must lie between "
-          "1 and 10, otherwise the estimate is undefined.", None),
+    ("c", "The correction factor for overtraining, from the flip test: how much worse the m"
+          "odel recognises deliberately relabelled rows it was trained on than rows it has "
+          "not seen (c = c in the training rows / c in the unseen part). It is about 1 when"
+          " the model does not overtrain, and large when it learns wrong labels by heart. T"
+          "he model's ordinary misses are already counted by the second factor. It is used "
+          "for the estimates on all data and not for the unseen test part, and must lie bet"
+          "ween 1 and the upper bound set in the configuration (10 by default), otherwise t"
+          "he estimate is undefined.", None),
 )
 
 
@@ -311,6 +334,13 @@ def readable_dark_table(detail: dict, translate, language: str = "sv") -> dict:
                 row[index] = translate(_CORRECTION_MODELS[value])
             elif column == "type" and isinstance(value, str):
                 row[index] = value.replace("_", " ")
+            elif column in ("capped", "corr_overtrained"):                    # 300n
+                row[index] = translate("Yes") if str(value).strip().lower() in ("true", "1") \
+                    else translate("No") if str(value).strip().lower() in ("false", "0") else "–"
+            elif column == "corr_source":
+                row[index] = _source_text(value, translate)                   # 300n
+            elif str(value).strip() in ("N/A", "nan", "None"):
+                row[index] = "–"                                               # 300n
             elif column == "corr_quality":
                 row[index] = translate(OOF_QUALITY.get(str(value), str(value or "")))  # 300e
             elif column in ("corr", "dark_number") \

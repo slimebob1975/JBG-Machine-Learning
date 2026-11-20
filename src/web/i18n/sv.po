@@ -2250,15 +2250,10 @@ msgstr "Odefinierad: den här delen saknar rader av målklassen eller av de övr
 msgid "Undefined: no usable correction factor (c), the pipeline is ill-suited to this problem"
 msgstr "Odefinierad: ingen användbar korrektionsfaktor (c), pipelinen passar inte det här problemet"
 
-msgid "The correction factor c must lie between 1 and 10, that is the model must find at least 10 % of the deliberately relabelled rows. Otherwise the Dark Number is undefined."
-msgstr "Korrektionsfaktorn c måste ligga mellan 1 och 10, det vill säga modellen måste hitta minst 10 % av de avsiktligt ommärkta raderna. Annars är mörkertalet odefinierat."
 
 # 299q: JBG v1.1, memorisation warning
 msgid "Training fit (correction model)"
 msgstr "Anpassning till träningsdata (korrektionsmodell)"
-
-msgid "The model fits its training rows clearly better than rows it has not seen (a fit of at least 95 % and at least 5 percentage points above its accuracy on unseen rows), so it may memorise them. The correction factor c may then be too large and the Dark Number too high."
-msgstr "Modellen passar sina träningsrader tydligt bättre än rader den inte har sett (en anpassning på minst 95 % och minst 5 procentenheter över träffsäkerheten på den osedda delen), så den kan memorera dem. Korrektionsfaktorn c kan då vara för stor och mörkertalet för högt."
 
 msgid "Accuracy on unseen rows"
 msgstr "Träffsäkerhet på osedd del"
@@ -2296,7 +2291,6 @@ msgstr "Medelsäkerheten på alla fel, målklassen mot de övriga."
 
 msgid "The root of the non-linear form."
 msgstr "Roten i den icke-linjära formen."
-
 
 msgid "alpha_FP / alpha_FN: mean certainty on FP / FN (alpha_FN weighs the misses only)"
 msgstr "α_FP / α_FN: medelsäkerhet för FP / FN (α_FN väger bara missarna)"
@@ -2438,8 +2432,61 @@ msgstr "Kvalitet för c"
 msgid "The correction factor c is uncertain (a wide interval) for this target class. Its interval is shown in the calculation table."
 msgstr "Korrektionsfaktorn c är osäker (ett brett intervall) för den här målklassen. Intervallet visas i beräkningstabellen."
 
-msgid "The correction factor for overtraining, from the flip test: how much worse the model recognises deliberately relabelled rows it was trained on than rows it has not seen (c = c in the training rows / c in the unseen part). It is about 1 when the model does not overtrain, and large when it learns wrong labels by heart. The model's ordinary misses are already counted by the second factor. It is used for the estimates on all data and not for the unseen test part, and must lie between 1 and 10, otherwise the estimate is undefined."
-msgstr "Korrektionsfaktorn för överträning, från ommärkningstestet: hur mycket sämre modellen känner igen avsiktligt ommärkta rader den tränats på än rader den inte sett (c = c i träningsraderna / c på osedd del). Den är ungefär 1 när modellen inte övertränar och stor när den lär sig felaktiga etiketter utantill. Modellens vanliga missar räknas redan av den andra faktorn. Den används för skattningarna på alla data men inte för den osedda testdelen, och den måste ligga mellan 1 och 10, annars är skattningen odefinierad."
 
 msgid "Computed with an earlier version of the method. The values are shown as they were saved. The texts below describe the current version, where c is the correction factor for overtraining; in this run's version c was the factor now called c in the training rows."
 msgstr "Beräknat med en tidigare version av metoden. Värdena visas som de sparades. Texterna nedan beskriver den nuvarande versionen, där c är korrektionsfaktorn för överträning. I den här körningens version var c den faktor som nu kallas c i träningsraderna."
+
+# 300n: adjustable parts of JBG 1.3; the calculation table in words
+msgid "Repeats in the correction test"
+msgstr "Upprepningar i korrektionstestet"
+
+msgid "Upper bound for c"
+msgstr "Övre gräns för c"
+
+msgid "Warn of overtraining when c is above"
+msgstr "Varna för överträning när c är över"
+
+msgid "Overtraining (c above the warning level)"
+msgstr "Överträning (c över varningsnivån)"
+
+msgid "Capped at 100 %"
+msgstr "Begränsad till 100 %"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nej"
+
+msgid "direct (the flip test)"
+msgstr "direkt (ommärkningstestet)"
+
+msgid "not used (test part)"
+msgstr "används inte (testdel)"
+
+msgid "not needed (no false positives)"
+msgstr "behövs inte (inga falska positiva)"
+
+msgid "undefined: c cannot be estimated"
+msgstr "odefinierad: c kan inte skattas"
+
+msgid "undefined: c is outside the bounds"
+msgstr "odefinierad: c ligger utanför gränserna"
+
+msgid "fallback (regression)"
+msgstr "reserv (regression)"
+
+msgid "fallback (perturbation)"
+msgstr "reserv (störning)"
+
+msgid "The model learns some of the deliberately wrong labels by heart: c is above the warning level set in the configuration, or the model fits its training rows clearly better than rows it has not seen. c corrects for this, but with uncertainty."
+msgstr "Modellen lär sig en del av de avsiktligt felaktiga etiketterna utantill: c är över varningsnivån i konfigurationen, eller så passar modellen sina träningsrader tydligt bättre än rader den inte sett. c korrigerar för det, men med osäkerhet."
+
+msgid "The correction factor c must lie between 1 and the upper bound set in the configuration (10 by default). Otherwise the Dark Number is undefined."
+msgstr "Korrektionsfaktorn c måste ligga mellan 1 och den övre gränsen i konfigurationen (10 som standard). Annars är mörkertalet odefinierat."
+
+msgid "The correction factor for overtraining, from the flip test: how much worse the model recognises deliberately relabelled rows it was trained on than rows it has not seen (c = c in the training rows / c in the unseen part). It is about 1 when the model does not overtrain, and large when it learns wrong labels by heart. The model's ordinary misses are already counted by the second factor. It is used for the estimates on all data and not for the unseen test part, and must lie between 1 and the upper bound set in the configuration (10 by default), otherwise the estimate is undefined."
+msgstr "Korrektionsfaktorn för överträning, från ommärkningstestet: hur mycket sämre modellen känner igen avsiktligt ommärkta rader den tränats på än rader den inte sett (c = c i träningsraderna / c på osedd del). Den är ungefär 1 när modellen inte övertränar och stor när den lär sig felaktiga etiketter utantill. Modellens vanliga missar räknas redan av den andra faktorn. Den används för skattningarna på alla data men inte för den osedda testdelen, och den måste ligga mellan 1 och den övre gränsen i konfigurationen (10 som standard), annars är skattningen odefinierad."
+
+msgid "overtraining warning"
+msgstr "varning för överträning"

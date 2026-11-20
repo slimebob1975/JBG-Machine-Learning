@@ -263,16 +263,15 @@ calculations and the confusion matrices.
 
 An estimate can be **Undefined**. That happens when the part of the data it
 is made on lacks rows of the target class or of the other classes, or when
-the correction factor c could not be estimated or lies outside 1–10 (the
-model must find at least 10 % of the rows that were deliberately relabelled
-in the test behind c). It means that the pipeline or the dataset is
-ill-suited to estimating Dark Numbers for that target class.
+the correction factor c could not be estimated or lies outside 1 to the upper
+bound set in the configuration (10 by default). It means that the pipeline or
+the dataset is ill-suited to estimating Dark Numbers for that target class.
 
-A warning says when the model behind c fits its own training rows clearly
-better than rows it has not seen (a fit of at least 95 %, at least 5
-percentage points above its accuracy on unseen rows). Such a model tends to
-learn the deliberately wrong labels in the test behind c, so c and the Dark
-Number may then be too high.
+A warning says when the model learns some of the deliberately wrong labels by
+heart: c is above the warning level set in the configuration (2 by default),
+or the model fits its training rows clearly better than rows it has not seen.
+c corrects for this, but with uncertainty, and a pipeline that learns less by
+heart gives a more reliable Dark Number.
 
 ### Dark Numbers in detail (JBG 1.3)
 
@@ -336,15 +335,19 @@ expected order between them.
 
 **Undefined estimates.** An estimate is undefined when the part of the data
 it is made on lacks rows of T or of the other classes, or when `c` could not
-be estimated or lies outside 1–10 (the model must recognise at least 10 % of
-the relabelled rows). That means the pipeline or the dataset is ill-suited to
-the problem for that target class. With no false positives the Dark Number
-is 0 whatever `c` is.
+be estimated or lies outside 1 to the upper bound (10 by default). That means
+the pipeline or the dataset is ill-suited to the problem for that target
+class. With no false positives the Dark Number is 0 whatever `c` is.
 
-**Warnings.** When the model behind `c` fits its own training rows at least
-95 % and at least 5 percentage points better than rows it has not seen, it
-probably memorises them, and `c` and the Dark Number may be too high. The
-calculation table shows both values.
+**Warnings.** When `c` is above the warning level (2 by default), the model
+learns some of the deliberately wrong labels by heart; `c` corrects for it,
+with uncertainty. The calculation table says so for each estimate.
+
+**Settings.** The configuration's Dark Numbers section sets, besides the
+flip fraction and the sampling, the repeats in the flip test (2 by default;
+each adds 4 model fits and narrows `c`'s interval, useful with a rare target
+class), the upper bound for `c` (10) and the warning level (2). The values
+used are shown with the equation and stored with the result.
 
 **Other forms.** Without alpha, D uses `(2 − TP_r)` without weights. The
 single-alpha and non-linear forms are kept as they were, with the same cap and

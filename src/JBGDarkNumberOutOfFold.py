@@ -62,7 +62,8 @@ def summarise(recoveries) -> dict:
             "recoveries": values, "quality": quality}
 
 
-def overtraining_factor(pairs, resamples: int = 2000, seed: int = 20261120) -> dict:
+def overtraining_factor(pairs, resamples: int = 2000, seed: int = 20261120,
+                        c_max: float = CORRECTION_MAX) -> dict:
     """The part of c that comes from overtraining only (JBG 1.3):
     c = max(1, mean(r_unseen) / mean(r_in)) = c_in / c_unseen, the quotient of
     the two columns shown in the calculation table. Both recoveries come from
@@ -97,7 +98,7 @@ def overtraining_factor(pairs, resamples: int = 2000, seed: int = 20261120) -> d
                           np.inf)
     low = max(1.0, float(np.quantile(ratios, 0.05)))
     high = max(1.0, float(np.quantile(ratios, 0.95)))
-    if not (CORRECTION_MIN <= c <= CORRECTION_MAX):
+    if not (CORRECTION_MIN <= c <= c_max):
         quality = "not_estimable"
     elif math.isinf(high) or (high - low) / 2 > RELIABLE_HALFWIDTH * c:
         quality = "uncertain"

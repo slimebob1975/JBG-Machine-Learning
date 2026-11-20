@@ -264,16 +264,16 @@ förväxlingsmatriserna.
 
 En skattning kan vara **Odefinierad**. Det händer när den del av data som den
 görs på saknar rader av målklassen eller av de övriga klasserna, eller när
-korrektionsfaktorn c inte kunde skattas eller ligger utanför 1–10 (modellen
-måste hitta minst 10 % av de rader som avsiktligt märktes om i testet bakom
-c). Det betyder att pipelinen eller datasetet inte passar för att skatta
-mörkertal för den målklassen.
+korrektionsfaktorn c inte kunde skattas eller ligger utanför intervallet från
+1 till den övre gränsen i konfigurationen (10 som standard). Det betyder att
+pipelinen eller datasetet inte passar för att skatta mörkertal för den
+målklassen.
 
-En varning visas när modellen bakom c passar sina egna träningsrader tydligt
-bättre än rader den inte har sett (en anpassning på minst 95 %, minst 5
-procentenheter över träffsäkerheten på den osedda delen). En sådan modell
-tenderar att lära sig de avsiktligt fel märkta raderna i testet bakom c, så c
-och mörkertalet kan då vara för höga.
+En varning visas när modellen lär sig en del av de avsiktligt felaktiga
+etiketterna utantill: c är över varningsnivån i konfigurationen (2 som
+standard), eller så passar modellen sina träningsrader tydligt bättre än
+rader den inte sett. c korrigerar för det, men med osäkerhet, och en pipeline
+som lär sig mindre utantill ger ett mer tillförlitligt mörkertal.
 
 ### Mörkertal i detalj (JBG 1.3)
 
@@ -337,15 +337,22 @@ ordning mellan dem.
 
 **Odefinierade skattningar.** En skattning är odefinierad när den del av
 data som den görs på saknar rader av T eller av de övriga klasserna, eller
-när `c` inte kunde skattas eller ligger utanför 1–10 (modellen måste känna
-igen minst 10 % av de ommärkta raderna). Det betyder att pipelinen eller
-datasetet inte passar problemet för den målklassen. Utan falska positiva är
-mörkertalet 0 oavsett `c`.
+när `c` inte kunde skattas eller ligger utanför intervallet från 1 till den
+övre gränsen (10 som standard). Det betyder att pipelinen eller datasetet inte
+passar problemet för den målklassen. Utan falska positiva är mörkertalet 0
+oavsett `c`.
 
-**Varningar.** När modellen bakom `c` passar sina egna träningsrader minst
-95 % och minst 5 procentenheter bättre än rader den inte har sett, memorerar
-den troligen dem, och `c` och mörkertalet kan då vara för höga.
-Beräkningstabellen visar båda värdena.
+**Varningar.** När `c` är över varningsnivån (2 som standard) lär sig
+modellen en del av de avsiktligt felaktiga etiketterna utantill. `c`
+korrigerar för det, med osäkerhet. Beräkningstabellen anger det för varje
+skattning.
+
+**Inställningar.** Konfigurationens avsnitt Mörkertal anger, utöver
+ommärkningsandelen och samplingen, upprepningarna i ommärkningstestet (2 som
+standard, varje upprepning ger 4 modellanpassningar till och smalnar av
+intervallet för `c`, användbart med en sällsynt målklass), den övre gränsen
+för `c` (10) och varningsnivån (2). Värdena som användes visas med ekvationen
+och sparas med resultatet.
 
 **Andra former.** Utan alfa använder D `(2 − TP_r)` utan vikter. Formerna med
 en alfa och de icke-linjära formerna är oförändrade, med samma begränsning

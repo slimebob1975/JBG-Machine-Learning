@@ -47,8 +47,11 @@ def build_dark_number_intervals(matrix):
                 # 299q2: the fit compared with the accuracy on unseen rows.
                 point["capped"] = str(row.get("capped", "")).strip().lower() in ("true", "1")
                 point["oof_quality"] = str(row.get("corr_quality") or "")           # 300l
+                # 300n: c above the warning level (JBG 1.3, the target class's own
+                # memorisation), or the earlier rule on the overall fit.
                 point["memorises"] = DarkNumberCalculator.memorises(
-                    row.get("corr_train_fit"), row.get("corr_unseen_accuracy"))
+                    row.get("corr_train_fit"), row.get("corr_unseen_accuracy")) or \
+                    str(row.get("corr_overtrained", "")).strip().lower() in ("true", "1")
                 try:
                     value = float(row["dark_number"])
                 except (ValueError, TypeError, OverflowError):

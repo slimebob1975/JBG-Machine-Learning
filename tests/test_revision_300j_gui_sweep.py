@@ -115,6 +115,7 @@ def test_every_text_sent_for_translation_is_in_the_catalogue():
               "DARK_REASONS": JBGWebUIResults.DARK_REASONS,
               "DARK_ESTIMATES": JBGWebUIResults.DARK_ESTIMATES,
               "OOF_QUALITY": JBGWebUIResults.OOF_QUALITY,
+              "CORRECTION_SOURCES": JBGWebUIResults.CORRECTION_SOURCES,       # 300n
               "OPTION_LABELS": JBGConfigSchema.OPTION_LABELS}
     for name, table in tables.items():
         for value in table.values():

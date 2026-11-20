@@ -2935,7 +2935,9 @@ class PredictionsHandler:
             # kept; 4 x 3, 5 x 2, 7 x 2, 4 x 4 ... elsewhere). The core count now
             # only sets how many folds run at the same time.
             n_splits = DarkNumberCalculator.FLIP_TEST_FOLDS
-            n_repeats = DarkNumberCalculator.FLIP_TEST_REPEATS
+            n_repeats = int(getattr(getattr(self.handler.config, "mode", None),
+                                    "dark_number_flip_repeats",
+                                    DarkNumberCalculator.FLIP_TEST_REPEATS))     # 300n
             # Apply the same negative-cap semantics as the shared CV executor.
             # A configured -1 means unlimited up to the logical CPU count.
             # PredictionsHandler does not implement ModelHandler._resolve_n_jobs.
@@ -3125,7 +3127,11 @@ class PredictionsHandler:
             # cannot be estimated.
             from JBGDarkNumberOutOfFold import overtraining_factor, summarise as out_of_fold
             estimator = locals().get("corr_estimator")
-            factor = overtraining_factor(list(getattr(estimator, "fold_pairs_", None) or []))
+            mode = getattr(self.handler.config, "mode", None)
+            c_max = float(getattr(mode, "dark_number_c_max", DarkNumberCalculator.CORRECTION_MAX))
+            c_warning = float(getattr(mode, "dark_number_c_warning", 2.0))       # 300n
+            factor = overtraining_factor(list(getattr(estimator, "fold_pairs_", None) or []),
+                                         c_max=c_max)
             unseen = out_of_fold(getattr(estimator, "oof_recoveries_", None) or [])
             self.__dict__.setdefault("dark_number_c_parts", {})[(corr_model, label)] = {
                 "in_sample": corr if corr_source == "direct" else None,
@@ -3136,7 +3142,8 @@ class PredictionsHandler:
             else:
                 corr, corr_source = None, f"fallback/unestimable (1.3: {corr_source})"
             # 299o, JBG v1.1: an unestimable or out-of-bounds c is -1 (D then -1).
-            bounded, bounded_source = DarkNumberCalculator.bounded_correction(corr, corr_source)
+            bounded, bounded_source = DarkNumberCalculator.bounded_correction(
+                corr, corr_source, c_max=c_max)
             if bounded != corr or bounded_source != corr_source:
                 self.handler.logger.print_warning(
                     f"Dark Number correction for {model_name}, target {label}: c={corr} "
@@ -3144,6 +3151,16 @@ class PredictionsHandler:
                     f"-{DarkNumberCalculator.CORRECTION_MAX:g}); the Dark Number is undefined (-1). "
                     "The pipeline is ill-suited to this problem.")
             corr, corr_source = bounded, bounded_source
+            # 300n: c above the warning level: the model learns some of the
+            # deliberately wrong labels by heart (c corrects for it, uncertainly).
+            overtrained = corr != DarkNumberCalculator.UNDEFINED and corr > c_warning
+            self.__dict__["dark_number_c_parts"][(corr_model, label)]["overtrained"] = overtrained
+            if overtrained:
+                warn = getattr(self.handler.logger, "print_warning", None)
+                if callable(warn):
+                    warn(f"Dark Number correction for {model_name}, target {label}: c={corr:.3g} is "
+                         f"above {c_warning:g}; the model learns some of the deliberately wrong "
+                         "labels by heart. c corrects for this, with uncertainty.")
             # 299q, JBG v1.1 (DN-01 F4): the correction model's fit to its own
             # training rows in the flip test, kept beside c for the results.
             # 299y (DN-02): the flip test's sampling, and the contamination risk
@@ -3518,6 +3535,8 @@ class PredictionsHandler:
                                                  for t in model_dark_numbers["target"]]
             model_dark_numbers["corr_low"] = [part(t, "low") for t in model_dark_numbers["target"]]
             model_dark_numbers["corr_high"] = [part(t, "high") for t in model_dark_numbers["target"]]
+            model_dark_numbers["corr_overtrained"] = [bool(part(t, "overtrained"))
+                                                      for t in model_dark_numbers["target"]]
             model_dark_numbers["corr_quality"] = [
                 part(t, "quality") if isinstance(oof.get(t), dict) else (oof.get(t) or "")
                 for t in model_dark_numbers["target"]]

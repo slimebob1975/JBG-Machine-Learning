@@ -33,13 +33,16 @@ down are kept as history and are current only where they are listed here.
   generator and summary received 2026-11-19 stay outside the repository).
 - [x] 300m (reported 2026-11-20): `c = inf` when one part of the flip test
   recognised none of its relabelled rows; `c` is now the ratio of the means.
+- [x] 300n (2026-11-20): Dark Number settings (repeats, upper bound for `c`,
+  warning level), an overtraining warning from `c`, the calculation table in
+  words.
 - [ ] Bugs reported in use: added here as they are found.
 
 ### Deferred: future development (in rough order)
 
 - Dark Numbers: mixture-proportion estimation tested on the study bench
-  (DN-05); "Mörkertal: avancerat" (`c_max`, the memorisation rule, the opt-in
-  standard estimator for the whole computation); an adaptive flip fraction in
+  (DN-05); the opt-in standard estimator for the whole computation (`c_max` and the
+  warning level became settings in 300n); an adaptive flip fraction in
   the GUI; ratio controls for over- and undersampling (the pipeline and the
   correction test); Dark Numbers per subgroup (first version, then several
   levels); DN-04, DN-07, DN-08; for v2, `c` on the cross-trained model's own

@@ -114,7 +114,9 @@ class Config:
     # 299b2: date_columns (298h) was missing here, so a configuration saved
     # before 298h could not be loaded (found 2026-11-13 on a CSV run).
     LATER_KEYS = {"mode": {"categorical_limit": 30, "date_columns": "",
-                           "dark_number_sampling_policy": "PIPELINE"}}       # 299y
+                           "dark_number_sampling_policy": "PIPELINE",        # 299y
+                           "dark_number_c_max": 10.0, "dark_number_c_warning": 2.0,
+                           "dark_number_flip_repeats": 2}}                    # 300n
     JSON_CONFIG_SCHEMA_VERSION = 2
 
     CLASS_TABLE_SCRIPT = "./sql/CreatePredictionTables.sql.txt"
@@ -404,6 +406,12 @@ class Config:
         # 299y (DN-02): sampling in the flip test behind c. PIPELINE (the
         # default) keeps the winning pipeline's own sampling, as before.
         dark_number_sampling_policy: str = "PIPELINE"
+        # 300n (asked 2026-11-20): JBG 1.3's adjustable parts. The upper bound
+        # for c, the c above which the view warns of overtraining, and the
+        # flip test's repeats (each adds 4 fits; more narrow c's interval).
+        dark_number_c_max: float = 10.0
+        dark_number_c_warning: float = 2.0
+        dark_number_flip_repeats: int = 2
         experimental_perturbed_dark_number_fallback: bool = True
         oversampler: Oversampling = field(default_factory=Oversampling.defaultOversampler)
         undersampler: Undersampling = field(default_factory=Undersampling.defaultUndersampler)
@@ -607,6 +615,12 @@ class Config:
                 raise ValueError("Argument dark_number_flip_fraction must be greater than 0 and less than 1")
             if self.dark_number_sampling_policy not in ("PIPELINE", "NONE", "SMOTE", "CLEAN_SMOTE", "UNDER"):
                 raise ValueError("Argument dark_number_sampling_policy is invalid")
+            if not 1.0 < float(self.dark_number_c_max) <= 100.0:
+                raise ValueError("Argument dark_number_c_max must be above 1 and at most 100")
+            if not 1.0 <= float(self.dark_number_c_warning) <= float(self.dark_number_c_max):
+                raise ValueError("Argument dark_number_c_warning must lie between 1 and dark_number_c_max")
+            if not 1 <= int(self.dark_number_flip_repeats) <= 10:
+                raise ValueError("Argument dark_number_flip_repeats must lie between 1 and 10")
 
             if not (isinstance(self.algorithm, AlgorithmTuple)):
                 raise TypeError("Argument algorithm is invalid")
@@ -1242,6 +1256,9 @@ class Config:
             saved_config.mode.dark_number_flip_fraction = config.mode.dark_number_flip_fraction
             saved_config.mode.dark_number_sampling_policy = getattr(
                 config.mode, "dark_number_sampling_policy", "PIPELINE")                # 299y
+            for name, default in (("dark_number_c_max", 10.0), ("dark_number_c_warning", 2.0),
+                                  ("dark_number_flip_repeats", 2)):                   # 300n
+                setattr(saved_config.mode, name, getattr(config.mode, name, default))
             # Saved model metadata deliberately contains no SQL password. Inject the
             # credentials from the current runtime configuration when loading a model.
             saved_config.connection.sql_username = config.connection.sql_username
@@ -1343,6 +1360,9 @@ class Config:
                 excluded_predictor_columns=module.mode.get("excluded_predictor_columns", ""),
                 date_columns=module.mode.get("date_columns", ""),
                 dark_number_sampling_policy=module.mode.get("dark_number_sampling_policy", "PIPELINE"),
+                dark_number_c_max=float(module.mode.get("dark_number_c_max", 10.0)),
+                dark_number_c_warning=float(module.mode.get("dark_number_c_warning", 2.0)),
+                dark_number_flip_repeats=int(module.mode.get("dark_number_flip_repeats", 2)),
                 preprocessor=(PreprocessTuple.from_string(module.mode["preprocessor"])
                               if isinstance(module.mode["preprocessor"], str)
                               else PreprocessTuple(module.mode["preprocessor"])),

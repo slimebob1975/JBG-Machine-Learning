@@ -1,3 +1,24 @@
+## Revision 300n - Dark Number settings, an overtraining warning from c, the table in words (2026-11-20)
+
+- Asked 2026-11-20: JBG 1.3's adjustable parts are configuration settings in
+  the Dark Numbers section, stored with each result and shown with the
+  equation: "Upprepningar i korrektionstestet" (2, 1–10; each repeat adds 4
+  model fits and narrows `c`'s interval), "Övre gräns för c" (10) and "Varna
+  för överträning när c är över" (2). New Config fields in `LATER_KEYS`.
+- Found 2026-11-20 in a real run (1:100 classes, a voting ensemble, `c` ≈
+  2–2.8): the memorisation warning compared overall accuracy (100 % against
+  99.5 %), dominated by the majority class, and did not fire. It is now given
+  when `c` is above the warning level (the earlier rule stays as a second
+  trigger), with a new column "Överträning (c över varningsnivån)" and a log
+  line.
+- The calculation table in words: "Begränsad till 100 %" with Ja/Nej (was
+  "capped" with True/False), the correction's basis in Swedish (was "direct",
+  "not applied (test part)" and so on), and "–" for empty values (was "N/A").
+  The texts about `c`'s bounds name the configured upper bound.
+- User guides and the DN-01 contract: the settings and the warning.
+- Tests: `tests/test_revision_300n_dark_number_settings.py`; the GUI sweep's
+  static check covers the correction's basis.
+
 ## Revision 300m - JBG 1.3: c as the ratio of the means (2026-11-20)
 
 - Reported 2026-11-20: a real run with a rare target class (about 1 %, about

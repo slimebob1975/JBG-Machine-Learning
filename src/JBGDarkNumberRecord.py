@@ -50,8 +50,12 @@ def parameters(config, used: dict) -> dict:
         "flip_fraction": _number(used.get("flip_fraction")
                                  if used.get("flip_fraction") is not None
                                  else mode.dark_number_flip_fraction),
-        "flip_test_folds": Calc.FLIP_TEST_FOLDS, "flip_test_repeats": Calc.FLIP_TEST_REPEATS,
-        "correction_min": Calc.CORRECTION_MIN, "correction_max": Calc.CORRECTION_MAX,
+        "flip_test_folds": Calc.FLIP_TEST_FOLDS,
+        "flip_test_repeats": int(getattr(mode, "dark_number_flip_repeats",
+                                         Calc.FLIP_TEST_REPEATS)),              # 300n
+        "correction_min": Calc.CORRECTION_MIN,
+        "correction_max": float(getattr(mode, "dark_number_c_max", Calc.CORRECTION_MAX)),
+        "c_warning": float(getattr(mode, "dark_number_c_warning", 2.0)),
         "cap": Calc.CAP,
         "memorisation_fit": Calc.MEMORISATION_FIT, "memorisation_gap": Calc.MEMORISATION_GAP,
         "memorisation_threshold": Calc.MEMORISATION_THRESHOLD,

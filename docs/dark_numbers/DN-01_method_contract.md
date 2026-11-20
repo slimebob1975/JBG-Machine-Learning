@@ -361,3 +361,14 @@ former `c`, and `1 / r_unseen`). A fallback estimate (regression or
 perturbation) has no parts, so `c` is then not estimable. In the validation
 study the three estimates on all data passed in 7–8 of 52 cells instead of
 1–2, with the same error as the test-part estimate (report, second run).
+
+### Settings and the overtraining warning (300n, 2026-11-20)
+
+The flip test's repeats (default 2, 1–10), the upper bound for `c` (default
+10) and the warning level for overtraining (default 2) are configuration
+settings, stored with each result. The warning is given when `c` is above the
+level: the model learns some of the deliberately wrong labels by heart for
+the target class. It replaces the overall-fit rule as the main signal (that
+rule stays as a second trigger), since overall accuracy is dominated by the
+majority class: a real run with 1:100 classes and `c` ≈ 2–2.8 showed a fit of
+100 % against 99.5 % and no warning.
