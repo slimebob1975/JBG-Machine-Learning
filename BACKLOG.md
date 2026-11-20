@@ -36,6 +36,8 @@ down are kept as history and are current only where they are listed here.
 - [x] 300n (2026-11-20): Dark Number settings (repeats, upper bound for `c`,
   warning level), an overtraining warning from `c`, the calculation table in
   words.
+- [x] 300o (reported 2026-11-20): older configurations could not be changed
+  after new settings were added; they now get the defaults.
 - [ ] Bugs reported in use: added here as they are found.
 
 ### Deferred: future development (in rough order)

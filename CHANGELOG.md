@@ -1,3 +1,14 @@
+## Revision 300o - Older configurations get the newer settings' defaults (2026-11-20)
+
+- Reported 2026-11-20: after 300n an older configuration could not be
+  changed. The Configuration tab showed the new settings empty and saving
+  failed (`KeyError`), so a new configuration had to be made. The defaults in
+  `Config.LATER_KEYS` were applied only when a run loaded a configuration; the
+  configuration service now fills them in too, when it shows stored settings
+  and when it saves a change (`with_later_defaults`). This also covers the
+  sampling policy (299y) and any setting added later.
+- Tests: `tests/test_revision_300o_older_configuration_defaults.py`.
+
 ## Revision 300n - Dark Number settings, an overtraining warning from c, the table in words (2026-11-20)
 
 - Asked 2026-11-20: JBG 1.3's adjustable parts are configuration settings in

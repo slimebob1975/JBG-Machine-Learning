@@ -77,8 +77,24 @@ def _server_template() -> dict:
     return template
 
 
+def with_later_defaults(settings: dict) -> dict:
+    """300o (reported 2026-11-20): a configuration saved before a setting
+    existed gets that setting's default (Config.LATER_KEYS), as a run already
+    did when it loaded the configuration. The Configuration tab showed such a
+    setting empty and refused to save it."""
+    from Config import Config
+    filled = copy.deepcopy(settings)
+    for section, defaults in Config.LATER_KEYS.items():
+        values = filled.get(section)
+        if isinstance(values, dict):
+            for key, default in defaults.items():
+                values.setdefault(key, copy.deepcopy(default))
+    return filled
+
+
 def user_view(settings: dict) -> dict:
     """The part of a stored configuration that belongs to the user."""
+    settings = with_later_defaults(settings)                               # 300o
     view = {}
     for section in USER_SECTIONS:
         owned = SERVER_OWNED.get(section, frozenset())
@@ -220,7 +236,8 @@ class ConfigurationService:
     def save(self, owner: str, project_id: str, configuration_id: str, *,
              settings: dict, expected_version: int) -> dict[str, Any]:
         project = self._projects.require(owner, project_id)
-        current = self.stored_settings(owner, project_id, configuration_id)
+        current = with_later_defaults(
+            self.stored_settings(owner, project_id, configuration_id))        # 300o
         stored = _normalized(_merge(current, settings), project)
         try:
             saved = self._repository.save(owner, project_id, configuration_id, stored,
