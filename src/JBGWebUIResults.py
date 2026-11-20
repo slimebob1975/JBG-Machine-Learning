@@ -34,12 +34,12 @@ DARK_COLUMNS = {"Model type": "Estimate", "type": "Calculation", "target": "Targ
                 "corr_source": "Basis of the correction", "dark_number": "Dark Number",
                 "corr_train_fit": "Training fit (correction model)",           # 299q
                 "corr_unseen_accuracy": "Accuracy on unseen rows",             # 299q2
-                # 300e (DN-03): the out-of-fold c beside the in-sample one.
-                "corr_oof": "Correction out-of-fold (c)",
-                "corr_oof_low": "c out-of-fold, lower (90 %)",
-                "corr_oof_high": "c out-of-fold, upper (90 %)",
-                "corr_oof_quality": "Quality of c out-of-fold",
-                "dark_number_oof": "Dark Number with c out-of-fold"}
+                # 300l, JBG 1.3: what c is made of, its interval and quality.
+                "corr_in_sample": "c in the training rows",
+                "corr_unseen": "c in the unseen part",
+                "corr_low": "c, lower (90 %)",
+                "corr_high": "c, upper (90 %)",
+                "corr_quality": "Quality of c"}
 
 
 # 299a2 (asked 2026-11-12): the engine's English column names in the result
@@ -238,12 +238,19 @@ EQUATION_PARTS = (
     ("α", "The mean certainty on all errors, the target class against the rest.",
      {"single_alpha", "non_linear_alpha"}),
     ("k", "The root of the non-linear form.", {"non_linear", "non_linear_alpha"}),
-    ("c", "The correction factor 1/r from the flip test, where r is the share of "
-          "deliberately relabelled rows of the target class that the model still recognises. "
-          "It corrects for a model that reproduces the registered labels of rows it was "
-          "trained on, so it is used for the estimates on all data and not for the unseen "
-          "test part. It must lie between 1 and 10, otherwise the estimate is undefined.", None),
+    ("c", "The correction factor for overtraining, from the flip test: how much worse the "
+          "model recognises deliberately relabelled rows it was trained on than rows it has "
+          "not seen (c = c in the training rows / c in the unseen part). It is about 1 when "
+          "the model does not overtrain, and large when it learns wrong labels by heart. The "
+          "model's ordinary misses are already counted by the second factor. It is used for "
+          "the estimates on all data and not for the unseen test part, and must lie between "
+          "1 and 10, otherwise the estimate is undefined.", None),
 )
+
+
+def _current_dark_version() -> str:
+    from JBGDarkNumbers import DarkNumberCalculator
+    return DarkNumberCalculator.METHOD_VERSION
 
 
 def _sampling_labels() -> dict:
@@ -304,9 +311,9 @@ def readable_dark_table(detail: dict, translate, language: str = "sv") -> dict:
                 row[index] = translate(_CORRECTION_MODELS[value])
             elif column == "type" and isinstance(value, str):
                 row[index] = value.replace("_", " ")
-            elif column == "corr_oof_quality":
+            elif column == "corr_quality":
                 row[index] = translate(OOF_QUALITY.get(str(value), str(value or "")))  # 300e
-            elif column in ("corr", "dark_number", "corr_oof", "dark_number_oof") \
+            elif column in ("corr", "dark_number") \
                     and _is_undefined(value):
                 row[index] = translate("Undefined")                         # 299o
             elif column in ("corr_train_fit", "corr_unseen_accuracy"):
@@ -379,6 +386,7 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                    "sampling_labels": _sampling_labels(),                       # 299y
                    "dark_equation": None, "dark_view": "share", "dark_record": None,
                    "dark_sampling_risks": [],
+                   "dark_current_version": _current_dark_version(),                # 300l
                    "dark_columns": DARK_COLUMNS, "investigation": None, "apply": None}
         if project is not None:
             # 296a: results belong to training runs; prediction runs are on the

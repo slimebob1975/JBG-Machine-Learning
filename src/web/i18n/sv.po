@@ -2297,8 +2297,6 @@ msgstr "Medelsäkerheten på alla fel, målklassen mot de övriga."
 msgid "The root of the non-linear form."
 msgstr "Roten i den icke-linjära formen."
 
-msgid "The correction factor 1/r from the flip test, where r is the share of deliberately relabelled rows of the target class that the model still recognises. It corrects for a model that reproduces the registered labels of rows it was trained on, so it is used for the estimates on all data and not for the unseen test part. It must lie between 1 and 10, otherwise the estimate is undefined."
-msgstr "Korrektionsfaktorn 1/r från ommärkningstestet, där r är andelen avsiktligt ommärkta rader av målklassen som modellen ändå känner igen. Den korrigerar för en modell som återger de registrerade etiketterna för rader den tränats på, så den används för skattningarna på alla data och inte för den osedda testdelen. Den måste ligga mellan 1 och 10, annars är skattningen odefinierad."
 
 msgid "alpha_FP / alpha_FN: mean certainty on FP / FN (alpha_FN weighs the misses only)"
 msgstr "α_FP / α_FN: medelsäkerhet för FP / FN (α_FN väger bara missarna)"
@@ -2404,20 +2402,6 @@ msgid "A run is queued or running in the project. Wait until it has finished."
 msgstr "En körning står i kö eller pågår i projektet. Vänta tills den är klar."
 
 # 300e: DN-03, the out-of-fold correction factor
-msgid "Correction out-of-fold (c)"
-msgstr "Korrektion på osedd del (c)"
-
-msgid "c out-of-fold, lower (90 %)"
-msgstr "c på osedd del, nedre (90 %)"
-
-msgid "c out-of-fold, upper (90 %)"
-msgstr "c på osedd del, övre (90 %)"
-
-msgid "Quality of c out-of-fold"
-msgstr "Kvalitet för c på osedd del"
-
-msgid "Dark Number with c out-of-fold"
-msgstr "Mörkertal med c på osedd del"
 
 msgid "Reliable"
 msgstr "Tillförlitlig"
@@ -2431,9 +2415,31 @@ msgstr "Ej skattbar"
 msgid "Not used (test part)"
 msgstr "Används inte (testdel)"
 
-msgid "The correction factor c measured out-of-fold is uncertain (a wide interval) for this target class. The Dark Number with it is shown, flagged, in the calculation table."
-msgstr "Korrektionsfaktorn c mätt på osedd del är osäker (ett brett intervall) för den här målklassen. Mörkertalet med den visas, flaggat, i beräkningstabellen."
-
 # 300g: progress of the Dark Number flip test
 msgid "Correction factor: folds done"
 msgstr "Korrektionsfaktor: klara delar"
+
+# 300l: JBG 1.3, what c is made of
+msgid "c in the training rows"
+msgstr "c i träningsraderna"
+
+msgid "c in the unseen part"
+msgstr "c på osedd del"
+
+msgid "c, lower (90 %)"
+msgstr "c, nedre (90 %)"
+
+msgid "c, upper (90 %)"
+msgstr "c, övre (90 %)"
+
+msgid "Quality of c"
+msgstr "Kvalitet för c"
+
+msgid "The correction factor c is uncertain (a wide interval) for this target class. Its interval is shown in the calculation table."
+msgstr "Korrektionsfaktorn c är osäker (ett brett intervall) för den här målklassen. Intervallet visas i beräkningstabellen."
+
+msgid "The correction factor for overtraining, from the flip test: how much worse the model recognises deliberately relabelled rows it was trained on than rows it has not seen (c = c in the training rows / c in the unseen part). It is about 1 when the model does not overtrain, and large when it learns wrong labels by heart. The model's ordinary misses are already counted by the second factor. It is used for the estimates on all data and not for the unseen test part, and must lie between 1 and 10, otherwise the estimate is undefined."
+msgstr "Korrektionsfaktorn för överträning, från ommärkningstestet: hur mycket sämre modellen känner igen avsiktligt ommärkta rader den tränats på än rader den inte sett (c = c i träningsraderna / c på osedd del). Den är ungefär 1 när modellen inte övertränar och stor när den lär sig felaktiga etiketter utantill. Modellens vanliga missar räknas redan av den andra faktorn. Den används för skattningarna på alla data men inte för den osedda testdelen, och den måste ligga mellan 1 och 10, annars är skattningen odefinierad."
+
+msgid "Computed with an earlier version of the method. The values are shown as they were saved. The texts below describe the current version, where c is the correction factor for overtraining; in this run's version c was the factor now called c in the training rows."
+msgstr "Beräknat med en tidigare version av metoden. Värdena visas som de sparades. Texterna nedan beskriver den nuvarande versionen, där c är korrektionsfaktorn för överträning. I den här körningens version var c den faktor som nu kallas c i träningsraderna."

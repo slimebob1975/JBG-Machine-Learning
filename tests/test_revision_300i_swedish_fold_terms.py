@@ -12,10 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def test_the_new_terms():
     catalog = _load_catalog("sv")
-    assert catalog["Correction out-of-fold (c)"] == "Korrektion på osedd del (c)"
-    assert catalog["c out-of-fold, lower (90 %)"] == "c på osedd del, nedre (90 %)"
-    assert catalog["Quality of c out-of-fold"] == "Kvalitet för c på osedd del"
-    assert catalog["Dark Number with c out-of-fold"] == "Mörkertal med c på osedd del"
+    assert catalog["c in the unseen part"] == "c på osedd del"                # 300l
     assert catalog["Accuracy on unseen rows"] == "Träffsäkerhet på osedd del"
     assert catalog["Correction factor: folds done"] == "Korrektionsfaktor: klara delar"
     assert catalog["outer folds"] == "yttre delar"

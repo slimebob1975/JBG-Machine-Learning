@@ -275,7 +275,7 @@ procentenheter över träffsäkerheten på den osedda delen). En sådan modell
 tenderar att lära sig de avsiktligt fel märkta raderna i testet bakom c, så c
 och mörkertalet kan då vara för höga.
 
-### Mörkertal i detalj (JBG 1.2)
+### Mörkertal i detalj (JBG 1.3)
 
 **Vad som skattas.** För en målklass T skattar mörkertalet D den dolda
 andelen: av raderna som är registrerade som en annan klass, andelen som
@@ -299,15 +299,21 @@ målklass för sig, målklassen mot alla de övriga.
   positiv räknas nästan fullt, en osäker lite (mjuk räkning).
 - `α_FN`: medelsannolikheten för att inte vara T på de falska negativa. Den
   väger bara missarna, så utan missar är skalfaktorn 1.
-- `c = 1/r`: korrektionsfaktorn från ommärkningstestet. En andel av T:s rader
-  får avsiktligt en annan klass (20 % som standard, fördelat på de övriga
-  klasserna efter deras storlek), en kopia av modellen tränas, och r är
-  andelen av de raderna som modellen ändå känner igen som T. En modell som
-  lär sig träningsdata utantill återger de registrerade, felaktiga
-  etiketterna och hittar få dolda fall bland raderna den tränats på. `c`
-  korrigerar för det. I praktiken är den stor för modeller som lätt
-  övertränas och nära 1 för de andra. Testet använder 4 delar och 2
-  upprepningar på alla datorer.
+- `c`: korrektionsfaktorn för överträning, från ommärkningstestet. En andel av
+  T:s rader får avsiktligt en annan klass (20 % som standard, fördelat på de
+  övriga klasserna efter deras storlek) och en kopia av modellen tränas, i 4
+  delar och 2 upprepningar på alla datorer. Varje kopia får frågor om två
+  sorters rader: de ommärkta rader den tränats på (den känner igen en andel
+  `r_i` av dem som T) och T:s rader i den del den inte sett (en andel
+  `r_osedd`). `c = r_osedd / r_i`, minst 1. En modell som lär sig felaktiga
+  etiketter utantill känner igen mycket färre av raderna den tränats på, så
+  `c` blir stort. En modell som inte övertränar känner igen båda sorterna
+  ungefär lika ofta, så `c` blir ungefär 1. Modellens vanliga missar påverkar
+  båda andelarna lika och tar ut varandra i kvoten. De räknas en gång, av den
+  andra faktorn. Från 1.3 (2026-11-19): `c` var `1 / r_i`, som också innehöll
+  de vanliga missarna och därför räknade dem två gånger. Beräkningstabellen
+  visar `c` med ett 90 %-intervall och en kvalitet, och de två faktorerna den
+  består av.
 - Resultatet begränsas till 100 %. Ett värde över det betyder att
   skattningen har brutit samman för den målklassen, och vyn säger det.
 
@@ -355,11 +361,13 @@ ommärkta rader" (syntetiska rader bara från rader som inte märktes om) och
 "Undersampling (1 : 1)" ersätter pipelinens sampling enbart i testet. Den
 vanliga träningen påverkas inte.
 
-**c mätt på osedd del.** Bredvid c visar beräkningstabellen c mätt på
-osedd del (från samma test: hur ofta varje dels modell ändå känner
-igen målklassens rader som den inte tränats på), dess 90 %-intervall och en kvalitet (tillförlitlig, osäker, ej
-skattbar), och det mörkertal den skulle ge. Mörkertalet använder fortfarande
-det första c. De två jämförs innan man byter.
+**c:s delar.** Beräkningstabellen visar bredvid c de två faktorer den består
+av: "c i träningsraderna" (`1 / r_i`, korrektionsfaktorn före 1.3) och "c på
+osedd del" (`1 / r_osedd`), och c:s 90 %-intervall och kvalitet
+(tillförlitlig, osäker, ej skattbar). Ett osäkert c används, men vyn säger
+det. Valideringsstudien (i `docs/dark_numbers/`) visade att detta c gör
+skattningarna på alla data lika nära sanningen som skattningen på testdelen,
+där det tidigare c ungefär fördubblade felet.
 
 **Version och inställningar.** Ekvationsavsnittet anger metodens version och
 inställningarna som användes (ommärkningsandel, delar och upprepningar,

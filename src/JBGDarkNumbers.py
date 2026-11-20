@@ -14,7 +14,7 @@ class DarkNumberCalculator:
     #   - c could not be estimated, or lies outside [CORRECTION_MIN,
     #     CORRECTION_MAX]: the pipeline is ill-suited to the problem.
     # With no false positives and rows outside the target, D = 0 whatever c is.
-    METHOD_VERSION = "1.2"               # 299u: the agreed reading (see below)
+    METHOD_VERSION = "1.3"               # 299u: the agreed reading; 300l: c = c_in / c_unseen
     # 299u, JBG v1.2 (settled 2026-11-16): D estimates the hidden share H, the
     # share of the rows registered as not T that really are T, so it is capped
     # at 1 (with a flag: the estimate has broken down there).

@@ -28,7 +28,8 @@ def test_the_quality_states():
     assert summarise([0.5, None, 0.5])["repeats"] == 2
 
 
-def test_the_handler_shows_both_side_by_side():
+def test_the_handler_shows_cs_parts():
+    """Since 300l (JBG 1.3) c is c_in / c_unseen; the table shows its parts."""
     import test_dark_number_dense_input as dense
     X, y = dense.dataset()
     models = dense.fitted_models(X, y)
@@ -37,22 +38,20 @@ def test_the_handler_shows_both_side_by_side():
         warnings.simplefilter("ignore")
         dense.run(handler, X, y, models)
     frame = handler.dark_numbers
-    assert {"corr_oof", "corr_oof_low", "corr_oof_high", "corr_oof_quality",
-            "dark_number_oof"} <= set(frame.columns)
+    assert {"corr_in_sample", "corr_unseen", "corr_low", "corr_high", "corr_quality"} <= \
+        set(frame.columns)
     names = frame["Model type"].replace("", pd.NA).ffill().astype(str)
-    assert set(frame.loc[names.str.startswith("D_cv_test"), "corr_oof_quality"]) == \
-        {"not applied"}
+    assert set(frame.loc[names.str.startswith("D_cv_test"), "corr_quality"]) == {"not applied"}
 
 
 def test_the_results_tab_names_the_columns_and_qualities():
     from JBGWebUI import _load_catalog, translator
     from JBGWebUIResults import DARK_COLUMNS, OOF_QUALITY, readable_dark_table
     catalog = _load_catalog("sv")
-    for key in ("corr_oof", "corr_oof_low", "corr_oof_high", "corr_oof_quality",
-                "dark_number_oof"):
+    for key in ("corr_in_sample", "corr_unseen", "corr_low", "corr_high", "corr_quality"):
         assert DARK_COLUMNS[key] in catalog
     assert all(label in catalog for label in OOF_QUALITY.values())
-    detail = {"columns": ["Model type", "corr_oof_quality"],
+    detail = {"columns": ["Model type", "corr_quality"],
               "rows": [["D_cv_full - M", "uncertain"], ["D_cv_test - M", "not applied"]]}
     readable_dark_table(detail, translator("sv"), "sv")
     assert [r[1] for r in detail["rows"]] == ["Osäker", "Används inte (testdel)"]

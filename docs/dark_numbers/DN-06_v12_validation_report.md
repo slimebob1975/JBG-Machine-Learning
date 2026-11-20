@@ -91,3 +91,32 @@ certainly not the target) are the next candidates.
    estimation), tested with this same study before it is put in the engine.
 3. **The study code** (`JBGDarkNumberStudy`) is the ready test bench for any
    candidate: the same populations, seeds and thresholds.
+
+## 5. Second run (2026-11-19): c on the unseen part and the overtraining factor
+
+The same 600 populations (300k), judged by the same thresholds, with two more
+variants of `D` for the estimates on all data: with `c` measured on the unseen
+part (DN-03), and with the overtraining factor `c_over = c / c_unseen`.
+
+| Estimate | D (1.2) | D with c on the unseen part | D with c_over |
+|---|---|---|---|
+| Cross-trained model, test data | 8 | 8 | 8 |
+| Cross-trained model, all data | 2 | 2 | 8 |
+| Final model, all data | 1 | 1 | 7 |
+| Combined | 1 | 1 | 8 |
+
+- `c_over` was about 1 for both models (median 1.00 for logistic regression,
+  1.02 for the MLP; the former `c` had medians 1.25–1.4 and reached 9). The
+  error of the estimates on all data fell from 38 to 24 percentage points on
+  average, the level of the test-part estimate; with 50 % target share and
+  weak separation the final model's estimate went from 98.5 % to 24.2 %.
+- `c` on the unseen part alone did not help: it was nearly as large as the
+  former `c`, since what inflated it here was the ordinary misses, not
+  memorisation. The ratio is what matters.
+- What remains is common to all four estimates: the model's own false
+  positives in the first factor, large with a majority target class or weak
+  separation.
+- The hit rate held: the flagged rows held on average about 4.5 times more
+  true hidden cases than random selection.
+
+Decision 2026-11-19: `c_over` replaces `c` as JBG 1.3 (300l).

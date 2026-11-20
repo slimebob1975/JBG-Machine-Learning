@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pathlib import Path
 
+import math
 import time
 import psutil
 import traceback
@@ -2882,7 +2883,7 @@ class PredictionsHandler:
     def _dark_number_oof_for(self, result_name, corr_models, corrs):
         """300e: per target, the out-of-fold c entry for this estimate's correction
         model; "not applied" on the unseen test part (c is not used there)."""
-        known = self.__dict__.get("dark_number_oof")
+        known = self.__dict__.get("dark_number_c_parts")              # 300l
         if not known:
             return None
         if result_name.startswith("D_cv_test"):
@@ -3116,6 +3117,24 @@ class PredictionsHandler:
                         "was not classified as resource-constrained; using 1.0 as fallback/unestimable."
                     )
 
+            # 300l, JBG 1.3 (settled 2026-11-19): c is the overtraining factor
+            # c_in / c_unseen = r_unseen / r_in from the flip test's folds. The
+            # model's ordinary misses (already in 1 + alpha_FN (1 - TP_r)) and the
+            # effect of the relabelled labels cancel in the ratio, so only
+            # memorisation is left. Without fold pairs (a fallback estimate) c
+            # cannot be estimated.
+            from JBGDarkNumberOutOfFold import overtraining_factor, summarise as out_of_fold
+            estimator = locals().get("corr_estimator")
+            factor = overtraining_factor(list(getattr(estimator, "fold_pairs_", None) or []))
+            unseen = out_of_fold(getattr(estimator, "oof_recoveries_", None) or [])
+            self.__dict__.setdefault("dark_number_c_parts", {})[(corr_model, label)] = {
+                "in_sample": corr if corr_source == "direct" else None,
+                "unseen": unseen["c"], "low": factor["c_low"], "high": factor["c_high"],
+                "quality": factor["quality"]}
+            if corr_source == "direct":
+                corr = factor["c"] if factor["c"] is not None else math.inf
+            else:
+                corr, corr_source = None, f"fallback/unestimable (1.3: {corr_source})"
             # 299o, JBG v1.1: an unestimable or out-of-bounds c is -1 (D then -1).
             bounded, bounded_source = DarkNumberCalculator.bounded_correction(corr, corr_source)
             if bounded != corr or bounded_source != corr_source:
@@ -3147,15 +3166,6 @@ class PredictionsHandler:
                          "be chosen in the configuration's Dark Numbers section.")
             fit = getattr(locals().get("corr_estimator"), "train_fit_", None)
             self.__dict__.setdefault("dark_number_train_fits", {})[(corr_model, label)] = fit
-            # 300e/300g (DN-03): the out-of-fold c, beside the in-sample one,
-            # from the same flip test's folds (no extra fits).
-            from JBGDarkNumberOutOfFold import summarise as out_of_fold
-            self.__dict__.setdefault("dark_number_oof", {})[(corr_model, label)] = out_of_fold(
-                getattr(locals().get("corr_estimator"), "oof_recoveries_", None) or [])
-            # 300k: the folds' (in-sample, unseen) recoveries, for the study's
-            # overtraining factor.
-            self.__dict__.setdefault("dark_number_fold_pairs", {})[(corr_model, label)] = list(
-                getattr(locals().get("corr_estimator"), "fold_pairs_", None) or [])
             unseen = self._dark_number_unseen_accuracy(corr_model)
             if DarkNumberCalculator.memorises(fit, unseen) \
                     and corr != DarkNumberCalculator.UNDEFINED:
@@ -3235,7 +3245,7 @@ class PredictionsHandler:
         self.__dict__["dark_number_used"] = {"flip_fraction": flip_fraction,
                                              "random_state": random_state, "root_degree": 3}
         self.__dict__["dark_number_sampling"] = {}                              # 299y
-        self.__dict__["dark_number_oof"] = {}                                   # 300e
+        self.__dict__["dark_number_c_parts"] = {}                               # 300l
         # 299t: class probabilities per estimate, fresh for every computation.
         self.__dict__["dark_number_class_probabilities"] = {}
         self.__dict__["dark_number_combined_parts"] = []
@@ -3495,44 +3505,22 @@ class PredictionsHandler:
                  for target in model_dark_numbers["target"]],
             )
         if oof is not None:
-            # 300e (DN-03): the out-of-fold c, its 90 % interval and quality, and
-            # the Dark Number it would give (shown beside the in-sample one
-            # during the transition). oof: target -> entry, or "not applied".
-            entries = [oof.get(target) for target in model_dark_numbers["target"]]
-            usable = {t: (e["c"] if isinstance(e, dict) and e.get("quality") != "not_estimable"
-                          else (1.0 if e == "not applied" else DarkNumberCalculator.UNDEFINED))
-                      for t, e in zip(model_dark_numbers["target"], entries)}
-            alternative = DarkNumberCalculator().compute_dark_numbers(
-                Y, Y_pred, Y_prob_pred, type=type, corrs=usable, targets=targets,
-                class_probabilities=class_probabilities)
-            def field(entry, name):
-                return entry.get(name) if isinstance(entry, dict) else None
-            model_dark_numbers["corr_oof"] = [usable[t] for t in model_dark_numbers["target"]]
-            model_dark_numbers["corr_oof_low"] = [field(e, "c_low") for e in entries]
-            model_dark_numbers["corr_oof_high"] = [field(e, "c_high") for e in entries]
-            model_dark_numbers["corr_oof_quality"] = [
-                e.get("quality") if isinstance(e, dict) else (e or "") for e in entries]
-            model_dark_numbers["dark_number_oof"] = list(alternative["dark_number"])
-        if oof is not None and self.__dict__.get("dark_number_study_over"):
-            # 300k (the validation study only, not shown in the GUI): D with the
-            # overtraining factor c_over = c / c_unseen instead of c.
-            from JBGDarkNumberOutOfFold import overtraining_factor
-            pairs = self.__dict__.get("dark_number_fold_pairs") or {}
-            over = {}
-            for target in model_dark_numbers["target"]:
+            # 300l, JBG 1.3: what c (the overtraining factor) is made of, per
+            # target: the in-sample c and the c on the unseen part (c = their
+            # ratio), and c's 90 % interval and quality. "not applied" on the
+            # test part, which uses no c.
+            def part(target, name):
                 entry = oof.get(target)
-                if entry == "not applied":
-                    over[target] = 1.0
-                    continue
-                key = ((corr_models or {}).get(target), target)
-                factor = overtraining_factor(pairs.get(key, []))
-                over[target] = factor["c"] if factor["quality"] != "not_estimable" \
-                    else DarkNumberCalculator.UNDEFINED
-            alternative = DarkNumberCalculator().compute_dark_numbers(
-                Y, Y_pred, Y_prob_pred, type=type, corrs=over, targets=targets,
-                class_probabilities=class_probabilities)
-            model_dark_numbers["corr_over"] = [over[t] for t in model_dark_numbers["target"]]
-            model_dark_numbers["dark_number_over"] = list(alternative["dark_number"])
+                return entry.get(name) if isinstance(entry, dict) else None
+            model_dark_numbers["corr_in_sample"] = [part(t, "in_sample")
+                                                    for t in model_dark_numbers["target"]]
+            model_dark_numbers["corr_unseen"] = [part(t, "unseen")
+                                                 for t in model_dark_numbers["target"]]
+            model_dark_numbers["corr_low"] = [part(t, "low") for t in model_dark_numbers["target"]]
+            model_dark_numbers["corr_high"] = [part(t, "high") for t in model_dark_numbers["target"]]
+            model_dark_numbers["corr_quality"] = [
+                part(t, "quality") if isinstance(oof.get(t), dict) else (oof.get(t) or "")
+                for t in model_dark_numbers["target"]]
         
         # Put together the results for the dark numbers
         model_name_col = pd.Series([model_name]+["" for i in range(model_dark_numbers.shape[0]-1)], name="Model type")

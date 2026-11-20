@@ -1,3 +1,27 @@
+## Revision 300l - JBG 1.3: c is the correction factor for overtraining (2026-11-19)
+
+- Decided 2026-11-19, after the second validation run: `c` mixed the
+  model's ordinary misses, already counted by `1 + α_FN (1 − TP_r)`, with
+  overtraining, what `c` was introduced for. Since 1.3 `c` is the
+  overtraining factor `c_in / c_unseen = r_unseen / r_in` (at least 1, the
+  mean over the flip test's 8 parts), with the bounds 1–10, a 90 % interval and
+  a quality state. Both recoveries come from the same models, so the ordinary
+  misses and the effect of the relabelled labels cancel in the ratio. A
+  fallback estimate has no parts, so `c` is then not estimable.
+  `DarkNumberCalculator.METHOD_VERSION = "1.3"`.
+- In the validation study the estimates on all data passed in 7–8 of 52 cells
+  instead of 1–2, as close to the truth as the test-part estimate.
+- The calculation table shows `c`'s parts ("c i träningsraderna", the former
+  `c`, and "c på osedd del"), its interval and quality; the columns that
+  showed the out-of-fold `c` and the Dark Number with it beside the old one
+  (300e) are gone, and so is the study's separate variant (300k). Runs saved
+  with 1.2 show their values as saved, with a note.
+- Results → Mörkertal explains `c` anew; the user guides ("Mörkertal i detalj
+  (JBG 1.3)" under Om), the DN-01 contract and the study report (second run)
+  are updated.
+- Tests: `tests/test_revision_300l_jbg_v13.py`; 300e, 300i, 300k, 299o,
+  299u, 299x and the dense-input fallbacks follow 1.3.
+
 ## Revision 300k - The overtraining factor in the validation study (2026-11-19)
 
 - Agreed 2026-11-19: `c` mixes two things, the model's ordinary misses (which

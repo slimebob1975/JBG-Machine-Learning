@@ -37,32 +37,27 @@ def test_the_flip_test_keeps_the_pairs():
     assert [u for _, u in fitted.fold_pairs_] == fitted.oof_recoveries_
 
 
-def _run(study_flag):
+def test_since_1_3_the_handler_uses_the_factor_as_c():
+    """300l: JBG 1.3, c = c_in / c_unseen in every run (not only the study)."""
     import test_dark_number_dense_input as dense
+    from JBGDarkNumbers import DarkNumberCalculator
     X, y = dense.dataset()
     models = dense.fitted_models(X, y)
     handler = dense.handler()
-    if study_flag:
-        handler.__dict__["dark_number_study_over"] = True
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         dense.run(handler, X, y, models)
-    return handler.dark_numbers
-
-
-def test_only_the_study_gets_d_with_the_factor():
-    assert "dark_number_over" not in _run(False).columns               # GUI unchanged
-    frame = _run(True)
-    assert {"corr_over", "dark_number_over"} <= set(frame.columns)
+    frame = handler.dark_numbers
     names = frame["Model type"].replace("", pd.NA).ffill().astype(str)
-    assert set(frame.loc[names.str.startswith("D_cv_test"), "corr_over"]) == {1.0}
+    in_sample = frame[~names.str.startswith("D_cv_test")]
+    for _, row in in_sample.iterrows():
+        if row["corr"] != DarkNumberCalculator.UNDEFINED and row["corr_in_sample"] is not None:
+            assert row["corr"] <= row["corr_in_sample"] + 1e-9
 
 
-def test_the_study_records_and_judges_it():
-    from JBGDarkNumberStudy import Cell, run_once, summarise
+def test_the_study_records_cs_parts():
+    from JBGDarkNumberStudy import Cell, run_once
     rows = pd.DataFrame(run_once(Cell(0.10, 0.5, "strong", rows=1200), 3))
-    assert {"D_over", "c_over"} <= set(rows.columns)
-    in_sample = rows[rows["estimate"] != "D_cv_test"]
-    assert (in_sample["c_over"] <= in_sample["c"] + 1e-9).all()
-    summary = summarise(rows)
-    assert {"mean_pp_over", "bias_pp_over", "verdict_over"} <= set(summary.columns)
+    assert {"c_in_sample", "c_unseen"} <= set(rows.columns)
+    in_sample = rows[(rows["estimate"] != "D_cv_test") & (rows["c"] > 0)]
+    assert (in_sample["c"] <= in_sample["c_in_sample"] + 1e-9).all()

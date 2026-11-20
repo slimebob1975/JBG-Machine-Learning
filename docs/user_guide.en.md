@@ -274,7 +274,7 @@ percentage points above its accuracy on unseen rows). Such a model tends to
 learn the deliberately wrong labels in the test behind c, so c and the Dark
 Number may then be too high.
 
-### Dark Numbers in detail (JBG 1.2)
+### Dark Numbers in detail (JBG 1.3)
 
 **What is estimated.** For a target class T, the Dark Number D estimates the
 hidden share: of the rows registered as another class, the share that really
@@ -298,14 +298,20 @@ each target class, the target class against all the others.
   positive counts almost fully, an uncertain one little (soft counting).
 - `α_FN`: the mean probability of not being T on the false negatives. It
   weighs the misses only, so with no misses the scaling factor is 1.
-- `c = 1/r`: the correction factor from the flip test. A share of T's rows is
-  deliberately given another class (20 % by default, spread over the other
-  classes by their size), a copy of the model is trained, and r is the share
-  of those rows the model still recognises as T. A model that learns its
-  training data by heart reproduces the registered, wrong labels and finds
-  few hidden cases among the rows it was trained on. `c` corrects for that.
-  In practice it is large for models prone to overtraining and close to 1 for
-  the others. The test uses 4 folds and 2 repeats on every computer.
+- `c`: the correction factor for overtraining, from the flip test. A share of
+  T's rows is deliberately given another class (20 % by default, spread over
+  the other classes by their size) and a copy of the model is trained, in 4
+  parts and 2 repeats on every computer. Each copy is asked about two kinds of
+  rows: the relabelled rows it was trained on (it recognises a share `r_in` of
+  them as T) and T's rows in the part it has not seen (a share `r_unseen`).
+  `c = r_unseen / r_in`, at least 1. A model that learns wrong labels by heart
+  recognises far fewer of the rows it was trained on, so `c` is large; a model
+  that does not overtrain recognises both kinds about equally, so `c` is about
+  1. The model's ordinary misses affect both shares alike and cancel in the
+  ratio; they are counted once, by the second factor. Since 1.3 (2026-11-19):
+  `c` was `1 / r_in`, which also contained the ordinary misses and so counted
+  them twice. The calculation table shows `c` with a 90 % interval and a
+  quality, and the two factors it is made of.
 - The result is capped at 100 %. A value above it means that the estimate
   has broken down for that target class, and the view says so.
 
@@ -354,11 +360,13 @@ can make c too high; the Dark Numbers view then warns. "None", "SMOTE",
 relabelled) and "Undersampling (1 : 1)" replace the pipeline's sampling in
 the test only. Ordinary training is not affected.
 
-**c measured out-of-fold.** Beside c, the calculation table shows c measured
-out-of-fold (from the same test: how often each fold's model still recognises
-the target rows it was not trained on), its 90 % interval and a quality (reliable, uncertain, not
-estimable), and the Dark Number it would give. The Dark Number itself still
-uses the first c; the two are compared before switching.
+**c's parts.** The calculation table shows, beside c, the two factors it is
+made of: "c in the training rows" (`1 / r_in`, the correction factor before
+1.3) and "c in the unseen part" (`1 / r_unseen`), and c's 90 % interval and
+quality (reliable, uncertain, not estimable). An uncertain c is used, but the
+view says so. The validation study (in `docs/dark_numbers/`) showed that this
+c brings the estimates on all data as close to the truth as the test-part
+estimate, where the earlier c roughly doubled the error.
 
 **Version and settings.** The equation section names the method version and
 the settings used (flip fraction, folds and repeats, the bounds on c, the

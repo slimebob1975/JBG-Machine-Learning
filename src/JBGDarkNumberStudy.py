@@ -144,7 +144,6 @@ class _Log:
 def _handler(log):
     from JBGHandler import PredictionsHandler
     ph = object.__new__(PredictionsHandler)
-    ph.__dict__["dark_number_study_over"] = True      # 300k: D with c_over as well
     jobs = SimpleNamespace(execute_n_job=lambda operation, estimator, X, y, **kw:
                            operation(estimator, X, y))
     ph.handler = SimpleNamespace(
@@ -204,8 +203,6 @@ def run_once(cell: Cell, seed: int) -> list:
         if scope is None:
             continue
         value = float(row["dark_number"])
-        oof = float(row["dark_number_oof"]) if "dark_number_oof" in row \
-            and row["dark_number_oof"] == row["dark_number_oof"] else value
         estimate = next(p for p in SCOPES if name.startswith(p))
         flagged, hit_rate = flags[flag_source[estimate]]
         rows.append({**asdict(cell), "seed": seed, "estimate": estimate,
@@ -213,15 +210,11 @@ def run_once(cell: Cell, seed: int) -> list:
                      "lift": hit_rate / truth[scope] if truth[scope] and hit_rate == hit_rate
                      else math.nan,
                      "true_H": truth[scope],
-                     # 300e: the Dark Number with the out-of-fold c, and that c.
-                     "D_oof": None if oof == -1.0 else oof,
-                     "c_oof": float(row["corr_oof"]) if "corr_oof" in row else math.nan,
-                     "c_oof_quality": str(row.get("corr_oof_quality", "")),
-                     # 300k: D with the overtraining factor c_over = c / c_unseen.
-                     "D_over": (lambda v: None if v == -1.0 else v)(
-                         float(row["dark_number_over"]) if "dark_number_over" in row
-                         and row["dark_number_over"] == row["dark_number_over"] else value),
-                     "c_over": float(row["corr_over"]) if "corr_over" in row else math.nan,
+                     # 300l: what c (JBG 1.3) is made of.
+                     "c_in_sample": float(row["corr_in_sample"])
+                     if row.get("corr_in_sample") is not None else math.nan,
+                     "c_unseen": float(row["corr_unseen"])
+                     if row.get("corr_unseen") is not None else math.nan,
                      "D": None if value == -1.0 else value, "undefined": value == -1.0,
                      "capped": bool(row.get("capped", False)), "c": float(row["corr"]),
                      "memorisation_warning": memorises, "seconds": seconds})
@@ -283,10 +276,6 @@ def summarise(results: pd.DataFrame) -> pd.DataFrame:
         row.update(repeats=len(group), truth_pp=100 * group["true_H"].mean(),
                    capped_share=float(group["capped"].mean()))
         row.update(_measures(group, "D"))
-        if "D_oof" in group:
-            row.update({f"{name}_oof": value for name, value in _measures(group, "D_oof").items()})
-        if "D_over" in group:                                                     # 300k
-            row.update({f"{name}_over": value for name, value in _measures(group, "D_over").items()})
         row.update(warning_share=float(group["memorisation_warning"].mean()),
                    # 300d: reported only, no threshold (the protocol is unchanged).
                    hit_rate_pp=float(100 * group["hit_rate"].mean())

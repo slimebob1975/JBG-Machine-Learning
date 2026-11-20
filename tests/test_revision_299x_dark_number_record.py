@@ -35,7 +35,7 @@ CONFIG = SimpleNamespace(
 def test_the_record():
     record = build(CONFIG, FRAME, {"flip_fraction": None, "random_state": 42, "root_degree": 3})
     assert record["schema_version"] == SCHEMA_VERSION == 1
-    assert record["method"] == {"name": "JBG", "version": "1.2"}
+    assert record["method"] == {"name": "JBG", "version": "1.3"}      # 300l
     p = record["parameters"]
     assert (p["calculation_type"], p["method"], p["alpha"], p["flip_fraction"]) == \
         ("separated_alpha", "LINEAR", "SEPARATED", 0.2)
@@ -77,7 +77,7 @@ def test_the_results_tab_with_and_without_a_record(tmp_path):
         record = build(CONFIG, pd.DataFrame(), {"random_state": 42})
         (csvs / "dark_numbers_r__train.json").write_text(json.dumps(record), encoding="utf-8")
         page = client.get(f"/ui/results?run={s.run}&view=dark_numbers").text
-    assert "Ekvationen <span class=\"muted\">· JBG 1.2</span>" in page
+    assert "Ekvationen <span class=\"muted\">· JBG 1.3</span>" in page
     assert "Inställningar som användes: ommärkningsandel 0,2 · ommärkningstest 4 × 2" in page
     assert "tidigare version" not in page
 

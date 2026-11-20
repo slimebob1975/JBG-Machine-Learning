@@ -27,7 +27,7 @@ def _all_branches(predicted, corr):
 
 
 def test_the_method_version_and_bounds():
-    assert Calc.METHOD_VERSION == "1.2"                     # 299u: the agreed reading
+    assert Calc.METHOD_VERSION == "1.3"                     # 300l: c = c_in / c_unseen
     assert (Calc.UNDEFINED, Calc.CORRECTION_MIN, Calc.CORRECTION_MAX) == (-1.0, 1.0, 10.0)
 
 

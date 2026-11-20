@@ -16,7 +16,7 @@ PROB = pd.Series([0.9, 0.8, 0.7, 0.6, 0.7, 0.9, 0.8, 0.9, 0.6, 0.7])
 
 
 def test_the_version():
-    assert Calc.METHOD_VERSION == "1.2" and Calc.CAP == 1.0
+    assert Calc.METHOD_VERSION == "1.3" and Calc.CAP == 1.0          # 300l
 
 
 def test_alpha_fn_weighs_the_misses_only():
@@ -79,6 +79,6 @@ def test_the_results_template_and_the_guides():
     root = Path(__file__).resolve().parent.parent / "docs"
     english = (root / "user_guide.en.md").read_text(encoding="utf-8")
     swedish = (root / "user_guide.sv.md").read_text(encoding="utf-8")
-    assert "### Dark Numbers in detail (JBG 1.2)" in english
-    assert "### Mörkertal i detalj (JBG 1.2)" in swedish
+    assert "### Dark Numbers in detail (JBG 1.3)" in english          # 300l
+    assert "### Mörkertal i detalj (JBG 1.3)" in swedish
     assert "`D = min(c · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`" in swedish

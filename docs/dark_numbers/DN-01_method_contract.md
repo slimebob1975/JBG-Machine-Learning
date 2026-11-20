@@ -341,3 +341,22 @@ not trained on, so the share it still predicts as the target is the recovery a
 relabelled row would have had. `c = 1/r` over the 8 fold values, with a 90 %
 t-interval and the same quality states. The in-sample `c`, and so the v1.2
 Dark Number, are unchanged. The flip test shows its progress fold by fold.
+
+### JBG 1.3 (300l, settled 2026-11-19): c is the overtraining factor
+
+`c` mixed the model's ordinary misses (already counted by
+`1 + α_FN (1 − TP_r)`, so counted twice) with overtraining, what `c` was
+introduced for. Since 1.3:
+
+`D = min(c · α_FP · (1 − TN_r) · (1 + α_FN · (1 − TP_r)), 1)`, with
+`c = max(1, mean over the flip test's 8 parts of r_unseen / r_in)`
+
+on the estimates on all data (the test part uses no `c`). Both recoveries come
+from the same models trained with the same relabelled rows, so the ordinary
+misses and the effect of the relabelled labels cancel in the ratio; what is
+left is memorisation. `c` keeps the bounds 1–10, gets a 90 % interval and a
+quality state, and the calculation table shows its two parts (`1 / r_in`, the
+former `c`, and `1 / r_unseen`). A fallback estimate (regression or
+perturbation) has no parts, so `c` is then not estimable. In the validation
+study the three estimates on all data passed in 7–8 of 52 cells instead of
+1–2, with the same error as the test-part estimate (report, second run).

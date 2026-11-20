@@ -130,6 +130,7 @@
           {# 299u (asked 2026-11-16): the equation behind the estimates, each part explained. #}
           <div class="formula-card dark-equation">
             <h3>{{ _("The equation") }} <span class="muted">· {{ dark_record.method.name }} {{ dark_record.method.version }}</span></h3>
+            {% if dark_current_version is defined and dark_record.method.version != dark_current_version %}<p class="message warn">{{ _("Computed with an earlier version of the method. The values are shown as they were saved. The texts below describe the current version, where c is the correction factor for overtraining; in this run's version c was the factor now called c in the training rows.") }}</p>{% endif %}
             {% if dark_equation.card.mathml %}{{ dark_equation.card.mathml | safe }}{% else %}<code>{{ dark_equation.card.latex }}</code>{% endif %}
             <p class="formula-note">{{ _("D is capped at 100 %.") }}</p>
             <dl class="equation-parts">
@@ -188,7 +189,7 @@
           {% set parts = interval.points | selectattr("percent") | list %}
           {% if parts | length > 1 %}<p class="hint">{{ _("Subintervals") }}: {% for p in parts %}{{ _(dark_estimates.get(p.label, p.label)) }} <b>{{ p.percent }}</b>{{ " → " if not loop.last }}{% endfor %}</p>{% endif %}
           {% endif %}
-          {% if interval.points | selectattr("oof_quality", "equalto", "uncertain") | list %}<p class="message warn">{{ _("The correction factor c measured out-of-fold is uncertain (a wide interval) for this target class. The Dark Number with it is shown, flagged, in the calculation table.") }}</p>{% endif %}
+          {% if interval.points | selectattr("oof_quality", "equalto", "uncertain") | list %}<p class="message warn">{{ _("The correction factor c is uncertain (a wide interval) for this target class. Its interval is shown in the calculation table.") }}</p>{% endif %}
           {% if interval.points | selectattr("capped") | list %}<p class="message warn">{{ _("At least one estimate exceeded 100 % and is shown as 100 %: the estimate has broken down for this target class.") }}</p>{% endif %}
           {% if interval.points | selectattr("memorises") | list %}<p class="message warn">{{ _("The model fits its training rows clearly better than rows it has not seen (a fit of at least 95 % and at least 5 percentage points above its accuracy on unseen rows), so it may memorise them. The correction factor c may then be too large and the Dark Number too high.") }}</p>{% endif %}
           {% if interval.points | selectattr("reason", "equalto", "undefined correction") | list %}<p class="hint">{{ _("The correction factor c must lie between 1 and 10, that is the model must find at least 10 % of the deliberately relabelled rows. Otherwise the Dark Number is undefined.") }}</p>{% endif %}

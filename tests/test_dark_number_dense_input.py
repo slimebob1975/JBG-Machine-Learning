@@ -154,7 +154,10 @@ def test_dense_requirement_reaches_both_correction_fallbacks(monkeypatch, branch
     # 299u, JBG v1.2: the unseen test part does not use c.
     names = ph.dark_numbers['Model type'].replace('', pd.NA).ffill().astype(str)
     in_sample = ~names.str.startswith('D_cv_test')
-    assert set(ph.dark_numbers.loc[in_sample, 'corr_source']) == {expected_source}
+    # 300l, JBG 1.3: c is the overtraining factor from the flip test's folds; a
+    # fallback estimate (regression, perturbation) has none, so c is unestimable.
+    assert set(ph.dark_numbers.loc[in_sample, 'corr_source']) == {'undefined/unestimable'}
+    assert expected_source
 
 
 def test_unrelated_dark_number_typeerror_is_not_densified():

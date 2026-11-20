@@ -26,9 +26,11 @@ down are kept as history and are current only where they are listed here.
 - [x] 300j: a systematic GUI sweep (every page and view, both languages,
   links, a real browser) kept as a native test; it found the font loaded
   from Google Fonts, now served by the server itself.
-- [ ] 300k (agreed 2026-11-19): the overtraining factor `c_over = c / c_unseen`
-  instead of `c`, tried in the validation study; rerun the study, then decide
-  whether it becomes JBG 1.3 (first beside 1.2).
+- [x] 300k, 300l: the overtraining factor `c_over = c / c_unseen`, tried in
+  the validation study, replaces `c` as JBG 1.3.
+- [ ] Later (less urgent, 2026-11-19): a production-like synthetic data set
+  for the validation study, generated from aggregated profiles (the
+  generator and summary received 2026-11-19 stay outside the repository).
 - [ ] Bugs reported in use: added here as they are found.
 
 ### Deferred: future development (in rough order)
