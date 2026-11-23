@@ -2490,3 +2490,25 @@ msgstr "Korrektionsfaktorn för överträning, från ommärkningstestet: hur myc
 
 msgid "overtraining warning"
 msgstr "varning för överträning"
+
+# 300r: renaming datasets and configurations.
+msgid "Configuration renamed."
+msgstr "Konfigurationen har bytt namn."
+
+msgid "Rename the configuration"
+msgstr "Byt namn på konfigurationen"
+
+msgid "A new name makes no new version. Runs show the new name."
+msgstr "Ett nytt namn ger ingen ny version. Körningarna visar det nya namnet."
+
+msgid "Rename"
+msgstr "Byt namn"
+
+msgid "Dataset renamed."
+msgstr "Datasetet har bytt namn."
+
+msgid "Rename the dataset"
+msgstr "Byt namn på datasetet"
+
+msgid "Only the name changes. Runs show the new name."
+msgstr "Bara namnet ändras. Körningarna visar det nya namnet."

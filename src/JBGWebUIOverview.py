@@ -68,6 +68,10 @@ def add_overview_tab(app, *, principal_dependency, render, active_project, datas
         open_id = project["project_id"] if project is not None else None
         stats = overview_stats(records, project_names=names, open_project=open_id,
                                models_in_use=in_use)
+        if open_id is not None and configurations is not None:                # 300r
+            from JBGWebUIRun import configuration_names, with_configuration_names
+            with_configuration_names(stats["latest"],
+                                     configuration_names(configurations, owner, open_id))
         language = request_language(request)
         _ = translator(language)
 
@@ -118,6 +122,11 @@ def add_overview_tab(app, *, principal_dependency, render, active_project, datas
             context["configuration_count"] = len(listed(configurations, owner, pid))
             (context["latest_training"], context["latest_prediction"],
              context["evaluation"]) = latest_runs(owner, pid)
+            if configurations is not None:                                    # 300r
+                from JBGWebUIRun import configuration_names, with_configuration_names
+                with_configuration_names(
+                    [r for r in (context["latest_training"], context["latest_prediction"]) if r],
+                    configuration_names(configurations, owner, pid))
             items = listed(models, owner, pid)
             context["model_count"] = len(items)
             context["available_count"] = sum(1 for m in items if m.get("state") == "available")

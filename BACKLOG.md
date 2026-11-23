@@ -84,9 +84,9 @@ decision.
 **Configurations and datasets**
 
 - [ ] If wanted: copy a configuration to another project (noted with 297d).
-- [ ] If wanted: rename datasets, and switch a dataset to or from the
-  prediction role (noted with 298f; compatibility and column roles to settle).
-  Deleting datasets is done (299f).
+- [x] 300r (asked 2026-11-23): rename datasets and configurations.
+- [ ] If wanted: switch a dataset to or from the prediction role (noted with
+  298f; compatibility and column roles to settle).
 - [ ] If wanted: in the roles form, choosing a second class or ID column
   could reset the former one in the browser (now refused on save, noted with
   298a).

@@ -22,6 +22,7 @@ MESSAGES = {
     "created": ("ok", "Configuration created."),
     "saved": ("ok", "Configuration saved."),
     "selected": ("ok", "Configuration selected."),
+    "renamed": ("ok", "Configuration renamed."),                             # 300r
     "duplicate": ("error", "A configuration with that name already exists."),
     "bad_name": ("error", "The name was not accepted (1-200 characters)."),
     "unavailable": ("error", "The configuration is no longer available."),
@@ -301,6 +302,25 @@ def add_configuration_tab(app, *, principal_dependency, render, redirect, active
             return redirect("/ui/configuration", message="unavailable")
         return remember(redirect("/ui/configuration", configuration=configuration_id,
                                  message="selected"), configuration_id)
+
+    @app.post("/ui/configuration/{configuration_id}/rename", include_in_schema=False)
+    def rename(request: Request, configuration_id: str, name: str = Form(""),
+               principal=Depends(principal_dependency)):
+        """300r (asked 2026-11-23): a new name, without a new version."""
+        pid = project_id(request, principal)
+        if pid is None:
+            return redirect("/ui/configuration")
+        try:
+            configurations.rename(principal.principal_key, pid, configuration_id, name=name)
+        except ConfigurationNameConflict:
+            return redirect("/ui/configuration", configuration=configuration_id,
+                            message="duplicate")
+        except (ConfigurationUnavailable, ProjectUnavailable):
+            return redirect("/ui/configuration", message="unavailable")
+        except (ValueError, TypeError):
+            return redirect("/ui/configuration", configuration=configuration_id,
+                            message="bad_name")
+        return redirect("/ui/configuration", configuration=configuration_id, message="renamed")
 
     @app.post("/ui/configuration/{configuration_id}", response_class=HTMLResponse,
               include_in_schema=False)

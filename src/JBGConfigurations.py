@@ -250,6 +250,28 @@ class ConfigurationRepository:
                 settings_json=encoded, created_at=now))
         return self.get_owned(owner, project_id, configuration_id)
 
+    def rename(self, owner: str, project_id: str, configuration_id: str,
+               name: str) -> Configuration:
+        """300r (asked 2026-11-23): a new name without a new version. The name is
+        unique in the project, ignoring case; a rename counts as a change for
+        the list order and the project (agreed 2026-11-23)."""
+        owner = _text(owner, "owner", 256)
+        name = _text(name, "configuration name", 200)
+        try:
+            with self._engine.begin() as connection:
+                touch_project(connection, self._metadata.schema, project_id)
+                self._project_owned(connection, owner, project_id)
+                changed = connection.execute(update(self._configs).where(
+                    self._configs.c.configuration_id == configuration_id,
+                    self._configs.c.project_id == project_id).values(
+                    name=name, name_key=name.casefold(),
+                    updated_at=datetime.now(timezone.utc))).rowcount
+                if not changed:
+                    raise KeyError("configuration unavailable")
+        except IntegrityError as error:
+            raise DuplicateConfigurationName("configuration name already exists") from error
+        return self.get_owned(owner, project_id, configuration_id)
+
     def delete(self, owner: str, project_id: str, configuration_id: str) -> int:
         """299e: remove a configuration with every version; returns how many
         versions there were. Runs keep their own copy of the settings."""

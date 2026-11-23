@@ -247,3 +247,15 @@ class ConfigurationService:
         except KeyError:
             raise ConfigurationUnavailable("configuration unavailable") from None
         return configuration_response(saved)
+
+    def rename(self, owner: str, project_id: str, configuration_id: str, *,
+               name: str) -> dict[str, Any]:
+        """300r: a new name, without a new version; runs show the current name."""
+        self._projects.require(owner, project_id)
+        try:
+            renamed = self._repository.rename(owner, project_id, configuration_id, name)
+        except DuplicateConfigurationName:
+            raise ConfigurationNameConflict("configuration name already exists") from None
+        except KeyError:
+            raise ConfigurationUnavailable("configuration unavailable") from None
+        return configuration_response(renamed)

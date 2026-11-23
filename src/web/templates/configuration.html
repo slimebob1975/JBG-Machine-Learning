@@ -102,6 +102,19 @@
       <p class="empty">{{ _("No configurations yet. Create one below.") }}</p>
       {% endif %}
     </div>
+    {% if selected %}
+    {# 300r: a new name, without a new version (saving the settings makes one). #}
+    <form method="post" action="/ui/configuration/{{ selected.configuration_id }}/rename" class="panel rename">
+      <fieldset>
+        <legend>{{ _("Rename the configuration") }}</legend>
+        <label for="rename-config">{{ _("Name") }}</label>
+        <input id="rename-config" name="name" required maxlength="200" value="{{ selected.name }}">
+        <p class="hint">{{ _("A new name makes no new version. Runs show the new name.") }}</p>
+        <button class="btn sub" data-wait="fields" data-wait-fields="#rename-config"
+          data-wait-reason="{{ _('Enter a name first.') }}">{{ _("Rename") }}</button>
+      </fieldset>
+    </form>
+    {% endif %}
     <form method="post" action="/ui/configuration" class="panel">
       <fieldset>
         <legend>{{ _("New configuration") }}</legend>

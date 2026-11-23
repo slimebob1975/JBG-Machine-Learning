@@ -37,6 +37,19 @@
       <p class="empty">{{ _("No datasets yet. Add one below.") }}</p>
       {% endif %}
     </div>
+    {% if selected %}
+    {# 300r: a new display name; the file or table, the roles and the runs stay. #}
+    <form method="post" action="/ui/dataset/{{ selected.dataset_id }}/rename" class="panel rename">
+      <fieldset>
+        <legend>{{ _("Rename the dataset") }}</legend>
+        <label for="rename-dataset">{{ _("Name") }}</label>
+        <input id="rename-dataset" name="name" required maxlength="200" value="{{ selected.name }}">
+        <p class="hint">{{ _("Only the name changes. Runs show the new name.") }}</p>
+        <button class="btn sub" data-wait="fields" data-wait-fields="#rename-dataset"
+          data-wait-reason="{{ _('Enter a name first.') }}">{{ _("Rename") }}</button>
+      </fieldset>
+    </form>
+    {% endif %}
 
     {% if active_project.source == "csv" %}
     <form method="post" action="/ui/dataset/csv" enctype="multipart/form-data" class="panel">

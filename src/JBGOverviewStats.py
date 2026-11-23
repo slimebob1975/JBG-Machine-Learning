@@ -112,6 +112,7 @@ def overview_stats(records, *, project_names: dict, open_project: str | None,
                          key=lambda item: (-item["rows"], item["name"].lower()))
 
     quality, rows_per_week, latest = [], [{"week": w, "rows": 0} for w in weeks], []
+    trained_with = {}
     if open_project is not None:
         trained = sorted((r for r in mine if _meta(r).get("kind", "training") == "training"
                           and r.status.value == "succeeded"), key=lambda r: r.created_at)
@@ -126,6 +127,10 @@ def overview_stats(records, *, project_names: dict, open_project: str | None,
             if at is not None and record.status.value == "succeeded":
                 rows_per_week[at]["rows"] += _count(record.result, "rows")
         latest = sorted(mine, key=lambda r: r.created_at, reverse=True)[:5]
+        # 300r: a prediction run's configuration is its model's training run's.
+        trained_with = {_meta(r).get("model_id"): _meta(r).get("configuration_id")
+                        for r in mine if _meta(r).get("kind", "training") != "prediction"
+                        and _meta(r).get("model_id")}
     recent = [q["value"] for q in quality[-3:]]
     metrics = {q["metric"] for q in quality}
     return {"totals": totals, "open": opened, "per_week": per_week, "per_project": per_project,
@@ -135,5 +140,7 @@ def overview_stats(records, *, project_names: dict, open_project: str | None,
             "latest": [{"run_id": r.run.key, "kind": _meta(r).get("kind", "training"),
                         "status": r.status.value, "created_at": r.created_at,
                         "configuration_name": _meta(r).get("configuration_name"),
-                        "configuration_version": _meta(r).get("configuration_version")}
+                        "configuration_version": _meta(r).get("configuration_version"),
+                        "configuration_id": _meta(r).get("configuration_id")       # 300r
+                        or trained_with.get(_meta(r).get("model_id"))}
                        for r in latest]}

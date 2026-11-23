@@ -2,9 +2,9 @@
 {% set title = {"run": "Delete run", "model": "Delete model", "configuration": "Delete configuration",
                 "dataset": "Delete dataset", "project": "Delete project"}[plan.kind] %}
 {# 299e/299f: what a deletion removes and what stays, before it is confirmed. #}
-{% macro run_line(r) %}{% set m = r.spec.project_run or {} %}
+{% macro run_line(r, names) %}{% set m = r.spec.project_run or {} %}{% set name = names.get(r.run.key) or m.configuration_name %}
   <li>{{ _("Prediction run") if m.kind == "prediction" else _("Training run") }}
-    {{ r.created_at.isoformat() | localtime }}{% if m.configuration_name %} · {{ m.configuration_name }}{% if m.configuration_version is not none %} v{{ m.configuration_version }}{% endif %}{% endif %}</li>
+    {{ r.created_at.isoformat() | localtime }}{% if name %} · {{ name }}{% if m.configuration_version is not none %} v{{ m.configuration_version }}{% endif %}{% endif %}</li>
 {% endmacro %}
 {% set all_runs = plan.runs + plan.hidden_runs %}
 {% block main %}
@@ -21,7 +21,7 @@
     {% if plan.configuration %}<li>{{ _("The configuration with all its versions") }}: {{ plan.versions }}</li>{% endif %}
     {% for c in plan.configurations %}<li>{{ _("Configuration") }} <b>{{ c.name }}</b> {{ _("with all its versions") }}</li>{% endfor %}
     {% for m in plan.models %}<li>{{ _("Model") }} <b>{{ m.name }}</b> {{ _("and its model files") }}</li>{% endfor %}
-    {% for r in all_runs[:20] %}{{ run_line(r) }}{% endfor %}
+    {% for r in all_runs[:20] %}{{ run_line(r, run_names or {}) }}{% endfor %}
     {% if all_runs | length > 20 %}<li>{{ _("and more runs") }}: {{ all_runs | length - 20 }}</li>{% endif %}
     {% if all_runs %}<li>{{ _("For each run: its log and all its result files (results, predictions, correction log).") }}</li>{% endif %}
     {% if plan.kind == "run" and plan.training_runs and not plan.hidden_runs %}<li>{{ _("The run's model file, if one was kept (no model is registered for this run).") }}</li>{% endif %}

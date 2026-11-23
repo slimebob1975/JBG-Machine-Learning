@@ -42,7 +42,7 @@ MESSAGES = {
 
 def add_prediction_tab(app, *, principal_dependency, render, redirect, active_project, runs,
                        project_runs, datasets, sessions, models, logs=None,
-                       results=None) -> None:
+                       results=None, configurations=None) -> None:
     from JBGApplicationContracts import RunReference
     from JBGProjectRuns import (IdColumnNotInteger, NothingToPredict, RunDoesNotMatchDataset,
                                 RunRequestRefused)
@@ -94,7 +94,8 @@ def add_prediction_tab(app, *, principal_dependency, render, redirect, active_pr
             context["recent"] = with_dataset_names(
                 [r for r in runs.list_project_runs(owner, project["project_id"])
                  if r.get("kind") == "prediction"],
-                datasets, owner, project["project_id"])
+                datasets, owner, project["project_id"],
+                configurations=configurations)                                  # 300r
             chosen = run or (context["recent"][0]["run_id"] if context["recent"] else "")
             if chosen and any(r["run_id"] == chosen for r in context["recent"]):
                 try:

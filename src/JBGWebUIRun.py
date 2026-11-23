@@ -84,15 +84,37 @@ def run_in_progress(runs, owner: str, project_id: str) -> bool:
         return False
 
 
-def with_dataset_names(items: list, datasets, owner: str, project_id: str) -> list:
+def with_dataset_names(items: list, datasets, owner: str, project_id: str, *,
+                       configurations=None) -> list:
     """300a (asked 2026-11-18): each listed run gets its dataset's name, so runs
-    of one configuration on several tables can be told apart."""
+    of one configuration on several tables can be told apart. 300r: and its
+    configuration's current name, when a configuration service is given."""
     try:
         names = {d["dataset_id"]: d["name"] for d in datasets.list(owner, project_id)}
     except Exception:
         names = {}
     for item in items:
         item["dataset_name"] = names.get(item.get("dataset_id"), "")
+    if configurations is not None:
+        with_configuration_names(items, configuration_names(configurations, owner, project_id))
+    return items
+
+
+def configuration_names(configurations, owner: str, project_id: str) -> dict:
+    """300r (agreed 2026-11-23): configuration ID -> current name."""
+    try:
+        return {c["configuration_id"]: c["name"]
+                for c in configurations.list(owner, project_id)}
+    except Exception:
+        return {}
+
+
+def with_configuration_names(items: list, names: dict) -> list:
+    """300r (agreed 2026-11-23): runs show their configuration's current name.
+    A run whose configuration is deleted keeps the name it was started with."""
+    for item in items:
+        if isinstance(item, dict) and names.get(item.get("configuration_id")):
+            item["configuration_name"] = names[item["configuration_id"]]
     return items
 
 
@@ -178,7 +200,7 @@ def add_run_tab(app, *, principal_dependency, render, redirect, active_project, 
             context["recent"] = with_dataset_names(
                 [r for r in runs.list_project_runs(owner, project["project_id"])
                  if r.get("kind", "training") != "prediction"],
-                datasets, owner, project["project_id"])
+                datasets, owner, project["project_id"], configurations=configurations)
             # 300d: nothing new can start while a run of the project is in progress.
             context["busy"] = run_in_progress(runs, owner, project["project_id"])
             if context["busy"]:

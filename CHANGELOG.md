@@ -1,3 +1,30 @@
+## Revision 300r - Renaming datasets and configurations (2026-11-23)
+
+- Asked 2026-11-23: a configuration or a dataset can get a new name, so a
+  configuration can be changed and renamed instead of creating a new one.
+  Agreed 2026-11-23:
+  1. A separate rename panel under the list on the Configuration and Dataset
+     tabs ("Byt namn på konfigurationen", "Byt namn på datasetet"). Renaming a
+     configuration makes no new version.
+  2. Runs show the configuration's current name: the Training, Results and
+     Prediction run lists, the model card, the Overview and the delete pages.
+     A run whose configuration is deleted keeps the name it was started with.
+     Models keep the name they were registered with. Dataset names were
+     already looked up when shown (300a).
+  3. A rename counts as a change: the configuration moves to the top of the
+     list (300p), and the project counts as changed (300b).
+- Names stay unique in a project, ignoring case. Nothing is stored under a
+  dataset's name (CSV files are kept by registration, SQL tables by catalog
+  and table), so only its record changes. The CSV download takes the new name.
+- Prediction runs record their configuration from now on. For older ones the
+  run list takes it from the model's training run, also when that run is
+  hidden because its model is still in use (299e).
+- API: `PATCH /api/projects/{id}/configurations/{configuration}` with a name,
+  and `PATCH /api/projects/{id}/datasets/{dataset}` takes a name as well as a
+  role (422 without either).
+- User guides: the Dataset and Configuration sections.
+- Tests: `tests/test_revision_300r_rename.py`.
+
 ## Revision 300q - The BACKLOG cleaned up (2026-11-23)
 
 - Asked 2026-11-23: `BACKLOG.md` held 157 unticked items below its current

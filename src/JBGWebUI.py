@@ -318,7 +318,8 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
         from JBGWebUIModels import add_models_tab
         add_models_tab(app, principal_dependency=principal_dependency, render=render,
                        redirect=_redirect, active_project=active_project, models=models,
-                       runs=runs, datasets=datasets)
+                       runs=runs, datasets=datasets,
+                       configurations=configurations)                           # 300r
     if results is not None and runs is not None:
         from JBGWebUIResults import add_results_tab
         # 299a/299b: corrections of mispredicted rows (SQL tables, CSV files).
@@ -330,6 +331,7 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
         add_results_tab(app, principal_dependency=principal_dependency, render=render,
                         active_project=active_project, runs=runs, results=results,
                         datasets=datasets,                                      # 300p
+                        configurations=configurations,                          # 300r
                         reclassification=reclassification, redirect=_redirect,
                         recommendation=_recommendation(runs, results,
                                                        getattr(datasets, "_repository", None)))
@@ -344,7 +346,8 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
         add_prediction_tab(app, principal_dependency=principal_dependency, render=render,
                            redirect=_redirect, active_project=active_project, runs=runs,
                            project_runs=project_runs, datasets=datasets, sessions=sessions,
-                           models=models, logs=logs, results=results)
+                           models=models, logs=logs, results=results,
+                           configurations=configurations)                       # 300r
     from JBGWebUIOverview import add_overview_tab                 # 295d
     add_overview_tab(app, principal_dependency=principal_dependency, render=render,
                      active_project=active_project, datasets=datasets,

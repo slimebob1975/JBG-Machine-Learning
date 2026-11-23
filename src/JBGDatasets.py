@@ -249,6 +249,24 @@ class DatasetRepository:
                 active_training=True, updated_at=now))
         return self.get_owned(owner, project_id, dataset_id)
 
+    def rename(self, owner, project_id, dataset_id, name):
+        """300r (asked 2026-11-23): a new display name. Nothing is stored under
+        the name (CSV files are kept by registration, SQL tables by catalog and
+        table), so only this record changes. Unique in the project, ignoring
+        case; counts as a change for the project (agreed 2026-11-23)."""
+        owner, name = _text(owner, "owner", 256), _text(name, "dataset name")
+        try:
+            with self._engine.begin() as connection:
+                touch_project(connection, self._metadata.schema, project_id)
+                self._owned_row(connection, owner, project_id, dataset_id)
+                connection.execute(update(self._datasets).where(
+                    self._datasets.c.dataset_id == dataset_id).values(
+                    name=name, name_key=name.casefold(),
+                    updated_at=datetime.now(timezone.utc)))
+        except IntegrityError as error:
+            raise DuplicateDatasetName("dataset name already exists") from error
+        return self.get_owned(owner, project_id, dataset_id)
+
     # 298f: training and mixed datasets carry their own column roles and are
     # checked the same way, so they may switch between the two; the
     # validation state, the roles and the active choice are kept.

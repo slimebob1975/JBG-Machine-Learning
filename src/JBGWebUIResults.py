@@ -409,7 +409,7 @@ RECOMMENDATION_REASONS = {
 
 def add_results_tab(app, *, principal_dependency, render, active_project, runs, results,
                     reclassification=None, redirect=None, recommendation=None,
-                    datasets=None) -> None:
+                    datasets=None, configurations=None) -> None:
     from fastapi import Form
     from JBGApplicationContracts import RunReference
     from JBGRunResults import RunResultsUnavailable
@@ -447,7 +447,8 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                 [r for r in runs.list_project_runs(owner, project["project_id"])
                  if r["status"] == "succeeded"
                  and r.get("kind", "training") in ("training", "investigation")],
-                datasets, owner, project["project_id"])
+                datasets, owner, project["project_id"],
+                configurations=configurations)                                  # 300r
             chosen = run or (context["finished"][0]["run_id"] if context["finished"] else "")
             item = next((r for r in context["finished"] if r["run_id"] == chosen), None)
             if item is not None and item.get("kind") == "investigation":

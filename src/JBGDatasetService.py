@@ -187,6 +187,18 @@ class DatasetService:
         except KeyError:
             raise DatasetUnavailable("dataset unavailable") from None
 
+    def rename(self, owner: str, project_id: str, dataset_id: str, *,
+               name: str) -> dict[str, Any]:
+        """300r: a new display name; run lists show it at once."""
+        self._project(owner, project_id)
+        try:
+            return dataset_response(self._repository.rename(owner, project_id, dataset_id,
+                                                            name))
+        except DuplicateDatasetName:
+            raise DatasetConflict("dataset name already exists") from None
+        except KeyError:
+            raise DatasetUnavailable("dataset unavailable") from None
+
 
 def _copy_limited(source: BinaryIO, target: BinaryIO, limit: int) -> int:
     copied = 0

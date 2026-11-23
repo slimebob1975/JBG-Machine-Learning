@@ -41,8 +41,9 @@ class ProjectUpdate(BaseModel):
 
 
 class DatasetUpdate(BaseModel):
-    """298f: training and mixed datasets may switch role."""
-    role: Literal["training", "mixed"]
+    """298f: training and mixed datasets may switch role. 300r: a new name."""
+    role: Optional[Literal["training", "mixed"]] = None
+    name: Optional[str] = None
 
 
 class SQLDatasetCreate(BaseModel):
@@ -62,6 +63,11 @@ class ConfigurationCreate(BaseModel):
 class ConfigurationSave(BaseModel):
     settings: dict
     expected_version: int
+
+
+class ConfigurationRename(BaseModel):
+    """300r: a new name, without a new version."""
+    name: str
 
 
 class ProjectRunRequest(BaseModel):
@@ -339,8 +345,16 @@ def _add_dataset_endpoints(app, principal_dependency, datasets):
     @app.patch("/api/projects/{project_id}/datasets/{dataset_id}")
     def update_dataset(project_id: str, dataset_id: str, request: DatasetUpdate = Body(...),
                        principal: AuthenticatedPrincipal = Depends(principal_dependency)):
-        return call(datasets.change_role, principal.principal_key, project_id, dataset_id,
-                    request.role)
+        if request.name is None and request.role is None:
+            raise HTTPException(status_code=422, detail="name or role required")
+        updated = None
+        if request.name is not None:                                          # 300r
+            updated = call(datasets.rename, principal.principal_key, project_id, dataset_id,
+                           name=request.name)
+        if request.role is not None:
+            updated = call(datasets.change_role, principal.principal_key, project_id,
+                           dataset_id, request.role)
+        return updated
 
     @app.post("/api/projects/{project_id}/datasets/{dataset_id}/activate")
     def activate_dataset(project_id: str, dataset_id: str,
@@ -415,6 +429,14 @@ def _add_configuration_endpoints(app, principal_dependency, configurations):
         return call(configurations.save, principal.principal_key, project_id,
                     configuration_id, settings=request.settings,
                     expected_version=request.expected_version)
+
+    @app.patch(base + "/{configuration_id}")
+    def rename_configuration(project_id: str, configuration_id: str,
+                             request: ConfigurationRename = Body(...),
+                             principal: AuthenticatedPrincipal = Depends(principal_dependency)):
+        """300r: a new name, without a new version."""
+        return call(configurations.rename, principal.principal_key, project_id,
+                    configuration_id, name=request.name)
 
 
 def _add_project_run_endpoints(app, principal_dependency, project_runs):

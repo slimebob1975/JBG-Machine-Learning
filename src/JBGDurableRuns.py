@@ -20,6 +20,19 @@ from JBGRunWorker import build_job_spec
 from Storage.ArtifactContract import StorageScope
 
 
+def _trained_configurations(metas) -> dict:
+    """300r: model ID -> configuration ID, from training runs. Prediction runs
+    before 300r did not record their configuration; it is their model's
+    training run's, so pages can show the configuration's current name."""
+    return {meta.get("model_id"): meta.get("configuration_id") for meta in metas
+            if meta.get("kind", "training") != "prediction" and meta.get("model_id")}
+
+
+def _needs_configuration(meta: dict, trained: dict) -> bool:
+    return (meta.get("kind") == "prediction" and not meta.get("configuration_id")
+            and bool(meta.get("model_id")) and meta.get("model_id") not in trained)
+
+
 class DurableRunService:
     """Submit, observe and cancel stored runs on behalf of their owners."""
 
@@ -166,10 +179,23 @@ class DurableRunService:
         if not isinstance(principal, str) or not principal.strip():
             raise PermissionError("authentication required")
         runs = []
+        records = []
         for record in self._store.list_for_owner(principal, 200):
             meta = record.spec.get("project_run") if isinstance(record.spec, dict) else None
-            if not isinstance(meta, dict) or meta.get("project_id") != project_id:
-                continue
+            if isinstance(meta, dict) and meta.get("project_id") == project_id:
+                records.append((record, meta))
+        trained = _trained_configurations(m for _, m in records)
+        if any(_needs_configuration(m, trained) for _, m in records):
+            # 300r: a model still in use keeps its training run hidden (299e).
+            try:
+                everything = self._store.list_for_owner(principal, None, include_hidden=True)
+            except TypeError:
+                everything = ()
+            trained.update(_trained_configurations(
+                m for m in (r.spec.get("project_run") if isinstance(r.spec, dict) else None
+                            for r in everything)
+                if isinstance(m, dict) and m.get("project_id") == project_id))
+        for record, meta in records:
             runs.append(dict(self._snapshot(record),
                              created_at=record.created_at.isoformat(),
                              finished_at=record.finished_at.isoformat() if record.finished_at else None,
@@ -178,7 +204,8 @@ class DurableRunService:
                              kind=meta.get("kind", "training"),            # 295c
                              dataset_id=meta.get("dataset_id"),            # 297h
                              model_id=meta.get("model_id"),                # 299e
-                             configuration_id=meta.get("configuration_id")))
+                             configuration_id=meta.get("configuration_id")
+                             or trained.get(meta.get("model_id"))))
             if len(runs) >= limit:
                 break
         return runs

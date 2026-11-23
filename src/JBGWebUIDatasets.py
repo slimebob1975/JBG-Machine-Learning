@@ -45,6 +45,8 @@ MESSAGES = {
     "roles_saved": ("ok", "Column roles saved. Validate the dataset again."),
     "role_changed": ("ok", "The dataset's role is changed."),
     "cannot_change_role": ("error", "Only training and mixed datasets can switch role."),
+    "renamed": ("ok", "Dataset renamed."),                                   # 300r
+    "bad_name": ("error", "The name was not accepted (1-200 characters)."),
 }
 READ_ERRORS = {
     "signin_required": "Sign in to SQL Server to read this dataset.",
@@ -317,6 +319,23 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
         return Response(content, media_type="text/csv", headers={
             "Content-Disposition": f'attachment; filename="{plain}"; '
                                    f"filename*=UTF-8''{quote(name)}"})
+
+    @app.post("/ui/dataset/{dataset_id}/rename", include_in_schema=False)
+    def rename(request: Request, dataset_id: str, name: str = Form(""),
+               principal=Depends(principal_dependency)):
+        """300r (asked 2026-11-23): a new display name; the file or table stays."""
+        pid = project_id(request, principal)
+        if pid is None:
+            return redirect("/ui/dataset")
+        try:
+            datasets.rename(principal.principal_key, pid, dataset_id, name=name)
+        except DatasetConflict:
+            return redirect("/ui/dataset", dataset=dataset_id, message="duplicate")
+        except (DatasetUnavailable, ProjectUnavailable):
+            return redirect("/ui/dataset", message="unavailable")
+        except (ValueError, TypeError):
+            return redirect("/ui/dataset", dataset=dataset_id, message="bad_name")
+        return redirect("/ui/dataset", dataset=dataset_id, message="renamed")
 
     @app.post("/ui/dataset/{dataset_id}/role", include_in_schema=False)
     def change_role(request: Request, dataset_id: str, role: str = Form(""),

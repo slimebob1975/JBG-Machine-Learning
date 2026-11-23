@@ -81,6 +81,12 @@ Prediktion. Prediktionsdataset kan inte byta roll.
 Under datasetet finns vyerna Förhandsgranskning, Profil, Klasser och
 Kolumnroller.
 
+Panelen **Byt namn på datasetet** under listan ger det valda datasetet ett
+nytt namn med **Byt namn**. Bara namnet ändras: filen eller tabellen,
+kolumnrollerna och körningarna finns kvar, och körningarna visar det nya
+namnet. Namnet får inte redan finnas i projektet, oavsett stora och små
+bokstäver.
+
 **Ta bort datasetet…** tar bort datasetet med dess kolumnroller, alla
 versioner av dess CSV-fil (även korrigerade), träningskörningarna på det,
 modellerna som tränats på det och prediktionerna som gjorts på det eller med
@@ -187,6 +193,10 @@ dina val direkt, och alpha ”Separated” går bara att välja med metoden
 - **Spara konfiguration** skapar en ny version, och tidigare versioner sparas.
   En ny konfiguration är version 0, så den första ändringen ger version 1.
   Listan visar den senast skapade eller ändrade konfigurationen först.
+- Panelen **Byt namn på konfigurationen** under listan ger den valda
+  konfigurationen ett nytt namn utan att skapa en ny version. Körningarna som
+  gjorts med den visar det nya namnet, och den hamnar först i listan.
+  Modellerna behåller namnet de fick när de tränades.
 - **Välj för körning** gör konfigurationen till den som används vid
   träning. Den är röd när konfigurationen redan är vald.
 - **Ta bort konfigurationen…** tar bort den med alla versioner, de

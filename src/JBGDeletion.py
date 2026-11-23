@@ -139,6 +139,26 @@ class DeletionService:
         return [r for r in runs if _kind(r) == "prediction"
                 and _meta(r).get("model_id") in model_ids]
 
+    def run_configuration_names(self, owner: str, project_id: str, records) -> dict:
+        """300r (agreed 2026-11-23): run key -> its configuration's current name,
+        for the confirmation page. A prediction run's configuration is its
+        model's training run's. A run whose configuration is gone keeps the name
+        it was started with."""
+        try:
+            names = {c.configuration_id: c.name
+                     for c in self._configurations.list_for_project(owner, project_id)}
+        except (KeyError, ValueError):
+            names = {}
+        trained = {_meta(r).get("model_id"): _meta(r).get("configuration_id")
+                   for r in self._project_runs(owner, project_id)
+                   if _kind(r) != "prediction" and _meta(r).get("model_id")}
+        shown = {}
+        for record in records:
+            meta = _meta(record)
+            configuration_id = meta.get("configuration_id") or trained.get(meta.get("model_id"))
+            shown[record.run.key] = names.get(configuration_id) or meta.get("configuration_name") or ""
+        return shown
+
     # --- Plans ------------------------------------------------------------------------
 
     def plan_run(self, owner: str, project_id: str, run_id: str) -> DeletionPlan:

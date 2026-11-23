@@ -28,8 +28,13 @@ def add_deletion_pages(app, *, principal_dependency, render, redirect, active_pr
     from JBGDeletion import DeletionFailed, DeletionRefused, DeletionUnavailable
 
     def page(request, principal, plan, *, tab, action, back):
+        try:                                                                  # 300r
+            run_names = deletion.run_configuration_names(
+                principal.principal_key, plan.project_id, plan.runs + plan.hidden_runs)
+        except Exception:
+            run_names = {}
         return render(request, principal, "delete.html", tab, plan=plan, action=action,
-                      back=back, refusals=REFUSALS,
+                      back=back, refusals=REFUSALS, run_names=run_names,
                       source=(active_project(request, principal.principal_key) or {}).get("source"))
 
     def project_id(request, principal):

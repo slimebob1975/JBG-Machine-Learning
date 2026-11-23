@@ -257,6 +257,7 @@ class ProjectRunService:
         _read_all_rows_unless_limited(config)
         metadata = {"project_id": project.project_id, "kind": "prediction", "model_id": model_id,
                     "dataset_id": dataset.dataset_id,
+                    "configuration_id": trained.get("configuration_id"),      # 300r
                     "configuration_name": trained.get("configuration_name"),
                     "configuration_version": trained.get("configuration_version")}
         from JBGRunSubmission import _SQL_SCOPE
@@ -296,6 +297,7 @@ class ProjectRunService:
         runtime.io.model_path, runtime.io.model_name = config.io.model_path, config.io.model_name
         metadata = {"project_id": project.project_id, "kind": "prediction", "model_id": model_id,
                     "dataset_id": trained.get("dataset_id"),
+                    "configuration_id": trained.get("configuration_id"),      # 300r
                     "configuration_name": trained.get("configuration_name"),
                     "configuration_version": trained.get("configuration_version")}
         repository, scope = project_csv_storage(project.project_id, root=self._csv_root)
@@ -362,6 +364,7 @@ class ProjectRunService:
         runtime.data_source.validate()
         metadata = {"project_id": project.project_id, "kind": "prediction", "model_id": model_id,
                     "dataset_id": dataset.dataset_id,
+                    "configuration_id": trained.get("configuration_id"),      # 300r
                     "configuration_name": trained.get("configuration_name"),
                     "configuration_version": trained.get("configuration_version"),
                     "model_source": {"dataset_id": trained_source.dataset_id,

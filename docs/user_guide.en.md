@@ -81,6 +81,11 @@ rows with a class, and a mixed dataset can also be predicted on the
 Prediction tab. Prediction datasets cannot switch role. Below the dataset are the views Preview, Profile, Classes and Column
 roles.
 
+The **Rename the dataset** panel below the list gives the selected dataset a
+new name with **Rename**. Only the name changes: the file or table, the column
+roles and the runs stay, and the runs show the new name. The name must not
+already exist in the project, whatever the case.
+
 **Delete the dataset…** deletes the dataset with its column roles, every
 version of its CSV file (corrected ones included), the training runs on it,
 the models trained on it and the predictions made on it or with those
@@ -186,6 +191,10 @@ only be chosen with the method "Linear".
 - **Save configuration** creates a new version; earlier versions are kept. A
   new configuration is version 0, so the first change makes version 1. The list
   shows the last created or changed configuration first.
+- The **Rename the configuration** panel below the list gives the selected
+  configuration a new name without creating a new version. The runs made with
+  it show the new name, and it moves to the top of the list. Models keep the
+  name they were given when they were trained.
 - **Choose for runs** makes the configuration the one used for training.
   It is red when the configuration is already chosen.
 - **Delete the configuration…** deletes it with every version, the training

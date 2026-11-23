@@ -21,7 +21,7 @@ MESSAGES = {
 
 
 def add_models_tab(app, *, principal_dependency, render, redirect, active_project, models,
-                   runs, datasets) -> None:
+                   runs, datasets, configurations=None) -> None:
     from JBGApplicationContracts import RunReference
     from JBGModelService import ModelUnavailable
     from JBGProjectService import ProjectUnavailable
@@ -36,6 +36,9 @@ def add_models_tab(app, *, principal_dependency, render, redirect, active_projec
             except Exception:
                 info["dataset"] = None
         listed = runs.list_project_runs(owner, pid, limit=200)
+        if configurations is not None:                                        # 300r
+            from JBGWebUIRun import configuration_names, with_configuration_names
+            with_configuration_names(listed, configuration_names(configurations, owner, pid))
         # 299e: the model's remaining prediction runs (deleted ones are not listed).
         info["predictions"] = [r for r in listed if r.get("kind") == "prediction"
                                and r.get("model_id") == model["model_id"]]
