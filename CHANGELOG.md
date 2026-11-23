@@ -1,3 +1,29 @@
+## Revision 300q - The BACKLOG cleaned up (2026-11-23)
+
+- Asked 2026-11-23: `BACKLOG.md` held 157 unticked items below its current
+  priorities, most of them from the Voilà era and done or superseded since.
+  Each was checked against the code and this CHANGELOG. The BACKLOG now lists
+  open work only: stabilisation, the pending Dark Numbers decision, deferred
+  work by area (runs and results, configurations and datasets, operation, Dark
+  Numbers, modelling and performance, platform), the standing rules, and a
+  record of what was closed and why.
+- The 300p BACKLOG is kept unchanged in `docs/backlog_archive_300p.md`.
+- Found while checking:
+  - why a run failed was already shown on the Training tab (297e), though two
+    items still listed it as open;
+  - the API still serves Voilà's interim configuration catalog (285d), which
+    the web interface does not use;
+  - the memorisation rule in Dark Numbers is still fixed in code, while
+    `c_max` and the warning level became settings in 300n;
+  - the link to `docs/backlog_archive_pre_152.md` pointed to a file no longer
+    in the repository.
+- New stabilisation items: the gate count (1381 expected, 1379 counted in a
+  container), a dependency support matrix (the QDA test fails with
+  scikit-learn 1.9 although the engine is right), repository housekeeping
+  after the rename, the gate's warnings and skips, retiring the interim
+  configuration catalog, and SQL acceptance with the operator protocol.
+- Tests: `tests/test_revision_300q_backlog_cleanup.py`.
+
 ## Revision 300p - Small fixes: versions from 0, list orders, Dark Number matrices (2026-11-20)
 
 - Asked 2026-11-20:
