@@ -1,0 +1,54 @@
+# Tested versions (300u, 2026-11-24): the Windows environment in which the gate
+# passed at 300t (-Quick, 1404 tests). Install with:
+#   python -m pip install -r requirements.txt -r requirements-fastapi.txt -c constraints-tested.txt
+# requirements*.txt stay unpinned; see docs/dependencies.md for how to update this file.
+
+# Numerical core: these decide the results
+numpy==2.3.2
+scipy==1.16.1
+pandas==2.3.1
+scikit-learn==1.7.2
+imbalanced-learn==0.14.0
+joblib==1.5.2
+threadpoolctl==3.6.0
+catboost==1.2.10
+
+# Neural networks (optional algorithms)
+torch==2.8.0
+skorch==1.2.0
+tensorflow==2.20.0
+keras==3.11.3
+scikeras==0.13.0
+jax==0.7.1
+jaxlib==0.7.1
+optax==0.2.6
+flax==0.11.2
+
+# Text and data handling
+langdetect==1.0.9
+lexicalrichness==0.5.1
+stop-words==2018.7.23
+pyodbc==5.2.0
+python-dotenv==1.1.1
+psutil==7.0.0
+matplotlib==3.10.6
+path.py==12.5.0
+terminal==0.4.0
+dill==0.4.0
+
+# Web interface and server
+fastapi==0.162.0
+starlette==0.47.2
+pydantic==2.13.5
+pydantic_core==2.46.5
+uvicorn==0.35.0
+httpx==0.28.1
+fastapi_offline==1.7.7
+SQLAlchemy==2.1.6
+python-multipart==0.0.20
+Jinja2==3.1.6
+babel==2.17.0
+
+# Voila interface and tests
+ipywidgets==8.1.7
+pytest==8.4.2

@@ -24,18 +24,13 @@ decision.
   table's name.
 - [x] 300t (found 2026-11-24): two outdated or unclear passages in the
   user guides' Dark Numbers section.
-- [ ] The gate count (found 2026-11-23): the full gate after 300p was expected
-  to run 1381 tests, a container run of the same code counted 1379. The
-  application layer (140 files, 1140 tests) and the native group (21) agree,
-  so the difference lies in the 14 unittest groups or the configuration
-  group. Compare with the per-group table of a gate run on Windows
-  (`test-results/backend_refactor_*_summary.txt`) and record the right count.
-- [ ] A dependency support matrix (from the P2 list, found again 2026-11-23):
-  record the tested versions of Python, scikit-learn, NumPy, pandas and
-  imbalanced-learn, and of TensorFlow, Keras, SciKeras and PyTorch where used,
-  and keep a reproducible Windows setup. `requirements.txt` pins none of them
-  today. (The QDA test that failed with scikit-learn 1.9 accepts both
-  behaviours since 300s.)
+- [x] 300u: the gate count. The Windows table (2026-11-24, 300t) and the
+  container agree: 64 + 154 + 1186 = 1404 with `-Quick`, 1425 with the native
+  group. The 1381 expected after 300p was a miscount (it was 1379).
+- [x] 300u: the tested versions (agreed 2026-11-24): `constraints-tested.txt`
+  and `docs/dependencies.md`. The requirements files stay unpinned.
+- [ ] Record the exact Python version in `docs/dependencies.md` (3.11 or later
+  is known from NumPy 2.3 and JAX 0.7).
 - [x] 300s: Precision and Recall (micro, macro, weighted) failed on text
   classes with scikit-learn 1.9 (found 2026-11-23).
 - [ ] Average Precision (micro, macro, weighted) fails on text classes too,
@@ -47,11 +42,10 @@ decision.
   Machine Learning" becomes the product name in the README, the masthead and
   the title of this file, and whether a separate production repository is
   renamed too.
-- [ ] The gate's warnings and skips (from 279ai, still open): review them. In
-  the container 2026-11-23 the application layer gave one NumPy
-  `RuntimeWarning` (`test_revision_300k_overtraining_factor.py::test_the_factor`)
-  and the configuration group one skip (`dill` not installed). Compare with
-  Windows.
+- [x] 300u: the gate's warnings and skips. The NumPy `RuntimeWarning` in the
+  300k test came from a real fault: an infinite upper bound of c read 1, and
+  the quality "reliable" (fixed). The skip is container-only: `dill` is
+  installed on Windows, where the gate skips nothing.
 - [ ] The interim configuration catalog (285d, design gap 10): project runs
   use the configuration repository since 288a, but the API still serves
   Voilà's saved configurations (`GET /api/configurations`,

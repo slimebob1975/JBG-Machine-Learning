@@ -1,3 +1,24 @@
+## Revision 300u - Tested versions; c's upper bound when resamples are infinite (2026-11-24)
+
+- Tested versions (agreed 2026-11-24: a constraints file and a document):
+  `constraints-tested.txt` fixes the 40 packages that matter at the versions of
+  the user's Windows environment, where the gate passed at 300t (`-Quick`, 1404
+  tests). `docs/dependencies.md` lists them, how to install with them, what the
+  container also passed with (scikit-learn 1.9.1, pandas 3.0.6, NumPy 2.5.4)
+  and how to update. The requirements files are unchanged. The container now
+  tests with the same versions as Windows.
+- The gate count is settled: 1404 with `-Quick`, 1425 in full. The 1381
+  expected after 300p was a miscount.
+- Found 2026-11-24 behind the NumPy `RuntimeWarning` in the 300k test: c's 90 %
+  interval is a bootstrap over the flip test's parts. A resample of parts that
+  all have r_in = 0 gives an infinite ratio, NumPy's quantile then returns nan
+  ("inf - inf"), and `max(1.0, nan)` is 1.0. So with mostly r_in = 0 (a model
+  that learns the relabelled rows by heart) the upper bound read 1, below the
+  lower bound, and the quality "reliable" instead of "uncertain". A nan
+  quantile is now infinite, finite bounds are unchanged, and the warning is
+  gone. The calculation table shows an infinite value as "∞", not "inf".
+- Tests: `tests/test_revision_300u_tested_versions.py`.
+
 ## Revision 300t - Two corrections in the user guides (2026-11-24)
 
 - Found 2026-11-24 while building a presentation from the Om tab:

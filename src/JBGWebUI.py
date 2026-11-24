@@ -15,6 +15,8 @@ business rules. Messages are chosen by fixed codes, never by echoing input.
 """
 from __future__ import annotations
 
+import math
+
 import hashlib
 from pathlib import Path
 from typing import Callable
@@ -115,6 +117,8 @@ def _number_text(value, language: str = "sv") -> str:
         return "" if value is None else str(value)
     if isinstance(value, int) or (isinstance(value, float) and value.is_integer() and abs(value) < 1e15):
         return str(int(value))
+    if isinstance(value, float) and math.isinf(value):
+        return "∞" if value > 0 else "−∞"                  # 300u: not "inf"
     if isinstance(value, float):
         text = f"{value:.4g}"
         return text.replace(".", ",") if language == "sv" else text

@@ -62,6 +62,18 @@ def summarise(recoveries) -> dict:
             "recoveries": values, "quality": quality}
 
 
+def _quantile(values, q: float) -> float:
+    """300u (found 2026-11-24): a quantile of resampled ratios, some of which
+    may be infinite (a resample of parts that all have r_in = 0). Between two
+    infinite values NumPy's interpolation gives nan (inf - inf), with a
+    RuntimeWarning, and max(1.0, nan) is 1.0: the upper bound of c then read 1
+    and an unbounded c was called reliable. nan only arises in the infinite
+    region, so it is infinite; finite quantiles are unchanged."""
+    with np.errstate(invalid="ignore"):
+        value = float(np.quantile(values, q))
+    return math.inf if math.isnan(value) else value
+
+
 def overtraining_factor(pairs, resamples: int = 2000, seed: int = 20261120,
                         c_max: float = CORRECTION_MAX) -> dict:
     """The part of c that comes from overtraining only (JBG 1.3):
@@ -96,8 +108,8 @@ def overtraining_factor(pairs, resamples: int = 2000, seed: int = 20261120,
     with np.errstate(divide="ignore", invalid="ignore"):
         ratios = np.where(sample_in > 0, sample_unseen / np.where(sample_in > 0, sample_in, 1),
                           np.inf)
-    low = max(1.0, float(np.quantile(ratios, 0.05)))
-    high = max(1.0, float(np.quantile(ratios, 0.95)))
+    low = max(1.0, _quantile(ratios, 0.05))
+    high = max(1.0, _quantile(ratios, 0.95))
     if not (CORRECTION_MIN <= c <= c_max):
         quality = "not_estimable"
     elif math.isinf(high) or (high - low) / 2 > RELIABLE_HALFWIDTH * c:
