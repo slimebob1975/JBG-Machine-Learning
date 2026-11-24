@@ -16,6 +16,8 @@ decision.
 ### Now: stabilisation
 
 - [ ] Bugs reported in use: added here as they are found.
+- [x] 300v (asked 2026-11-24): default limits for c, 20 for the upper bound and
+  10 for the warning level.
 - [x] 300s (asked 2026-11-23): the Run tab showed nothing during the final
   training of the winning pipeline (the spot check's bar stayed full). It now
   has a bar of its own, moving with the time against the grid search's

@@ -55,7 +55,7 @@ def parameters(config, used: dict) -> dict:
                                          Calc.FLIP_TEST_REPEATS)),              # 300n
         "correction_min": Calc.CORRECTION_MIN,
         "correction_max": float(getattr(mode, "dark_number_c_max", Calc.CORRECTION_MAX)),
-        "c_warning": float(getattr(mode, "dark_number_c_warning", 2.0)),
+        "c_warning": float(getattr(mode, "dark_number_c_warning", 10.0)),
         "cap": Calc.CAP,
         "memorisation_fit": Calc.MEMORISATION_FIT, "memorisation_gap": Calc.MEMORISATION_GAP,
         "memorisation_threshold": Calc.MEMORISATION_THRESHOLD,

@@ -115,7 +115,7 @@ class Config:
     # before 298h could not be loaded (found 2026-11-13 on a CSV run).
     LATER_KEYS = {"mode": {"categorical_limit": 30, "date_columns": "",
                            "dark_number_sampling_policy": "PIPELINE",        # 299y
-                           "dark_number_c_max": 10.0, "dark_number_c_warning": 2.0,
+                           "dark_number_c_max": 20.0, "dark_number_c_warning": 10.0,     # 300v
                            "dark_number_flip_repeats": 2}}                    # 300n
     JSON_CONFIG_SCHEMA_VERSION = 2
 
@@ -409,8 +409,8 @@ class Config:
         # 300n (asked 2026-11-20): JBG 1.3's adjustable parts. The upper bound
         # for c, the c above which the view warns of overtraining, and the
         # flip test's repeats (each adds 4 fits; more narrow c's interval).
-        dark_number_c_max: float = 10.0
-        dark_number_c_warning: float = 2.0
+        dark_number_c_max: float = 20.0          # 300v (asked 2026-11-24): was 10
+        dark_number_c_warning: float = 10.0      # 300v (asked 2026-11-24): was 2
         dark_number_flip_repeats: int = 2
         experimental_perturbed_dark_number_fallback: bool = True
         oversampler: Oversampling = field(default_factory=Oversampling.defaultOversampler)
@@ -1256,7 +1256,7 @@ class Config:
             saved_config.mode.dark_number_flip_fraction = config.mode.dark_number_flip_fraction
             saved_config.mode.dark_number_sampling_policy = getattr(
                 config.mode, "dark_number_sampling_policy", "PIPELINE")                # 299y
-            for name, default in (("dark_number_c_max", 10.0), ("dark_number_c_warning", 2.0),
+            for name, default in (("dark_number_c_max", 20.0), ("dark_number_c_warning", 10.0),
                                   ("dark_number_flip_repeats", 2)):                   # 300n
                 setattr(saved_config.mode, name, getattr(config.mode, name, default))
             # Saved model metadata deliberately contains no SQL password. Inject the
@@ -1360,8 +1360,8 @@ class Config:
                 excluded_predictor_columns=module.mode.get("excluded_predictor_columns", ""),
                 date_columns=module.mode.get("date_columns", ""),
                 dark_number_sampling_policy=module.mode.get("dark_number_sampling_policy", "PIPELINE"),
-                dark_number_c_max=float(module.mode.get("dark_number_c_max", 10.0)),
-                dark_number_c_warning=float(module.mode.get("dark_number_c_warning", 2.0)),
+                dark_number_c_max=float(module.mode.get("dark_number_c_max", 20.0)),
+                dark_number_c_warning=float(module.mode.get("dark_number_c_warning", 10.0)),
                 dark_number_flip_repeats=int(module.mode.get("dark_number_flip_repeats", 2)),
                 preprocessor=(PreprocessTuple.from_string(module.mode["preprocessor"])
                               if isinstance(module.mode["preprocessor"], str)

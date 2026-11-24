@@ -266,7 +266,7 @@ EQUATION_PARTS = (
           " the model does not overtrain, and large when it learns wrong labels by heart. T"
           "he model's ordinary misses are already counted by the second factor. It is used "
           "for the estimates on all data and not for the unseen test part, and must lie bet"
-          "ween 1 and the upper bound set in the configuration (10 by default), otherwise t"
+          "ween 1 and the upper bound set in the configuration (20 by default), otherwise t"
           "he estimate is undefined.", None),
 )
 

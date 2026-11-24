@@ -19,8 +19,8 @@ def test_the_settings_and_their_defaults():
     from JBGWebUI import translator
     later = Config.LATER_KEYS["mode"]
     assert (later["dark_number_c_max"], later["dark_number_c_warning"],
-            later["dark_number_flip_repeats"]) == (10.0, 2.0, 2)
-    for bad in ({"dark_number_c_max": 1.0}, {"dark_number_c_warning": 20.0},
+            later["dark_number_flip_repeats"]) == (20.0, 10.0, 2)       # 300v: were 10 and 2
+    for bad in ({"dark_number_c_max": 1.0}, {"dark_number_c_warning": 25.0},
                 {"dark_number_flip_repeats": 0}):
         with pytest.raises(ValueError):
             Config.Mode(**bad).validate()
@@ -32,12 +32,13 @@ def test_the_settings_and_their_defaults():
 
 
 def test_the_upper_bound_is_a_parameter():
-    assert Calc.bounded_correction(12.0, "direct")[0] == -1.0
-    assert Calc.bounded_correction(12.0, "direct", c_max=15.0) == (12.0, "direct")
+    # 300v: the default upper bound is 20, so c = 25 is out of bounds by default.
+    assert Calc.bounded_correction(25.0, "direct")[0] == -1.0
+    assert Calc.bounded_correction(25.0, "direct", c_max=30.0) == (25.0, "direct")
     from JBGDarkNumberOutOfFold import overtraining_factor
-    pairs = [(0.05, 0.6)] * 8                                           # c = 12
+    pairs = [(0.024, 0.6)] * 8                                          # c = 25
     assert overtraining_factor(pairs)["quality"] == "not_estimable"
-    assert overtraining_factor(pairs, c_max=15.0)["quality"] == "reliable"
+    assert overtraining_factor(pairs, c_max=30.0)["quality"] == "reliable"
 
 
 def _run(**mode):

@@ -41,7 +41,7 @@ def test_the_record():
         ("separated_alpha", "LINEAR", "SEPARATED", 0.2)
     assert (p["flip_test_folds"], p["flip_test_repeats"], p["correction_max"], p["cap"],
             p["memorisation_fit"], p["memorisation_gap"], p["random_state"], p["root_degree"]) == \
-        (4, 2, 10.0, 1.0, 0.95, 0.05, 42, 3)
+        (4, 2, 20.0, 1.0, 0.95, 0.05, 42, 3)                           # 300v: was 10
     entries = record["estimates"]
     assert [(e["scope"], e["target"], e["status"], e["value"]) for e in entries] == [
         ("D_cv_test", "a", "ok", 0.02), ("D_cv_test", "b", "capped", 1.0),

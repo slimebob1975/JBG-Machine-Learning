@@ -3133,7 +3133,7 @@ class PredictionsHandler:
             estimator = locals().get("corr_estimator")
             mode = getattr(self.handler.config, "mode", None)
             c_max = float(getattr(mode, "dark_number_c_max", DarkNumberCalculator.CORRECTION_MAX))
-            c_warning = float(getattr(mode, "dark_number_c_warning", 2.0))       # 300n
+            c_warning = float(getattr(mode, "dark_number_c_warning", 10.0))      # 300n, 300v
             factor = overtraining_factor(list(getattr(estimator, "fold_pairs_", None) or []),
                                          c_max=c_max)
             unseen = out_of_fold(getattr(estimator, "oof_recoveries_", None) or [])
@@ -3152,7 +3152,7 @@ class PredictionsHandler:
                 self.handler.logger.print_warning(
                     f"Dark Number correction for {model_name}, target {label}: c={corr} "
                     f"({corr_source}) is not usable (allowed {DarkNumberCalculator.CORRECTION_MIN:g}"
-                    f"-{DarkNumberCalculator.CORRECTION_MAX:g}); the Dark Number is undefined (-1). "
+                    f"-{c_max:g}); the Dark Number is undefined (-1). "                  # 300v
                     "The pipeline is ill-suited to this problem.")
             corr, corr_source = bounded, bounded_source
             # 300n: c above the warning level: the model learns some of the

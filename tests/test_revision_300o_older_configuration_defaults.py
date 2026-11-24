@@ -43,7 +43,7 @@ def test_an_older_configuration_shows_the_defaults_and_saves(tmp_path):
                     & (repository._revisions.c.version == row["version"])).values(
                     settings_json=json.dumps(settings)))
         page = client.get(f"/ui/configuration?configuration={configuration}").text
-        assert 'name="f:mode.dark_number_c_max" value="10.0"' in page
+        assert 'name="f:mode.dark_number_c_max" value="20.0"' in page            # 300v
         assert 'name="f:mode.dark_number_flip_repeats" value="2"' in page
         current = service.get(OWNER, project, configuration)
         schema = configuration_schema("csv", translator("sv"), _server_template())
@@ -55,4 +55,4 @@ def test_an_older_configuration_shows_the_defaults_and_saves(tmp_path):
                             follow_redirects=False)
         assert saved.status_code == 303 and "message=saved" in saved.headers["location"]
         stored = service.get(OWNER, project, configuration)["settings"]["mode"]
-        assert stored["dark_number_flip_repeats"] == 5 and stored["dark_number_c_max"] == 10.0
+        assert stored["dark_number_flip_repeats"] == 5 and stored["dark_number_c_max"] == 20.0

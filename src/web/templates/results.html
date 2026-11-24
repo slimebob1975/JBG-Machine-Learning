@@ -192,7 +192,7 @@
           {% if interval.points | selectattr("oof_quality", "equalto", "uncertain") | list %}<p class="message warn">{{ _("The correction factor c is uncertain (a wide interval) for this target class. Its interval is shown in the calculation table.") }}</p>{% endif %}
           {% if interval.points | selectattr("capped") | list %}<p class="message warn">{{ _("At least one estimate exceeded 100 % and is shown as 100 %: the estimate has broken down for this target class.") }}</p>{% endif %}
           {% if interval.points | selectattr("memorises") | list %}<p class="message warn">{{ _("The model learns some of the deliberately wrong labels by heart: c is above the warning level set in the configuration, or the model fits its training rows clearly better than rows it has not seen. c corrects for this, but with uncertainty.") }}</p>{% endif %}
-          {% if interval.points | selectattr("reason", "equalto", "undefined correction") | list %}<p class="hint">{{ _("The correction factor c must lie between 1 and the upper bound set in the configuration (10 by default). Otherwise the Dark Number is undefined.") }}</p>{% endif %}
+          {% if interval.points | selectattr("reason", "equalto", "undefined correction") | list %}<p class="hint">{{ _("The correction factor c must lie between 1 and the upper bound set in the configuration (20 by default). Otherwise the Dark Number is undefined.") }}</p>{% endif %}
           {% if interval.points | selectattr("source", "equalto", "not_needed_zero_fp") | list %}<p class="hint">{{ _("No false positives were observed, so no correction was needed.") }}</p>{% endif %}
         {% else %}
           <p class="hint">{{ _("No summary could be made from the calculations.") }}</p>

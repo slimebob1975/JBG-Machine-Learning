@@ -157,6 +157,8 @@ case (`DarkNumberCalculator.METHOD_VERSION = "1.1"`):
 - `c` must satisfy `1 ≤ c ≤ c_max` with `c_max = 10`, that is the model must
   recover at least 10 % of the flipped rows (a recovery below that cannot be
   told from chance in an unstable setting). Otherwise `c = −1` and `D = −1`.
+  (300v: the default upper bound is 20, see "Settings and the overtraining
+  warning" below.)
 - If `c` cannot be estimated (it was silently 1.0, "fallback/unestimable"),
   `c = −1` and `D = −1`: the pipeline is ill-suited to the problem.
 - With `FP = 0` and rows outside the target, `D = 0` whatever `c` is.
@@ -366,7 +368,14 @@ study the three estimates on all data passed in 7–8 of 52 cells instead of
 
 The flip test's repeats (default 2, 1–10), the upper bound for `c` (default
 10) and the warning level for overtraining (default 2) are configuration
-settings, stored with each result. The warning is given when `c` is above the
+settings, stored with each result.
+
+Changed 2026-11-24 (300v, the user's decision): the defaults are 20 for the
+upper bound and 10 for the warning level. 10 and 2 proved too limiting in
+daily use. Under JBG 1.3 (`c = mean(r_unseen) / mean(r_in)`) an upper bound
+of 20 means the model must recognise at least one twentieth as large a share
+of its relabelled training rows as of the target rows it has not seen.
+Configurations keep the values they were saved with. The warning is given when `c` is above the
 level: the model learns some of the deliberately wrong labels by heart for
 the target class. It replaces the overall-fit rule as the main signal (that
 rule stays as a second trigger), since overall accuracy is dominated by the

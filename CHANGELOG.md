@@ -1,3 +1,23 @@
+## Revision 300v - Default limits for c: upper bound 20, warning level 10 (2026-11-24)
+
+- Asked 2026-11-24: the default upper bound for `c` (beyond it the Dark Number
+  is undefined) is 20, and the default warning level for overtraining is 10.
+  10 and 2 were too limiting in daily use. Changed in `Config.Mode`,
+  `Config.LATER_KEYS` (so older configurations without the settings get the new
+  defaults, as in 300o), the loading of older saved models, and the engine's
+  fallbacks (`DarkNumberCalculator.CORRECTION_MAX`, `JBGDarkNumberOutOfFold`,
+  the handler and the result record).
+- Configurations keep the values they were saved with. To use the new limits in
+  an existing configuration, set them in its Mörkertal section and save.
+- An upper bound below 10 needs a warning level at or below it too, as before
+  (validation refuses a warning level above the bound).
+- The log's warning for an unusable `c` named the default bound (10), not the
+  configured one. It names the configured bound now.
+- Texts: the two Dark Numbers texts on the Results tab, both user guides, and a
+  dated note in `docs/dark_numbers/DN-01_method_contract.md`.
+- Tests: `tests/test_revision_300v_c_limits.py`. The tests of 299o, 300n and 300o
+  that pinned the old defaults use the new ones.
+
 ## Revision 300u - Tested versions; c's upper bound when resamples are infinite (2026-11-24)
 
 - Tested versions (agreed 2026-11-24: a constraints file and a document):

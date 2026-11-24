@@ -28,14 +28,15 @@ def _all_branches(predicted, corr):
 
 def test_the_method_version_and_bounds():
     assert Calc.METHOD_VERSION == "1.3"                     # 300l: c = c_in / c_unseen
-    assert (Calc.UNDEFINED, Calc.CORRECTION_MIN, Calc.CORRECTION_MAX) == (-1.0, 1.0, 10.0)
+    # 300v: the default upper bound is 20 (was 10).
+    assert (Calc.UNDEFINED, Calc.CORRECTION_MIN, Calc.CORRECTION_MAX) == (-1.0, 1.0, 20.0)
 
 
 @pytest.mark.parametrize("corr, source, expected", [
     (1.0, "direct", (1.0, "direct")),
-    (10.0, "direct", (10.0, "direct")),
+    (20.0, "direct", (20.0, "direct")),                                 # 300v
     (2.5, "regressed_same_model", (2.5, "regressed_same_model")),
-    (10.5, "direct", (-1.0, "undefined/out_of_bounds (direct)")),
+    (20.5, "direct", (-1.0, "undefined/out_of_bounds (direct)")),       # 300v
     (0.5, "direct", (-1.0, "undefined/out_of_bounds (direct)")),
     (math.inf, "direct", (-1.0, "undefined/out_of_bounds (direct)")),
     (math.nan, "direct", (-1.0, "undefined/out_of_bounds (direct)")),

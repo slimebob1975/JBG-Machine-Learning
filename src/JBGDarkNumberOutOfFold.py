@@ -28,7 +28,7 @@ import math
 import numpy as np
 
 RELIABLE_HALFWIDTH = 0.25      # reliable when the 90 % interval is within +/-25 %
-CORRECTION_MIN, CORRECTION_MAX = 1.0, 10.0
+CORRECTION_MIN, CORRECTION_MAX = 1.0, 20.0                # 300v: was 10
 _T90 = {1: 6.314, 2: 2.920, 3: 2.353, 4: 2.132, 5: 2.015, 6: 1.943, 7: 1.895, 8: 1.860,
         9: 1.833, 10: 1.812, 11: 1.796, 12: 1.782, 13: 1.771, 14: 1.761, 15: 1.753}
 

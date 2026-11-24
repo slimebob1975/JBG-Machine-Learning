@@ -21,7 +21,7 @@ class DarkNumberCalculator:
     CAP = 1.0
     UNDEFINED = -1.0
     CORRECTION_MIN = 1.0
-    CORRECTION_MAX = 10.0
+    CORRECTION_MAX = 20.0          # 300v: the default upper bound for c (was 10)
     # 299q/299q2, JBG v1.1 (DN-01 F4, settled 2026-11-16): a correction model is
     # taken to memorise its training rows (c may then be overestimated; a
     # warning, D is unchanged) when its fit to them in the flip test is at least

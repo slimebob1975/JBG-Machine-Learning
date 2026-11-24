@@ -284,12 +284,12 @@ förväxlingsmatriserna.
 En skattning kan vara **Odefinierad**. Det händer när den del av data som den
 görs på saknar rader av målklassen eller av de övriga klasserna, eller när
 korrektionsfaktorn c inte kunde skattas eller ligger utanför intervallet från
-1 till den övre gränsen i konfigurationen (10 som standard). Det betyder att
+1 till den övre gränsen i konfigurationen (20 som standard). Det betyder att
 pipelinen eller datasetet inte passar för att skatta mörkertal för den
 målklassen.
 
 En varning visas när modellen lär sig en del av de avsiktligt felaktiga
-etiketterna utantill: c är över varningsnivån i konfigurationen (2 som
+etiketterna utantill: c är över varningsnivån i konfigurationen (10 som
 standard), eller så passar modellen sina träningsrader tydligt bättre än
 rader den inte sett. c korrigerar för det, men med osäkerhet, och en pipeline
 som lär sig mindre utantill ger ett mer tillförlitligt mörkertal.
@@ -358,11 +358,11 @@ ordning mellan dem.
 **Odefinierade skattningar.** En skattning är odefinierad när den del av
 data som den görs på saknar rader av T eller av de övriga klasserna, eller
 när `c` inte kunde skattas eller ligger utanför intervallet från 1 till den
-övre gränsen (10 som standard). Det betyder att pipelinen eller datasetet inte
+övre gränsen (20 som standard). Det betyder att pipelinen eller datasetet inte
 passar problemet för den målklassen. Utan falska positiva är mörkertalet 0
 oavsett `c`.
 
-**Varningar.** När `c` är över varningsnivån (2 som standard) lär sig
+**Varningar.** När `c` är över varningsnivån (10 som standard) lär sig
 modellen en del av de avsiktligt felaktiga etiketterna utantill. `c`
 korrigerar för det, med osäkerhet. Beräkningstabellen anger det för varje
 skattning.
@@ -371,7 +371,7 @@ skattning.
 ommärkningsandelen och samplingen, upprepningarna i ommärkningstestet (2 som
 standard, varje upprepning ger 4 modellanpassningar till och smalnar av
 intervallet för `c`, användbart med en sällsynt målklass), den övre gränsen
-för `c` (10) och varningsnivån (2). Värdena som användes visas med ekvationen
+för `c` (20) och varningsnivån (10). Värdena som användes visas med ekvationen
 och sparas med resultatet.
 
 **Andra former.** Utan alfa använder D `(2 − TP_r)` utan vikter. Formerna med

@@ -23,7 +23,7 @@ def test_the_interval():
 def test_the_quality_states():
     assert summarise([0.5] * 8)["quality"] == "reliable"
     assert summarise([0.2, 0.9, 0.3, 0.8])["quality"] == "uncertain"
-    assert summarise([0.05] * 8)["quality"] == "not_estimable"          # c = 20
+    assert summarise([0.04] * 8)["quality"] == "not_estimable"          # c = 25 (300v: bound 20)
     assert summarise([])["quality"] == "not_estimable"
     assert summarise([0.5, None, 0.5])["repeats"] == 2
 

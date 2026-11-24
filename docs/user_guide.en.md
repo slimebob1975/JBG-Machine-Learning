@@ -282,11 +282,11 @@ calculations and the confusion matrices.
 An estimate can be **Undefined**. That happens when the part of the data it
 is made on lacks rows of the target class or of the other classes, or when
 the correction factor c could not be estimated or lies outside 1 to the upper
-bound set in the configuration (10 by default). It means that the pipeline or
+bound set in the configuration (20 by default). It means that the pipeline or
 the dataset is ill-suited to estimating Dark Numbers for that target class.
 
 A warning says when the model learns some of the deliberately wrong labels by
-heart: c is above the warning level set in the configuration (2 by default),
+heart: c is above the warning level set in the configuration (10 by default),
 or the model fits its training rows clearly better than rows it has not seen.
 c corrects for this, but with uncertainty, and a pipeline that learns less by
 heart gives a more reliable Dark Number.
@@ -355,18 +355,18 @@ expected order between them.
 
 **Undefined estimates.** An estimate is undefined when the part of the data
 it is made on lacks rows of T or of the other classes, or when `c` could not
-be estimated or lies outside 1 to the upper bound (10 by default). That means
+be estimated or lies outside 1 to the upper bound (20 by default). That means
 the pipeline or the dataset is ill-suited to the problem for that target
 class. With no false positives the Dark Number is 0 whatever `c` is.
 
-**Warnings.** When `c` is above the warning level (2 by default), the model
+**Warnings.** When `c` is above the warning level (10 by default), the model
 learns some of the deliberately wrong labels by heart; `c` corrects for it,
 with uncertainty. The calculation table says so for each estimate.
 
 **Settings.** The configuration's Dark Numbers section sets, besides the
 flip fraction and the sampling, the repeats in the flip test (2 by default;
 each adds 4 model fits and narrows `c`'s interval, useful with a rare target
-class), the upper bound for `c` (10) and the warning level (2). The values
+class), the upper bound for `c` (20) and the warning level (10). The values
 used are shown with the equation and stored with the result.
 
 **Other forms.** Without alpha, D uses `(2 − TP_r)` without weights. The
