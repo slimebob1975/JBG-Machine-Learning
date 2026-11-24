@@ -20,12 +20,17 @@
                            "feature_importance": _("Feature importance steps"),
                            "shadow_fits": _("Dark number fits"),
                            "feature_subsets": _("Feature subsets evaluated"),
-                           "correction_folds": _("Correction factor: folds done")} %}
+                           "correction_folds": _("Correction factor: folds done"),
+                           "final_fit": _("Final training of the chosen pipeline"),
+                           "grid_search": _("Parameter search for the chosen pipeline, estimated time")} %}
     {% set inner_percent = ((inner.done / inner.total * 100) | round | int) if inner else 0 %}
+    {# 300s: the parameter search counts seconds, shown as minutes against the estimate. #}
+    {% macro minutes(seconds) %}{{ _("under 1 min") if seconds < 60 else ((seconds / 60) | round | int) ~ " min" }}{% endmacro %}
     <div class="inner-progress" data-run-inner data-inner-labels="{{ inner_labels | tojson | forceescape }}"
-         data-inner-of="{{ _('of') }}"{% if not inner %} hidden{% endif %}>
+         data-inner-of="{{ _('of') }}" data-inner-timed="grid_search" data-inner-about="{{ _('about') }}"
+         data-inner-under-minute="{{ _('under 1 min') }}"{% if not inner %} hidden{% endif %}>
       <p class="hint"><span data-inner-label>{{ inner_labels.get(inner.kind, "") if inner }}</span>:
-        <span data-inner-count>{% if inner %}{{ inner.done }} {{ _("of") }} {{ inner.total }}{% endif %}</span></p>
+        <span data-inner-count>{% if inner and inner.kind == "grid_search" %}{{ minutes(inner.done) }} {{ _("of") }} {{ _("about") }} {{ minutes(inner.total) }}{% elif inner %}{{ inner.done }} {{ _("of") }} {{ inner.total }}{% endif %}</span></p>
       <div class="progress thin" role="progressbar" aria-valuemin="0" aria-valuemax="100"
            aria-valuenow="{{ inner_percent }}" data-inner-meter>
         <div class="bar" data-inner-bar style="width: {{ inner_percent }}%"></div>

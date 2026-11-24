@@ -539,6 +539,7 @@ The map above is the target. What exists after revision 285m3:
 | `/ui/configuration`, `/ui/results` | 300p | Versions from 0; the newest configuration first; the dataset in the Results list; Dark Number matrices one per estimate |
 | (BACKLOG) | 300q | The BACKLOG lists open work only, checked against the code; the 300p BACKLOG kept in `docs/backlog_archive_300p.md` |
 | `/ui/configuration`, `/ui/dataset`, `PATCH .../configurations/{id}`, `PATCH .../datasets/{id}` | 300r | Renaming configurations (no new version) and datasets; runs, the model card, the Overview and the delete pages show the configuration's current name |
+| `/ui/run`, `/ui/dataset` | 300s | The final training of the winning pipeline has its own bar, timed against the grid search's estimate; a new dataset's name starts as the file's or table's name |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

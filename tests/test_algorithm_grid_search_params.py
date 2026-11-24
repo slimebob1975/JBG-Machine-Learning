@@ -273,8 +273,18 @@ def test_qda_spot_check_starts_with_regularization_for_rank_deficient_covariance
     ])
     y = np.array([0, 0, 0, 0, 1, 1, 1, 1])
 
-    with pytest.warns(LinAlgWarning, match="not full rank"):
-        QuadraticDiscriminantAnalysis().fit(X, y)
+    # Unregularised QDA warns about this (scikit-learn before 1.9) or refuses it
+    # (1.9 and later; 300s, found 2026-11-23). Either way regularisation is needed.
+    import warnings
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        try:
+            QuadraticDiscriminantAnalysis().fit(X, y)
+        except np.linalg.LinAlgError as error:
+            assert "not full rank" in str(error)
+        else:
+            assert any(issubclass(w.category, LinAlgWarning) and "not full rank" in str(w.message)
+                       for w in caught)
 
     estimator = Algorithm.QDA.call_algorithm(max_iterations=200, size=len(X))
     configured_reg_params = AlgorithmGridSearchParams.QDA.parameters["reg_param"]

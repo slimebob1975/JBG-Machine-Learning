@@ -878,9 +878,15 @@ class ScoreMetric(MetaEnum):
             return self.callable
         
         else:
-
-            if self.kwargs:
-                return make_scorer(self.callable, **(self.kwargs))
+            kwargs = dict(self.kwargs or {})
+            if self.callable in (precision_score, recall_score):
+                # 300s (found 2026-11-23): averaged precision and recall need no
+                # positive class, and scikit-learn 1.9 refuses its default (1) for
+                # text classes. Set here, not in the values: they identify the
+                # members when stored models and configurations are loaded.
+                kwargs.setdefault("pos_label", None)
+            if kwargs:
+                return make_scorer(self.callable, **kwargs)
             else:
                 return make_scorer(self.callable)
         

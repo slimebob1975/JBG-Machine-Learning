@@ -66,8 +66,16 @@
     if (!ok) { box.hidden = true; return; }
     var percent = Math.round(Math.min(Math.max(inner.done / inner.total, 0), 1) * 100);
     box.querySelector("[data-inner-label]").textContent = labels[inner.kind];
-    box.querySelector("[data-inner-count]").textContent =
-      inner.done + " " + (box.getAttribute("data-inner-of") || "/") + " " + inner.total;
+    var of = box.getAttribute("data-inner-of") || "/";
+    if (inner.kind === box.getAttribute("data-inner-timed")) {
+      /* 300s: seconds elapsed of the estimated seconds, as minutes. */
+      var under = box.getAttribute("data-inner-under-minute") || "< 1 min";
+      var minutes = function (s) { return s < 60 ? under : Math.round(s / 60) + " min"; };
+      box.querySelector("[data-inner-count]").textContent = minutes(inner.done) + " " + of +
+        " " + (box.getAttribute("data-inner-about") || "") + " " + minutes(inner.total);
+    } else {
+      box.querySelector("[data-inner-count]").textContent = inner.done + " " + of + " " + inner.total;
+    }
     box.querySelector("[data-inner-bar]").style.width = percent + "%";
     box.querySelector("[data-inner-meter]").setAttribute("aria-valuenow", String(percent));
     box.hidden = false;
@@ -346,6 +354,29 @@
     if (window.ResizeObserver) { new ResizeObserver(update).observe(document.body); }
   }
 
+  /* 300s (asked 2026-11-23): a new dataset's name starts as its file's or
+     table's name, without ".csv" or the schema, and can be edited. It follows
+     the chosen file or table until the user types a name of their own. */
+  function wireDefaultName(input) {
+    var source = document.querySelector(input.getAttribute("data-name-from"));
+    if (!source) { return; }
+    var filled = input.value;
+    function suggestion() {
+      if (source.type === "file") {
+        var file = source.files && source.files[0];
+        return file ? file.name.replace(/\.csv$/i, "") : "";
+      }
+      var value = source.value || "";
+      return value.slice(value.lastIndexOf(".") + 1);
+    }
+    source.addEventListener("change", function () {
+      if (input.value !== "" && input.value !== filled) { return; }
+      filled = suggestion().slice(0, 200);
+      input.value = filled;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".scroll").forEach(addTopScrollbar);
     document.querySelectorAll("[data-all-group]").forEach(wireAllGroup);
@@ -357,6 +388,7 @@
     document.querySelectorAll("select[data-class-choice]").forEach(wireClassChoice);
     wireSectionLinks();
     document.querySelectorAll("[data-top-actions]").forEach(wireTopActions);
+    document.querySelectorAll("input[data-name-from]").forEach(wireDefaultName);   /* 300s */
     document.querySelectorAll("button[data-wait]").forEach(wireWaiting);
   });
 })();

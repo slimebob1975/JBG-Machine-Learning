@@ -1,3 +1,36 @@
+## Revision 300s - The final training on the Run tab, default dataset names, Precision and Recall with text classes (2026-11-23)
+
+- Asked 2026-11-23: during the final training of the winning pipeline the Run
+  tab showed nothing new: the spot check's bar ("Algoritmkombinationer") stayed
+  full in the same stage, and the engine's grid search estimate was only a log
+  message. The worker now records a bar of its own for the final training:
+  - "Slutträning av vald pipeline" (0 of 1, then 1 of 1) for an ordinary fit,
+    or a grid search without an estimate;
+  - "Parametersökning för vald pipeline, uppskattad tid" for a grid search
+    with an estimate (agreed 2026-11-23): it moves with the time against the
+    estimate, shown as minutes ("2 min av cirka 4 min"), and waits at 95 %
+    until the search is done. Past the estimate, the estimate grows.
+  GridSearchCV's fits cannot be counted from the worker (they run as one call,
+  often in other processes), so the bar is timed. It is recorded every five
+  seconds from a thread, as the heartbeat is. The engine calls the worker only
+  when its logger offers it, so the Voilà interface is unchanged.
+- Asked 2026-11-23: a new dataset's name starts as the chosen file's name
+  without ".csv", or the chosen table's name without the schema
+  ("dbo.Ärenden" gives "Ärenden"). It can be edited, and it follows the
+  choice of file or table until the user types a name of their own. The SQL
+  form gets the first table's name from the server, so it works before any
+  choice is made.
+- Precision and Recall (micro, macro, weighted) failed with scikit-learn 1.9
+  on text classes such as "Korrekt" and "Inkorrekt" (found 2026-11-23): the
+  scorers now pass no positive class, as F1 already did. The stored values of
+  the metric choices are unchanged, so older models and configurations load as
+  before. Average Precision is left in the BACKLOG: it needs probabilities.
+- The QDA test accepts both scikit-learn behaviours for a rank-deficient
+  covariance (a warning before 1.9, an error from 1.9).
+- `.coverage` is no longer tracked, and `.gitignore` keeps coverage data out.
+- User guides: the Dataset and Training sections.
+- Tests: `tests/test_revision_300s_final_fit_progress.py`.
+
 ## Revision 300r - Renaming datasets and configurations (2026-11-23)
 
 - Asked 2026-11-23: a configuration or a dataset can get a new name, so a

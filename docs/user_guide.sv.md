@@ -73,6 +73,10 @@ Prediktion eller Blandad.
   tabell, ange namn och välj **Registrera**. Inloggningen finns bara i
   serverns minne, så efter en omstart av servern loggar du in igen.
 
+Namnet fylls i med filens namn utan ”.csv” eller tabellens namn utan schema.
+Det kan ändras, och det följer valet av fil eller tabell tills du skriver ett
+eget namn.
+
 Välj **Aktivera för träning** på det dataset som modellen ska tränas på.
 Ett tränings- eller blandat dataset kan byta till den andra rollen med **Byt
 roll till …**. Kolumnrollerna och valideringen behålls. Träningen använder
@@ -231,9 +235,12 @@ variabler, och MCC med dem och med alla variabler.
 
 Förloppet uppdateras av sig självt. När modellerna tränas och jämförs visar
 en tunnare stapel hur många algoritmkombinationer som är klara, till exempel
-”12 av 40”. Körningen fortsätter även om du stänger
-webbläsaren och kan avbrytas med **Avbryt körningen**. **Visa logg** visar
-körningens logg.
+”12 av 40”. Sedan visar den slutträningen av den vinnande pipelinen. Med
+parametersökning rör sig stapeln med tiden mot en uppskattning, till exempel
+”2 min av cirka 4 min”, och väntar strax före slutet tills sökningen är klar.
+Uppskattningen ökar om sökningen tar längre tid. Körningen fortsätter även om
+du stänger webbläsaren och kan avbrytas med **Avbryt körningen**. **Visa
+logg** visar körningens logg.
 
 **Avbryt körningen** ber körningen att stanna: den stannar efter steget den
 arbetar med, till exempel algoritmkombinationen som prövas. Ett långt steg

@@ -2512,3 +2512,16 @@ msgstr "Byt namn på datasetet"
 
 msgid "Only the name changes. Runs show the new name."
 msgstr "Bara namnet ändras. Körningarna visar det nya namnet."
+
+# 300s: the final training of the chosen pipeline on the Run tab.
+msgid "Final training of the chosen pipeline"
+msgstr "Slutträning av vald pipeline"
+
+msgid "Parameter search for the chosen pipeline, estimated time"
+msgstr "Parametersökning för vald pipeline, uppskattad tid"
+
+msgid "about"
+msgstr "cirka"
+
+msgid "under 1 min"
+msgstr "under 1 min"

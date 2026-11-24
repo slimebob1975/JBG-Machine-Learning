@@ -74,6 +74,10 @@ Prediction or Mixed.
   table, enter a name and choose **Register**. The sign-in is kept only in
   the server's memory; after a server restart, sign in again.
 
+The name is filled in with the file's name without ".csv", or the table's name
+without the schema. It can be changed, and it follows the chosen file or table
+until you type a name of your own.
+
 Choose **Activate for training** on the dataset the model is to be trained
 on. A training or mixed dataset can switch to the other role with **Change
 role to …**; its column roles and validation are kept. Training uses only
@@ -230,8 +234,11 @@ every variable.
 
 The progress updates itself. While the models are trained and compared, a
 thinner bar shows how many algorithm combinations are done, for example
-"12 of 40". The run continues even if you close the
-browser, and it can be stopped with **Cancel the run**. **Show log** shows
+"12 of 40". Then it shows the final training of the winning pipeline. With
+a parameter search the bar moves with the time against an estimate, for example
+"2 min of about 4 min", and waits just before the end until the search is done.
+The estimate grows if the search takes longer. The run continues even if you
+close the browser, and it can be stopped with **Cancel the run**. **Show log** shows
 the run's log.
 
 **Cancel the run** asks the run to stop: it stops after the step it is

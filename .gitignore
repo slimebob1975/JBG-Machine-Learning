@@ -42,3 +42,7 @@ output/models/
 
 # Per-run result folders of API project runs (295a; class names and row values)
 output/runs/
+
+# 300s: coverage data is local, never committed.
+.coverage
+.coverage.*

@@ -1181,6 +1181,10 @@ class ModelHandler:
             estimate = self._report_grid_search_estimate(
                 n_param_combos, n_splits, search.n_jobs, history=history, timing_key=timing_key,
             )
+            # 300s: the web worker's final-training bar moves against the estimate.
+            if getattr(self.handler.logger, "reports_final_fit", False) is True:
+                self.handler.logger.begin_final_fit(
+                    getattr(estimate, "seconds", None) if estimate is not None else None)
             estimator_X = prepare_model_input(X, model)
             started = time.perf_counter()
             try:

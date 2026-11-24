@@ -197,7 +197,9 @@ def test_a_store_failure_never_stops_the_run(tmp_path, capsys):
 
 
 def test_every_engine_description_maps_to_a_known_kind():
-    assert set(INNER_PROGRESS.values()) == INNER_KINDS
+    # 300s: plus the final-training kinds, which the worker records itself.
+    from JBGRunOverview import FINAL_FIT_KINDS
+    assert set(INNER_PROGRESS.values()) | FINAL_FIT_KINDS == INNER_KINDS
 
 
 # --- The live view -------------------------------------------------------------------------------
@@ -322,12 +324,15 @@ class InnerProgressNative297a(revision_281c.CSVApplicationEndToEnd281c):
             self.assertTrue(all(0 <= inner["done"] <= 9 for inner in models))
             done = [inner["done"] for inner in models]
             self.assertEqual(done, sorted(done))                             # never backwards
-            # 297c: the finished spot check is left full; later stages hide it, and a
-            # finished run shows no inner progress.
+            # 297c: the finished bar is left full; later stages hide it, and a
+            # finished run shows no inner progress. 300s: the final training's bar
+            # follows the spot check's in the same stage and replaces it.
             events = client.app.state.jbg["store"].progress(RunReference(run_id))
-            self.assertEqual([e.message for e in events
-                              if (e.message or "").startswith("jbg_inner:")],
-                             ["jbg_inner:models:9:9"])
+            inner = [e.message for e in events if (e.message or "").startswith("jbg_inner:")]
+            self.assertEqual(len(inner), 1, inner)
+            kind, done, total = inner[0][len("jbg_inner:"):].split(":")
+            self.assertIn(kind, {"final_fit", "grid_search"})
+            self.assertEqual(done, total)
             overview = client.get(f"/api/runs/{run_id}/overview").json()
             self.assertNotIn("inner", overview["stage"])
             _wait_for_workers_to_exit(client)

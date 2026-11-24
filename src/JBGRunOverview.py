@@ -27,7 +27,11 @@ INNER_PROGRESS = {
     "Feature subsets": "feature_subsets",       # 299i: a feature investigation
     "Correction-factor folds": "correction_folds",  # 300g: the Dark Number flip test
 }
-INNER_KINDS = frozenset(INNER_PROGRESS.values())
+# 300s: the final training of the chosen pipeline, recorded by the worker itself
+# (not through an engine bar): an ordinary fit as 0 or 1 of 1, a grid search as
+# seconds elapsed of the estimated seconds.
+FINAL_FIT_KINDS = frozenset({"final_fit", "grid_search"})
+INNER_KINDS = frozenset(INNER_PROGRESS.values()) | FINAL_FIT_KINDS
 
 
 def _inner(events) -> dict[str, Any] | None:

@@ -59,7 +59,7 @@
         <input id="csv-file" type="file" name="file" accept=".csv,text/csv" required>
         <p class="hint">{{ _("At most 25 MB, with a header row. The delimiter is detected automatically.") }}</p>
         <label for="csv-name">{{ _("Name") }}</label>
-        <input id="csv-name" name="name" required maxlength="200">
+        <input id="csv-name" name="name" required maxlength="200" data-name-from="#csv-file">
         <label for="csv-role">{{ _("Role") }}</label>
         <select id="csv-role" name="role">
           {% for value, label in role_labels.items() %}<option value="{{ value }}">{{ _(label) }}</option>{% endfor %}
@@ -118,7 +118,9 @@
             </select>
             {% if table_choice.filtered %}<p class="hint">{{ _("Only tables compatible with the training dataset are shown.") }}</p>{% endif %}
             <label for="sql-name">{{ _("Name") }}</label>
-            <input id="sql-name" name="name" required maxlength="200">
+            {# 300s: the first table's name, followed by the choice (jbg.js). #}
+            <input id="sql-name" name="name" required maxlength="200" data-name-from="#sql-table"
+              value="{{ table_choice.tables[0].split('.')[-1][:200] }}">
             <button class="btn act ready" data-wait="fields" data-wait-fields="#sql-name"
               data-wait-reason="{{ _('Enter a name first.') }}">{{ _("Register") }}</button>
           </form>

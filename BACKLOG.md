@@ -16,6 +16,12 @@ decision.
 ### Now: stabilisation
 
 - [ ] Bugs reported in use: added here as they are found.
+- [x] 300s (asked 2026-11-23): the Run tab showed nothing during the final
+  training of the winning pipeline (the spot check's bar stayed full). It now
+  has a bar of its own, moving with the time against the grid search's
+  estimate.
+- [x] 300s (asked 2026-11-23): a new dataset's name starts as the file's or
+  table's name.
 - [ ] The gate count (found 2026-11-23): the full gate after 300p was expected
   to run 1381 tests, a container run of the same code counted 1379. The
   application layer (140 files, 1140 tests) and the native group (21) agree,
@@ -26,13 +32,16 @@ decision.
   record the tested versions of Python, scikit-learn, NumPy, pandas and
   imbalanced-learn, and of TensorFlow, Keras, SciKeras and PyTorch where used,
   and keep a reproducible Windows setup. `requirements.txt` pins none of them
-  today. Found 2026-11-23: with scikit-learn 1.9, unregularised QDA raises on a
-  rank-deficient covariance instead of warning, so
-  `test_qda_spot_check_starts_with_regularization_for_rank_deficient_covariance`
-  fails although the engine is right (it starts QDA regularised). The test
-  should accept both behaviours.
-- [ ] Repository housekeeping (from the rename, 2026-11-20): remove the
-  tracked `.coverage` file and add it to `.gitignore`. Decide whether "JBG
+  today. (The QDA test that failed with scikit-learn 1.9 accepts both
+  behaviours since 300s.)
+- [x] 300s: Precision and Recall (micro, macro, weighted) failed on text
+  classes with scikit-learn 1.9 (found 2026-11-23).
+- [ ] Average Precision (micro, macro, weighted) fails on text classes too,
+  and scores hard predictions, where it needs probabilities (found
+  2026-11-23). Make it score `predict_proba` with the target class as the
+  positive one, or take it out of the list.
+- [x] 300s: `.coverage` is no longer tracked, and `.gitignore` keeps it out.
+- [ ] After the rename (2026-11-20): decide whether "JBG
   Machine Learning" becomes the product name in the README, the masthead and
   the title of this file, and whether a separate production repository is
   renamed too.

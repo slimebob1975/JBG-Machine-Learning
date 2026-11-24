@@ -114,6 +114,8 @@ class StoreProgressLogger:
         self.evaluation = None
         self.feature_importance = None
         self._inner = {}     # 297a: key -> [kind, total, recorded done, recorded at, latest done]
+        self._final_fit = None          # 300s: (kind, total) of the final-training bar
+        self._final_fit_timer = None    # 300s: (stop event, thread) of the timed bar
         # 299g: set here, never looked up through __getattr__ (the engine logger).
         self._checked_at = float("-inf")
         # 299k: counted for the Overview (no engine change): the rows of the
@@ -199,6 +201,59 @@ class StoreProgressLogger:
             kind, total, _recorded_done, _recorded_at, latest = bar
             self._record_inner(kind, total if set_100 else latest, total)
         return result
+
+    # --- 300s: the final training of the chosen pipeline -------------------------------
+
+    reports_final_fit = True        # the engine checks this before calling the two below
+    FINAL_FIT_INTERVAL = 5.0        # seconds between recorded steps of the timed bar
+    FINAL_FIT_CAP = 0.95            # the timed bar waits here until the search is done
+
+    def begin_final_fit(self, estimated_seconds=None) -> None:
+        """The spot check's bar is followed by one for the final training (asked
+        2026-11-23: it showed nothing). Without an estimate (an ordinary fit, or a
+        grid search the engine could not estimate) it is 0 of 1 until done. With
+        one it moves with the time against the estimate (agreed 2026-11-23),
+        since GridSearchCV's fits cannot be counted from here. Past the
+        estimate, the estimate grows so the bar stays below full."""
+        self._stop_final_fit_timer()
+        try:
+            seconds = float(estimated_seconds) if estimated_seconds is not None else 0.0
+        except (TypeError, ValueError, OverflowError):
+            seconds = 0.0
+        if not (seconds == seconds and 1.0 <= seconds < 1e7):
+            self._final_fit = ("final_fit", 1)
+            self._record_inner("final_fit", 0, 1)
+            self._inner_checkpoint()
+            return
+        estimate = max(1, int(round(seconds)))
+        self._final_fit = ("grid_search", estimate)
+        self._record_inner("grid_search", 0, estimate)
+        stop, started = threading.Event(), time.monotonic()
+
+        def tick():
+            while not stop.wait(self.FINAL_FIT_INTERVAL):
+                elapsed = int(time.monotonic() - started)
+                total = max(estimate, int(elapsed / self.FINAL_FIT_CAP) + 1)
+                self._final_fit = ("grid_search", total)
+                self._record_inner("grid_search", min(elapsed, int(total * self.FINAL_FIT_CAP)),
+                                   total)
+        thread = threading.Thread(target=tick, name="jbg-final-fit-progress", daemon=True)
+        self._final_fit_timer = (stop, thread)
+        thread.start()
+        self._inner_checkpoint()
+
+    def end_final_fit(self) -> None:
+        """The final-training bar full; it stays until the next stage hides it."""
+        self._stop_final_fit_timer()
+        state, self._final_fit = self._final_fit, None
+        if state is not None:
+            self._record_inner(state[0], state[1], state[1])
+
+    def _stop_final_fit_timer(self) -> None:
+        timer, self._final_fit_timer = self._final_fit_timer, None
+        if timer is not None:
+            timer[0].set()
+            timer[1].join(5)
 
     _dataset_rows_seen = False
 

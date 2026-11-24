@@ -18,6 +18,23 @@ def fit_selected_model(context: Any, model: Any, dh: Any, k: int, cross_validati
     model_name = model.get_name()
     alg_name = model_name.split('-')[-1]
     t0 = time.time()
+    # 300s: the web worker shows the final training as a bar of its own.
+    logger = context.handler.logger
+    tracked = getattr(logger, "reports_final_fit", False) is True
+    if tracked:
+        logger.begin_final_fit(None)
+    try:
+        _fit(context, model, dh, k, cross_validation_filepath, model_name, alg_name)
+    finally:
+        if tracked:
+            logger.end_final_fit()
+    t1 = time.time()
+    context.handler.logger.print_info(f"Final training of model {alg_name} took {str(round(t1-t0,2))} secs.")
+    return model
+
+
+def _fit(context: Any, model: Any, dh: Any, k: int, cross_validation_filepath: str,
+         model_name: str, alg_name: str) -> None:
     if not model.algorithm.search_params.parameters:
         context.handler.logger.print_progress(f"Using ordinary fit for final training of model {model_name}...(consider adding grid search parameters)")
         model.pipeline = context.train_picked_model(model.pipeline, dh.X_train, dh.Y_train)
@@ -45,6 +62,3 @@ def fit_selected_model(context: Any, model: Any, dh: Any, k: int, cross_validati
             context.handler.logger.print_info(f"Grid search failed: {str(ex)}. Using ordinary fit as fallback for: {model_name}. " + \
                 f"You might need to adjust grid search parameters for pipeline: {str(model.pipeline)}")
             model.pipeline = context.train_picked_model(model.pipeline, dh.X_train, dh.Y_train)
-    t1 = time.time()
-    context.handler.logger.print_info(f"Final training of model {alg_name} took {str(round(t1-t0,2))} secs.")
-    return model
