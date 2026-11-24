@@ -321,8 +321,9 @@ målklass för sig, målklassen mot alla de övriga.
 - `c`: korrektionsfaktorn för överträning, från ommärkningstestet. En andel av
   T:s rader får avsiktligt en annan klass (20 % som standard, fördelat på de
   övriga klasserna efter deras storlek) och en kopia av modellen tränas, i 4
-  delar och 2 upprepningar på alla datorer. Varje kopia får frågor om två
-  sorters rader: de ommärkta rader den tränats på (den känner igen en andel
+  delar och 2 upprepningar (standard). Delarna är desamma på alla datorer,
+  oavsett antalet processorkärnor, så c blir detsamma. Varje kopia får
+  frågor om två sorters rader: de ommärkta rader den tränats på (den känner igen en andel
   `r_i` av dem som T) och T:s rader i den del den inte sett (en andel
   `r_osedd`). `c = r_osedd / r_i`, minst 1. En modell som lär sig felaktiga
   etiketter utantill känner igen mycket färre av raderna den tränats på, så
@@ -401,10 +402,10 @@ gränserna för c, regeln för memorering och slumpfrö). Körningar gjorda för
 version 1.2 saknar sådana uppgifter. Deras värden visas som de sparades, med
 en anmärkning.
 
-**Vad som kommer.** Version 2 mäter ommärkningstestets återfinnande på rader
-som modellen inte tränats på, ger `c` en osäkerhet och lägger till metoder
-som skattar den dolda andelen direkt med intervall. Planen finns i
-`docs/dark_numbers/` i repositoriet.
+**Vad som kommer.** Mätningen på rader som modellen inte tränats på och
+intervallet för `c`, som tidigare planerades till version 2, finns sedan 1.3
+(se c:s delar ovan). Kvar i planen är metoder som skattar den dolda andelen
+direkt, med intervall. Planen finns i `docs/dark_numbers/` i repositoriet.
 
 I **Felklassificeringar** för en SQL-körning kan du rätta klasser som är
 fel i källdata. Välj **Rätt klass** för raderna och sedan **Granska

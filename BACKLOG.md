@@ -22,6 +22,8 @@ decision.
   estimate.
 - [x] 300s (asked 2026-11-23): a new dataset's name starts as the file's or
   table's name.
+- [x] 300t (found 2026-11-24): two outdated or unclear passages in the
+  user guides' Dark Numbers section.
 - [ ] The gate count (found 2026-11-23): the full gate after 300p was expected
   to run 1381 tests, a container run of the same code counted 1379. The
   application layer (140 files, 1140 tests) and the native group (21) agree,

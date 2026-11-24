@@ -318,7 +318,9 @@ each target class, the target class against all the others.
 - `c`: the correction factor for overtraining, from the flip test. A share of
   T's rows is deliberately given another class (20 % by default, spread over
   the other classes by their size) and a copy of the model is trained, in 4
-  parts and 2 repeats on every computer. Each copy is asked about two kinds of
+  parts and 2 repeats (by default). The parts are the same on every computer,
+  whatever its number of processor cores, so c is the same. Each copy is
+  asked about two kinds of
   rows: the relabelled rows it was trained on (it recognises a share `r_in` of
   them as T) and T's rows in the part it has not seen (a share `r_unseen`).
   `c = r_unseen / r_in`, at least 1. A model that learns wrong labels by heart
@@ -394,10 +396,11 @@ the settings used (flip fraction, folds and repeats, the bounds on c, the
 memorisation rule, the random seed). Runs made before version 1.2 have no
 such record: their values are shown as they were saved, with a note.
 
-**What comes next.** Version 2 measures the flip test's recovery on rows the
-model has not been trained on, gives `c` an uncertainty, and adds methods that
-estimate the hidden share directly with intervals. The plan is in
-`docs/dark_numbers/` in the repository.
+**What comes next.** The measurement on rows the model has not been trained
+on and the interval for `c`, planned earlier for version 2, are in place since
+1.3 (see c's parts above). Still in the plan are methods that estimate the
+hidden share directly, with intervals. The plan is in `docs/dark_numbers/` in
+the repository.
 
 In **Mispredictions** of an SQL run you can correct classes that are wrong
 in the source data. Choose the **Right class** for the rows, then **Review

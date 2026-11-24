@@ -1,3 +1,18 @@
+## Revision 300t - Two corrections in the user guides (2026-11-24)
+
+- Found 2026-11-24 while building a presentation from the Om tab:
+  - "Vad som kommer" ("What comes next") still promised for version 2 the
+    measurement on rows the model has not been trained on and an uncertainty
+    for `c`. Both are in place since 1.3 (c's parts and its 90 % interval).
+    The paragraph now says so, and that methods estimating the hidden share
+    directly, with intervals, remain in the plan (DN-05 in the BACKLOG).
+  - "i 4 delar och 2 upprepningar på alla datorer" ("on every computer")
+    read as unclear. It means that since 299s the flip test's parts are the
+    same on every computer, whatever its number of cores, so `c` is the same.
+    The sentence says that now, and that 2 repeats is the default (a setting
+    since 300n).
+- Tests: `tests/test_revision_300t_guide_corrections.py`.
+
 ## Revision 300s - The final training on the Run tab, default dataset names, Precision and Recall with text classes (2026-11-23)
 
 - Asked 2026-11-23: during the final training of the winning pipeline the Run
