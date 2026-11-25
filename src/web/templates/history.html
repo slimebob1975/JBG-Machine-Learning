@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% set title = "Run History" %}
+{# 301c: every run of the project, the settings it used, two runs compared, and rerun. #}
+{% set kind_labels = dict(kinds) %}
+{% set status_labels = dict(statuses) %}
+
+{% macro badge(status) %}<span class="badge {{ 'b-ok' if status == 'succeeded' else ('b-fail' if status in ('failed', 'interrupted') else 'b-neu') }}">{{ _(status_labels.get(status, status)) }}</span>{% endmacro %}
+
+{% macro what(item) %}{% if item.dataset_name %}<b>{{ item.dataset_name }}</b><br>{% endif %}<span class="{{ 'muted' if item.dataset_name }}">{{ item.configuration_name or "–" }}{% if item.configuration_version is not none %} v{{ item.configuration_version }}{% endif %}</span>{% endmacro %}
+
+{% macro results_block(d) %}
+  <dl class="meta metrics">
+    <dt>{{ _("Kind") }}</dt><dd>{{ _(kind_labels.get(d.item.kind, d.item.kind)) }}</dd>
+    <dt>{{ _("Status") }}</dt><dd>{{ badge(d.item.status) }}</dd>
+    <dt>{{ _("Started") }}</dt><dd>{{ d.item.created_at | localtime }}</dd>
+    <dt>{{ _("Duration") }}</dt><dd>{{ d.duration }}</dd>
+    {% if d.winner %}<dt>{{ _("Winning pipeline") }}</dt><dd>{{ d.winner }}</dd>{% endif %}
+    {% set ev = d.evaluation %}
+    {% if ev %}
+      <dt>{{ _("Accuracy") }}</dt><dd>{{ (ev.accuracy * 100) | pct(language) }}</dd>
+      <dt>{{ _("Balanced accuracy") }}</dt><dd>{{ (ev.balanced_accuracy * 100) | pct(language) }}</dd>
+      <dt>MCC</dt><dd>{{ "%.3f" | format(ev.mcc) | replace(".", "," if language == "sv" else ".") }}</dd>
+      <dt>F1 (macro)</dt><dd>{{ "%.3f" | format(ev.f1_macro) | replace(".", "," if language == "sv" else ".") }}</dd>
+    {% endif %}
+    {% if d.summary and d.summary.mispredicted_count is not none %}<dt>{{ _("Mispredicted rows (all labelled rows)") }}</dt><dd>{{ d.summary.mispredicted_count }}</dd>{% endif %}
+    {% for target, interval in d.dark %}<dt>{{ _("Estimated Dark Number") }} · {{ target }}</dt><dd>{{ interval }}</dd>{% endfor %}
+  </dl>
+{% endmacro %}
+
+{% macro differences(rows, left_title, right_title, empty_text) %}
+  {% if rows is none %}<p class="hint">{{ _("Not available for this run.") }}</p>
+  {% elif rows %}
+  <div class="scroll"><table class="grid diff">
+    <thead><tr><th>{{ _("Setting") }}</th><th>{{ left_title }}</th><th>{{ right_title }}</th></tr></thead>
+    <tbody>{% for label, a, b in rows %}<tr><th>{{ label }}</th><td>{{ a }}</td><td>{{ b }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="hint">{{ empty_text }}</p>{% endif %}
+{% endmacro %}
+
+{% block main %}
+{% if no_project %}
+  <div class="card"><p class="empty">{{ _("Open a project in the Projects tab first.") }}
+    <a href="/ui/projects">{{ _("Projects") }}</a></p></div>
+{% else %}
+<div class="layout-two history-layout">
+  <section>
+    <form class="card filters" method="get" action="/ui/history">
+      <h2>{{ _("Runs") }}</h2>
+      <div class="filter-row">
+        <label>{{ _("Kind") }}<select name="kind"><option value="">{{ _("All") }}</option>
+          {% for value, label in kinds %}<option value="{{ value }}" {{ 'selected' if filters.kind == value }}>{{ _(label) }}</option>{% endfor %}</select></label>
+        <label>{{ _("Status") }}<select name="status"><option value="">{{ _("All") }}</option>
+          {% for value, label in statuses %}<option value="{{ value }}" {{ 'selected' if filters.status == value }}>{{ _(label) }}</option>{% endfor %}</select></label>
+        <label>{{ _("Dataset") }}<select name="dataset"><option value="">{{ _("All") }}</option>
+          {% for value, label in datasets_seen %}<option value="{{ value }}" {{ 'selected' if filters.dataset == value }}>{{ label }}</option>{% endfor %}</select></label>
+        <label>{{ _("Configuration") }}<select name="configuration"><option value="">{{ _("All") }}</option>
+          {% for value, label in configurations_seen %}<option value="{{ value }}" {{ 'selected' if filters.configuration == value }}>{{ label }}</option>{% endfor %}</select></label>
+        <button class="btn sub">{{ _("Filter") }}</button>
+      </div>
+    </form>
+    <form class="card" method="get" action="/ui/history">
+      {% for key, value in filters.items() if value %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+      {% if compare_error %}<p class="message error">{{ _("Tick exactly two runs to compare.") }}</p>{% endif %}
+      {% if shown %}
+      <p class="hint">{{ shown | length }} {{ _("of") }} {{ items | length }} {{ _("runs") }}. {{ _("Tick two runs and choose Compare.") }}</p>
+      <div class="scroll"><table class="grid">
+        <thead><tr><th></th><th>{{ _("Started") }}</th><th>{{ _("Dataset / Configuration") }}</th><th>{{ _("Kind") }}</th><th>{{ _("Status") }}</th><th class="num">{{ _("Duration") }}</th></tr></thead>
+        <tbody>
+        {% for item in shown %}
+          <tr class="{{ 'hl' if selected and item.run_id == selected.item.run_id }}">
+            <td><input type="checkbox" name="compare" value="{{ item.run_id }}" aria-label="{{ _('Compare') }}"></td>
+            <td class="num"><a href="/ui/history?run={{ item.run_id }}{% for key, value in filters.items() if value %}&{{ key }}={{ value | urlencode }}{% endfor %}">{{ item.created_at | localtime }}</a></td>
+            <td>{{ what(item) }}</td>
+            <td>{{ _(kind_labels.get(item.kind, item.kind)) }}</td>
+            <td>{{ badge(item.status) }}</td>
+            <td class="num">{{ item.duration }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+      <button class="btn sub" data-wait="change">{{ _("Compare") }}</button>
+      {% elif items %}<p class="empty">{{ _("No runs match the filters.") }}</p>
+      {% else %}<p class="empty">{{ _("No runs yet.") }}</p>{% endif %}
+    </form>
+  </section>
+  <aside class="card">
+  {% if compared %}
+    <h2>{{ _("Two runs compared") }}</h2>
+    <div class="compare">
+      {% for d in (compared.left, compared.right) %}
+      <div><h3>{{ d.item.created_at | localtime }}</h3><p>{{ what(d.item) }}</p>{{ results_block(d) }}</div>
+      {% endfor %}
+    </div>
+    <h3>{{ _("Settings that differ") }}</h3>
+    {{ differences(compared.settings, compared.left.item.created_at | localtime, compared.right.item.created_at | localtime, _("The runs used the same settings.")) }}
+    <h3>{{ _("Column roles that differ") }}</h3>
+    {{ differences(compared.roles, compared.left.item.created_at | localtime, compared.right.item.created_at | localtime, _("The runs used the same column roles.")) }}
+  {% elif selected %}
+    {% set d = selected %}
+    <h2>{{ _("Run") }} <span class="muted">{{ d.item.run_id[:8] }}</span></h2>
+    <p>{{ what(d.item) }}</p>
+    {{ results_block(d) }}
+    <p>{% if d.item.kind == "prediction" %}<a href="/ui/prediction?run={{ d.item.run_id }}">{{ _("Show on the Prediction tab") }} ›</a>
+       {% elif d.item.status == "succeeded" %}<a href="/ui/results?run={{ d.item.run_id }}">{{ _("All results of this run") }} ›</a>{% endif %}</p>
+    {% if d.rerunnable %}
+    <form method="post" action="/ui/history/{{ d.item.run_id }}/rerun">
+      <button class="btn" {% if not can_rerun %}disabled title="{{ _('A run is queued or running in the project. Wait until it has finished.') }}"{% endif %}>{{ _("Run again") }}</button>
+      <span class="hint">{{ _("With the same configuration version and dataset.") }}</span>
+    </form>
+    {% endif %}
+    <h3>{{ _("Settings against the configuration's current version") }}</h3>
+    {{ differences(d.settings, _("This run"), _("Now"), _("The configuration has not changed since this run.")) }}
+    <h3>{{ _("Column roles against the dataset's current roles") }}</h3>
+    {{ differences(d.roles, _("This run"), _("Now"), _("The column roles have not changed since this run.")) }}
+  {% else %}
+    <p class="empty">{{ _("Select a run in the list, or tick two runs and choose Compare.") }}</p>
+  {% endif %}
+  </aside>
+</div>
+{% endif %}
+{% endblock %}

@@ -2591,3 +2591,100 @@ msgstr "Används av"
 
 msgid "Other methods use their own rules, and the run log says so."
 msgstr "Övriga metoder följer sina egna regler, och körningens logg säger det."
+
+# 301c: the Run History tab.
+msgid "Categorical variables"
+msgstr "Kategoriska variabler"
+
+msgid "Column roles against the dataset's current roles"
+msgstr "Kolumnroller jämfört med datasetets nuvarande roller"
+
+msgid "Column roles that differ"
+msgstr "Kolumnroller som skiljer sig"
+
+msgid "Compare"
+msgstr "Jämför"
+
+msgid "Date variables"
+msgstr "Datumvariabler"
+
+msgid "Duration"
+msgstr "Tid"
+
+msgid "Filter"
+msgstr "Filtrera"
+
+msgid "Kind"
+msgstr "Typ"
+
+msgid "Limit for categorisation"
+msgstr "Gräns för kategorisering"
+
+msgid "No runs match the filters."
+msgstr "Inga körningar matchar filtren."
+
+msgid "Not available for this run."
+msgstr "Finns inte för den här körningen."
+
+msgid "Numeric variables"
+msgstr "Numeriska variabler"
+
+msgid "Only training runs and feature investigations can be run again."
+msgstr "Bara träningskörningar och variabelundersökningar kan köras igen."
+
+msgid "Run again"
+msgstr "Kör igen"
+
+msgid "Select a run in the list, or tick two runs and choose Compare."
+msgstr "Välj en körning i listan, eller markera två körningar och välj Jämför."
+
+msgid "Setting"
+msgstr "Inställning"
+
+msgid "Settings against the configuration's current version"
+msgstr "Inställningar jämfört med konfigurationens nuvarande version"
+
+msgid "Settings that differ"
+msgstr "Inställningar som skiljer sig"
+
+msgid "Show on the Prediction tab"
+msgstr "Visa på fliken Prediktion"
+
+msgid "Text variables"
+msgstr "Textvariabler"
+
+msgid "The column roles have not changed since this run."
+msgstr "Kolumnrollerna har inte ändrats sedan den här körningen."
+
+msgid "The configuration has not changed since this run."
+msgstr "Konfigurationen har inte ändrats sedan den här körningen."
+
+msgid "The run could not be started again."
+msgstr "Körningen kunde inte startas igen."
+
+msgid "The runs used the same column roles."
+msgstr "Körningarna använde samma kolumnroller."
+
+msgid "The runs used the same settings."
+msgstr "Körningarna använde samma inställningar."
+
+msgid "This run"
+msgstr "Den här körningen"
+
+msgid "Tick exactly two runs to compare."
+msgstr "Markera exakt två körningar för att jämföra."
+
+msgid "Tick two runs and choose Compare."
+msgstr "Markera två körningar och välj Jämför."
+
+msgid "Two runs compared"
+msgstr "Två körningar jämförda"
+
+msgid "Winning pipeline"
+msgstr "Vinnande pipeline"
+
+msgid "With the same configuration version and dataset."
+msgstr "Med samma konfigurationsversion och dataset."
+
+msgid "runs"
+msgstr "körningar"

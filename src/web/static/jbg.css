@@ -346,3 +346,9 @@ svg.chart { width: 100%; height: auto; display: block; }
 .share-slider input[type="range"] { flex: 1; accent-color: var(--blue); }
 .share-slider input[type="range"]:disabled { opacity: 0.45; }
 .share-slider output { min-width: 5.5em; font-variant-numeric: tabular-nums; font-weight: 600; }
+/* 301c: the Run History tab */
+.filters .filter-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; }
+.filters .filter-row label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; min-width: 150px; }
+.history-layout aside .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.history-layout aside h3 { margin-top: 18px; }
+table.diff th { font-weight: 600; text-align: left; }

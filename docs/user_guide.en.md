@@ -479,7 +479,25 @@ read.
 
 ## Run History
 
-Available in a later version.
+The tab lists every run in the project: training runs, prediction runs and
+feature investigations. The list can be filtered on kind, status, dataset and
+configuration.
+
+A selected run shows what ran, its duration and its results: the winning
+pipeline, the evaluation on test data and, if Dark Numbers were computed, the
+interval for each target class. Below are the settings where the run differs
+from the configuration's current version, and the column roles where it
+differs from the dataset's current roles. The settings come from the
+configuration version the run used, the column roles from the run itself.
+
+**Run again** starts a training run or feature investigation again with the
+same configuration version and dataset. The dataset's current data and column
+roles are used, and the Training tab shows the progress. It is not possible
+while another run is going on in the project. Prediction runs are not run
+again here.
+
+Tick two runs and choose **Compare** to see them side by side: the results
+first, then every setting and column role where they differ.
 
 ## Good to know
 

@@ -74,7 +74,8 @@ def test_unavailable_tabs_are_shown_but_not_linked(tmp_path):
         page = client.get("/ui/projects").text
     # 291a-295b made Dataset, Configuration, Run, Results and Models available;
     # 295d the Overview (and About).
-    assert re.search(r'<span class="off" aria-disabled="true"[^>]*>Körhistorik</span>', page)
+    # 301c: Run History is available too, so no tab is greyed out.
+    assert '<a href="/ui/history"' in page and '<span class="off"' not in page
     assert '<a href="/ui/overview"' in page and '<a href="/ui/about"' in page
     assert '<a href="/ui/projects" class="on"' in page
     assert '<a href="/ui/dataset"' in page and '<a href="/ui/configuration"' in page

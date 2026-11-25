@@ -75,7 +75,7 @@ decision.
 
 **Runs and results**
 
-- [ ] Run history (Körhistorik, tab 8 of the design in
+- [x] 301c: run history (Körhistorik, tab 8 of the design in
   `docs/gui/JBG_web_gui_design.md`). Kept (decided 2026-11-24) for what the
   Training and Results tabs do not have: rerun any run, compare two runs side
   by side, and the settings a run used against the current configuration.

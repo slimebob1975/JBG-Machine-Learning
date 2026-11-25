@@ -46,7 +46,7 @@ TABS = (("overview", "Overview", True), ("projects", "Projects", True),
         ("dataset", "Dataset", False), ("configuration", "Configuration", False),
         ("run", "Training", False), ("results", "Results", False),
         ("models", "Models", False), ("prediction", "Prediction", False),
-        ("history", "Run History", False), ("about", "About", True))
+        ("history", "Run History", True), ("about", "About", True))          # 301c
 
 MESSAGES = {
     "created": ("ok", "Project created."), "saved": ("ok", "Changes saved."),
@@ -244,7 +244,10 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
                  | ({"run"} if project_runs is not None and runs is not None else set())
                  | ({"results"} if results is not None and runs is not None else set())
                  | ({"models"} if models is not None and runs is not None else set())
-                 | ({"prediction"} if project_runs is not None and runs is not None else set()))
+                 | ({"prediction"} if project_runs is not None and runs is not None else set())
+                 | ({"history"} if project_runs is not None and runs is not None
+                    and results is not None and configurations is not None
+                    and datasets is not None and inspection is not None else set()))   # 301c
     tabs = tuple((key, label, key in available) for key, label, _ in TABS)
 
     def active_dataset(owner: str, project):
@@ -318,6 +321,14 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
                         sessions=sessions, sql_server=sql_server,
                         recommendation=_recommendation(runs, results,
                                                        getattr(datasets, "_repository", None)))
+    if (project_runs is not None and runs is not None and results is not None
+            and configurations is not None and datasets is not None
+            and inspection is not None):                                       # 301c
+        from JBGWebUIHistory import add_history_tab
+        add_history_tab(app, principal_dependency=principal_dependency, render=render,
+                        redirect=_redirect, active_project=active_project, runs=runs,
+                        results=results, datasets=datasets, configurations=configurations,
+                        project_runs=project_runs, inspection=inspection)
     if models is not None and runs is not None:
         from JBGWebUIModels import add_models_tab
         add_models_tab(app, principal_dependency=principal_dependency, render=render,

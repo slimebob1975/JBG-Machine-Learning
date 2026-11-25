@@ -1,3 +1,29 @@
+## Revision 301c - Run History (Körhistorik) (2026-11-24)
+
+- Decided 2026-11-24: the Run History tab, tab 8 of the design, for what the
+  Training and Results tabs do not have. It is no longer greyed out.
+  - Every run in the project in one list (training runs, prediction runs and
+    feature investigations), with filters on kind, status, dataset and
+    configuration, and each run's duration.
+  - A selected run: what ran, its duration, the winning pipeline (the
+    cross-validation leaderboard's best row), the evaluation on test data and
+    the Dark Numbers interval per target class. Then the settings where the run
+    differs from the configuration's current version, and the column roles
+    where it differs from the dataset's current roles. The settings come from
+    the stored configuration version the run used (versions are never changed),
+    so runtime adjustments do not show as differences. The roles come from the
+    configuration the run recorded.
+  - Two runs ticked and compared side by side: their results, then every setting
+    and column role where they differ.
+  - "Kör igen" (agreed 2026-11-24): training runs and feature investigations
+    start again with the same configuration version and dataset, and the
+    Training tab shows the progress. Prediction runs are not rerun here. One
+    run at a time per project, as on the Training tab.
+  - No notes per run (decided 2026-11-24).
+- User guides: the Run History section, which said "in a later version".
+- Tests: `tests/test_revision_301c_run_history.py`. The 295d test that checked
+  the tab was greyed out checks the link now.
+
 ## Revision 301b - Dark Numbers rows stacked without a pandas warning (2026-11-24)
 
 - Reported 2026-11-24 (found with 300y): the gate showed a pandas

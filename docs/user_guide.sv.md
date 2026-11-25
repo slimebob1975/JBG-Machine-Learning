@@ -483,7 +483,25 @@ prediktionen läste.
 
 ## Körhistorik
 
-Kommer i en senare version.
+Fliken visar alla körningar i projektet i en lista: träningskörningar,
+prediktionskörningar och variabelundersökningar. Listan kan filtreras på typ,
+status, dataset och konfiguration.
+
+En vald körning visar vad som kördes, dess tid och dess resultat: den vinnande
+pipelinen, utvärderingen på testdata och, om mörkertal beräknades, intervallet
+för varje målklass. Därunder visas de inställningar där körningen skiljer sig
+från konfigurationens nuvarande version, och de kolumnroller där den skiljer
+sig från datasetets nuvarande roller. Inställningarna kommer från den
+konfigurationsversion körningen använde, och kolumnrollerna från körningen
+själv.
+
+**Kör igen** startar en träningskörning eller variabelundersökning på nytt med
+samma konfigurationsversion och dataset. Datasetets nuvarande data och
+kolumnroller används, och fliken Träning visar förloppet. Det går inte medan en
+annan körning pågår i projektet. Prediktionskörningar körs inte igen här.
+
+Markera två körningar och välj **Jämför** för att se dem sida vid sida:
+resultaten först, sedan varje inställning och kolumnroll där de skiljer sig.
 
 ## Bra att veta
 

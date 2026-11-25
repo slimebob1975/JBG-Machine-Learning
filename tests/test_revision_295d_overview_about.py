@@ -76,7 +76,9 @@ def test_overview_and_about_are_linked_and_about_is_last(tmp_path):
     labels = re.findall(r'<(?:a href="/ui/[a-z]+"[^>]*|span class="off"[^>]*)>([^<]+)</(?:a|span)>', nav)
     assert labels[0] == "Översikt" and labels[-2:] == ["Körhistorik", "Om"]
     assert '<a href="/ui/overview"' in nav and '<a href="/ui/about"' in nav
-    assert re.search(r'<span class="off"[^>]*>Körhistorik</span>', nav)       # still to come
+    # 301c: Run History is available now, a link like the other tabs.
+    assert re.search(r'<a href="/ui/history"[^>]*>Körhistorik</a>', nav)
+    assert '<span class="off"' not in nav
 
 
 @pytest.mark.parametrize("path", ["/ui/projects", "/ui/models", "/ui/about"])
