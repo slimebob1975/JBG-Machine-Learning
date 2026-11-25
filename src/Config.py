@@ -116,7 +116,8 @@ class Config:
     LATER_KEYS = {"mode": {"categorical_limit": 30, "date_columns": "",
                            "dark_number_sampling_policy": "PIPELINE",        # 299y
                            "dark_number_c_max": 20.0, "dark_number_c_warning": 10.0,     # 300v
-                           "dark_number_flip_repeats": 2}}                    # 300n
+                           "dark_number_flip_repeats": 2,                     # 300n
+                           "dark_number_standard_estimator": True}}           # 300y
     JSON_CONFIG_SCHEMA_VERSION = 2
 
     CLASS_TABLE_SCRIPT = "./sql/CreatePredictionTables.sql.txt"
@@ -412,6 +413,9 @@ class Config:
         dark_number_c_max: float = 20.0          # 300v (asked 2026-11-24): was 10
         dark_number_c_warning: float = 10.0      # 300v (asked 2026-11-24): was 2
         dark_number_flip_repeats: int = 2
+        # 300y (asked 2026-11-24): logistic regression replaces the algorithm in
+        # the Dark Numbers computation when c cannot be used. On by default.
+        dark_number_standard_estimator: bool = True
         experimental_perturbed_dark_number_fallback: bool = True
         oversampler: Oversampling = field(default_factory=Oversampling.defaultOversampler)
         undersampler: Undersampling = field(default_factory=Undersampling.defaultUndersampler)
@@ -621,6 +625,8 @@ class Config:
                 raise ValueError("Argument dark_number_c_warning must lie between 1 and dark_number_c_max")
             if not 1 <= int(self.dark_number_flip_repeats) <= 10:
                 raise ValueError("Argument dark_number_flip_repeats must lie between 1 and 10")
+            if not isinstance(self.dark_number_standard_estimator, bool):
+                raise TypeError("Argument dark_number_standard_estimator must be true or false")
 
             if not (isinstance(self.algorithm, AlgorithmTuple)):
                 raise TypeError("Argument algorithm is invalid")
@@ -1257,7 +1263,8 @@ class Config:
             saved_config.mode.dark_number_sampling_policy = getattr(
                 config.mode, "dark_number_sampling_policy", "PIPELINE")                # 299y
             for name, default in (("dark_number_c_max", 20.0), ("dark_number_c_warning", 10.0),
-                                  ("dark_number_flip_repeats", 2)):                   # 300n
+                                  ("dark_number_flip_repeats", 2),                    # 300n
+                                  ("dark_number_standard_estimator", True)):          # 300y
                 setattr(saved_config.mode, name, getattr(config.mode, name, default))
             # Saved model metadata deliberately contains no SQL password. Inject the
             # credentials from the current runtime configuration when loading a model.
@@ -1363,6 +1370,7 @@ class Config:
                 dark_number_c_max=float(module.mode.get("dark_number_c_max", 20.0)),
                 dark_number_c_warning=float(module.mode.get("dark_number_c_warning", 10.0)),
                 dark_number_flip_repeats=int(module.mode.get("dark_number_flip_repeats", 2)),
+                dark_number_standard_estimator=bool(module.mode.get("dark_number_standard_estimator", True)),
                 preprocessor=(PreprocessTuple.from_string(module.mode["preprocessor"])
                               if isinstance(module.mode["preprocessor"], str)
                               else PreprocessTuple(module.mode["preprocessor"])),

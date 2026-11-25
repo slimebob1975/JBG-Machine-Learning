@@ -477,7 +477,11 @@ class TaskRunner:
         calculation_type = "all" if self.regression_suite else self.config.get_dark_number_calculation_type()
         self.logger.print_progress(message="Get dark numbers")
 
-        self.ph.get_dark_numbers(
+        # 300y: with logistic regression in place of the algorithm when c cannot
+        # be used (handlers without it compute as before).
+        compute = getattr(self.ph, "get_dark_numbers_with_standard_estimator",
+                          self.ph.get_dark_numbers)
+        compute(
             X=self.dh.X,
             Y=self.dh.Y,
             type=calculation_type,

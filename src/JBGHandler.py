@@ -3447,6 +3447,93 @@ class PredictionsHandler:
 
         return None
 
+    # --- 300y: logistic regression when c cannot be used ----------------------------------
+
+    STANDARD_ESTIMATOR = "Logistic Regression"
+
+    def _targets_without_usable_correction(self) -> list:
+        """The target classes whose c was undefined (above the upper bound or
+        not estimable) in some estimate of the last computation."""
+        frame = getattr(self, "dark_numbers", None)
+        if frame is None or getattr(frame, "empty", True) or "corr_source" not in frame:
+            return []
+        undefined = frame[frame["corr_source"].astype(str).str.startswith("undefined")]
+        return sorted({str(target) for target in undefined.get("target", pd.Series(["?"]))})
+
+    def _with_standard_algorithm(self, model):
+        """A fresh copy of the pipeline with only its last step, the algorithm,
+        replaced by the engine's logistic regression (agreed 2026-11-24)."""
+        from sklearn.base import clone
+        from JBGMeta import Algorithm
+        config = self.handler.config
+        max_iterations = config.get_max_iterations() or getattr(config, "MAX_ITERATIONS", 20000)
+        estimator = Algorithm.LRN.call_algorithm(max_iterations=max_iterations, size=0)
+        if not hasattr(model, "steps"):
+            return estimator, type(model).__name__
+        copy = clone(model)
+        name, replaced = copy.steps[-1]
+        copy.steps[-1] = (name, estimator)
+        return copy, type(replaced).__name__
+
+    def _fit_standard_copy(self, model, X, Y):
+        estimator_X = prepare_model_input(X, model)
+        return call_with_sparse_input_retry(
+            lambda X_input: model.fit(X_input, Y), estimator_X, logger=self.handler.logger,
+            context="Dark Number standard estimator fit", estimator=model)
+
+    def get_dark_numbers_with_standard_estimator(self, **kwargs) -> None:
+        """300y (asked 2026-11-24): the Dark Numbers computation, repeated with
+        logistic regression in place of the pipeline's algorithm when c cannot
+        be used for some target class (above the upper bound, 20 by default, or
+        not estimable). On by default (``mode.dark_number_standard_estimator``).
+        The rest of the pipeline is kept. The whole computation (TP_r, TN_r, the
+        alphas and c) then uses the logistic-regression copies, and the result
+        record says so, so the view can tell the user every time."""
+        self.get_dark_numbers(**kwargs)
+        enabled = bool(getattr(self.handler.config.mode, "dark_number_standard_estimator", True))
+        targets = self._targets_without_usable_correction()
+        if not enabled or not targets:
+            return None
+        models = list(kwargs.get("models") or [])
+        if not models:
+            return None
+        original = (self.dark_numbers, self.dark_numb_conf_matrix,
+                    self.dark_number_fallback_events, dict(self.__dict__))
+        try:
+            replaced, replaced_names = [], []
+            for index, model in enumerate(models):
+                copy, replaced_name = self._with_standard_algorithm(model)
+                if index == 0 and kwargs.get("X_cv_training") is not None \
+                        and kwargs.get("Y_cv_training") is not None:
+                    X_fit, Y_fit = kwargs["X_cv_training"], kwargs["Y_cv_training"]
+                else:
+                    X_fit, Y_fit = kwargs["X"], kwargs["Y"]
+                replaced.append(self._fit_standard_copy(copy, X_fit, Y_fit))
+                replaced_names.append(replaced_name)
+            self.handler.logger.print_warning(
+                f"Dark Numbers: c could not be used for {', '.join(targets)} (above the upper "
+                f"bound or not estimable). The computation is repeated with "
+                f"{self.STANDARD_ESTIMATOR} in place of the pipeline's algorithm "
+                f"({', '.join(sorted(set(replaced_names)))}); the rest of the pipeline is kept.")
+            self.get_dark_numbers(**dict(kwargs, models=replaced))
+        except Exception as error:
+            # Keep the pipeline's own results, and say that the fallback failed.
+            (self.dark_numbers, self.dark_numb_conf_matrix,
+             self.dark_number_fallback_events, saved) = original
+            self.__dict__.update({k: v for k, v in saved.items()
+                                  if k.startswith("dark_number")})
+            self.handler.logger.print_warning(
+                f"Dark Numbers: {self.STANDARD_ESTIMATOR} could not replace the pipeline's "
+                f"algorithm ({type(error).__name__}); the pipeline's own results are kept.")
+            self.__dict__.setdefault("dark_number_used", {})["standard_estimator"] = {
+                "used": False, "failed": type(error).__name__, "targets": targets}
+            return None
+        self.__dict__.setdefault("dark_number_used", {})["standard_estimator"] = {
+            "used": True, "algorithm": self.STANDARD_ESTIMATOR,
+            "replaced": sorted(set(replaced_names)), "targets": targets,
+            "still_undefined": self._targets_without_usable_correction()}
+        return None
+
     def _auto_n_splits_and_repeats(self, n_jobs_desired=None, min_n_splits=1, min_n_repeats=1, max_multiplier=3):
         """
         Försök hitta en (n_splits, n_repeats) så att n_splits * n_repeats är en multipel av n_jobs (cores),

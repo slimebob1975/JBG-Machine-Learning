@@ -126,6 +126,11 @@
       <button class="btn act ready" data-wait="fields-any" data-wait-fields="select[name^='corr:']"
         data-wait-reason="{{ _('Choose the right class for at least one row first.') }}">{{ _("Review the corrections") }}</button>{% endif %}
       {% if view == "dark_numbers" %}
+        {# 300y (asked 2026-11-24): always say when logistic regression replaced the algorithm. #}
+        {% set standard = (dark_record.parameters.standard_estimator if dark_record and dark_record.parameters else none) or {} %}
+        {% if standard.used %}<p class="message warn">{{ _("The Dark Number is computed with logistic regression in place of the pipeline's algorithm, because c could not be used (above the upper bound or not estimable). The rest of the pipeline is unchanged.") }}
+          {{ _("Target classes") }}: <b>{{ standard.targets | join(", ") }}</b> · {{ _("Replaced algorithm") }}: <b>{{ standard.replaced | join(", ") }}</b>{% if standard.still_undefined %}<br>{{ _("c could not be used with logistic regression either for") }}: <b>{{ standard.still_undefined | join(", ") }}</b>{% endif %}</p>
+        {% elif standard.failed %}<p class="message warn">{{ _("Logistic regression could not replace the pipeline's algorithm, so the pipeline's own results are shown.") }}</p>{% endif %}
         {% if dark_equation %}
           {# 299u (asked 2026-11-16): the equation behind the estimates, each part explained. #}
           <div class="formula-card dark-equation">

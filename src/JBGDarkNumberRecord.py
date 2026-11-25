@@ -66,6 +66,9 @@ def parameters(config, used: dict) -> dict:
         # 300l, JBG 1.3: c = c_in / c_unseen from the flip test's folds.
         "correction": "overtraining factor (c_in / c_unseen)",
         "reliable_halfwidth": 0.25,
+        # 300y: logistic regression in place of the algorithm when c cannot be used.
+        "standard_estimator_enabled": bool(getattr(mode, "dark_number_standard_estimator", True)),
+        "standard_estimator": dict(used.get("standard_estimator") or {"used": False}),
     }
 
 

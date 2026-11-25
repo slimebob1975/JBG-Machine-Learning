@@ -374,6 +374,14 @@ each adds 4 model fits and narrows `c`'s interval, useful with a rare target
 class), the upper bound for `c` (20) and the warning level (10). The values
 used are shown with the equation and stored with the result.
 
+**Logistic regression when c cannot be used.** If `c` is above the upper
+bound or cannot be estimated for some target class, the whole computation is
+repeated with logistic regression in place of the pipeline's algorithm. The
+other steps of the pipeline are kept. It is on by default and switched off with
+the box **Use logistic regression when c cannot be used** in the Dark Numbers
+section. The Dark Numbers view always says when it happened, for which target
+classes and which algorithm was replaced.
+
 **Other forms.** Without alpha, D uses `(2 − TP_r)` without weights. The
 single-alpha and non-linear forms are kept as they were, with the same cap and
 the same use of `c`.

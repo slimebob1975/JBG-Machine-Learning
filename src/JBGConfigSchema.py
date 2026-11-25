@@ -241,6 +241,11 @@ _f("mode.dark_number_c_max", "dark_numbers", "number", "Upper bound for c",
    minimum=1.0, maximum=100.0)
 _f("mode.dark_number_c_warning", "dark_numbers", "number", "Warn of overtraining when c is above",
    minimum=1.0, maximum=100.0)
+# 300y (asked 2026-11-24): on by default, always reported on the results.
+_f("mode.dark_number_standard_estimator", "dark_numbers", "boolean",
+   "Use logistic regression when c cannot be used",
+   "Replaces only the algorithm in the pipeline, when c is above the upper bound or cannot be "
+   "estimated. The results say when it was used.")
 _f("mode.dark_number_sampling_policy", "dark_numbers", "choice", "Sampling in the correction test",
    options=_inline("mode.dark_number_sampling_policy"))
 _f("mode.experimental_perturbed_dark_number_fallback", "dark_numbers", "boolean",

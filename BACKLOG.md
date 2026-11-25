@@ -47,6 +47,9 @@ decision.
   300k test came from a real fault: an infinite upper bound of c read 1, and
   the quality "reliable" (fixed). The skip is container-only: `dill` is
   installed on Windows, where the gate skips nothing.
+- [ ] A pandas `FutureWarning` in `PredictionsHandler._update_dark_numbers`
+  (found with 300y): joining an estimate's rows when some columns are empty or
+  undefined. Harmless with pandas 2.3. Exclude the empty columns before joining.
 - [ ] The interim configuration catalog (285d, design gap 10): project runs
   use the configuration repository since 288a, but the API still serves
   Voilà's saved configurations (`GET /api/configurations`,
@@ -135,16 +138,15 @@ decision.
   R02) are removed.
 - [ ] DN-05: mixture-proportion estimation (PU-SCAR, calibrated
   probabilities), tested with the study before any engine work (300c).
-- [ ] Next after the rename (specified 2026-11-24): a standard estimator,
-  logistic regression with standard scaling, used for the whole Dark Numbers
-  computation (`TP_r`, `TN_r`, the alphas and `c`) when the pipeline's own `c`
-  is above the upper bound (20 by default) or cannot be estimated. On by
-  default, with a new checkbox in the Mörkertal section to switch it off. The
-  user is always told when it was used. Not wanted (2026-11-24): `c` for each
-  pipeline in the model comparison. The test-data performance is enough for
-  choosing a pipeline. Still fixed in `JBGDarkNumbers.py`: the memorisation
-  rule (fit 0.95 and a gap of 5 percentage points, 0.99 without an unseen
-  accuracy).
+- [x] 300y (specified 2026-11-24): logistic regression in place of the
+  pipeline's algorithm (only the algorithm is replaced) for the whole Dark
+  Numbers computation when `c` is above the upper bound or cannot be estimated.
+  On by default, with a checkbox in the Mörkertal section, always reported.
+  Not wanted (2026-11-24): `c` for each pipeline in the model comparison. The
+  test-data performance is enough for choosing a pipeline.
+- [ ] If wanted: the memorisation rule as settings. It is still fixed in
+  `JBGDarkNumbers.py` (fit 0.95 and a gap of 5 percentage points, 0.99 without
+  an unseen accuracy).
 - [ ] An adaptive flip fraction, adjusted to the class size, settable in the
   Dark Numbers section (asked 2026-11-18; a fixed 0.2 by default today).
 - [ ] Dark Numbers per subgroup of a categorical column, chosen in the Dark

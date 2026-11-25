@@ -2529,3 +2529,25 @@ msgstr "Mörkertalet är en skattning, inte en statistiskt säkerställd andel. 
 
 msgid "Estimated Dark Number"
 msgstr "Skattat mörkertal"
+
+# 300y: logistic regression when c cannot be used.
+msgid "Use logistic regression when c cannot be used"
+msgstr "Använd logistisk regression när c inte kan användas"
+
+msgid "Replaces only the algorithm in the pipeline, when c is above the upper bound or cannot be estimated. The results say when it was used."
+msgstr "Ersätter bara algoritmen i pipelinen, när c är över den övre gränsen eller inte kan skattas. Resultaten säger när den har använts."
+
+msgid "The Dark Number is computed with logistic regression in place of the pipeline's algorithm, because c could not be used (above the upper bound or not estimable). The rest of the pipeline is unchanged."
+msgstr "Mörkertalet är beräknat med logistisk regression i stället för pipelinens algoritm, eftersom c inte kunde användas (över den övre gränsen eller inte skattbar). Resten av pipelinen är oförändrad."
+
+msgid "c could not be used with logistic regression either for"
+msgstr "c kunde inte heller användas med logistisk regression för"
+
+msgid "Logistic regression could not replace the pipeline's algorithm, so the pipeline's own results are shown."
+msgstr "Logistisk regression kunde inte ersätta pipelinens algoritm, så pipelinens egna resultat visas."
+
+msgid "Target classes"
+msgstr "Målklasser"
+
+msgid "Replaced algorithm"
+msgstr "Ersatt algoritm"

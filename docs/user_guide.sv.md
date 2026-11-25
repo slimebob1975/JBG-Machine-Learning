@@ -379,6 +379,14 @@ intervallet för `c`, användbart med en sällsynt målklass), den övre gränse
 för `c` (20) och varningsnivån (10). Värdena som användes visas med ekvationen
 och sparas med resultatet.
 
+**Logistisk regression när c inte kan användas.** Är `c` över den övre
+gränsen eller inte skattbar för någon målklass, görs hela beräkningen om med
+logistisk regression i stället för pipelinens algoritm. Övriga steg i
+pipelinen behålls. Det är påslaget som standard och stängs av med rutan
+**Använd logistisk regression när c inte kan användas** i avsnittet
+Mörkertal. Vyn Mörkertal säger alltid när det har hänt, för vilka målklasser
+och vilken algoritm som ersattes.
+
 **Andra former.** Utan alfa använder D `(2 − TP_r)` utan vikter. Formerna med
 en alfa och de icke-linjära formerna är oförändrade, med samma begränsning
 och samma användning av `c`.

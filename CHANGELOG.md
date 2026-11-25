@@ -1,3 +1,24 @@
+## Revision 300y - Logistic regression for Dark Numbers when c cannot be used (2026-11-24)
+
+- Asked 2026-11-24: when `c` cannot be used for some target class (above the
+  upper bound, 20 by default, or not estimable), the whole Dark Numbers
+  computation (`TP_r`, `TN_r`, the alphas and `c`) is repeated with logistic
+  regression in place of the pipeline's algorithm. Agreed 2026-11-24: only the
+  algorithm, the pipeline's last step, is replaced. Text handling, scaling,
+  sampling and dimension reduction are kept. Copies of both models are fitted
+  (the cross-trained one on the training part, the final one on all data). The
+  models themselves are not changed.
+- On by default: the new checkbox "Använd logistisk regression när c inte kan
+  användas" in the Mörkertal section (`mode.dark_number_standard_estimator`,
+  also in `Config.LATER_KEYS`, so older configurations get it on).
+- Always told: the Mörkertal view says when it happened, for which target
+  classes and which algorithm was replaced, and for which target classes `c`
+  still could not be used. The run log says it too, and the result record keeps
+  it (`parameters.standard_estimator`). If the logistic-regression fit fails,
+  the pipeline's own results are kept and the view says so.
+- User guides: the Dark Numbers section in detail.
+- Tests: `tests/test_revision_300y_standard_estimator.py`.
+
 ## Revision 300x - The product is called JBG Machine Learning (2026-11-24)
 
 - Decided 2026-11-24: the full rename, after the repository's rename on
