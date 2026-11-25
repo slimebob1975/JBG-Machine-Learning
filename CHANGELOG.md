@@ -1,3 +1,16 @@
+## Revision 301b - Dark Numbers rows stacked without a pandas warning (2026-11-24)
+
+- Reported 2026-11-24 (found with 300y): the gate showed a pandas
+  `FutureWarning` from `PredictionsHandler._update_dark_numbers`. Stacking each
+  estimate's rows under the earlier ones met a column that was empty in one
+  block (for example `c`'s interval when `c` is undefined). pandas ignores such a
+  column when it chooses the column's type, and warns that it will stop doing
+  so. The new `_concat_rows` gives the empty column the other block's type
+  first (float stays float, whole numbers become float, true/false becomes
+  object), so the result is unchanged and the warning gone. Checked: the same
+  rows and column types as before in three Dark Numbers computations.
+- Tests: `tests/test_revision_301b_dark_number_rows.py`.
+
 ## Revision 301a - Share sliders for over- and undersampling (2026-11-24)
 
 - Specified 2026-11-24: one slider in each sampling section of the

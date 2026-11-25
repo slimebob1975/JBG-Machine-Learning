@@ -2268,6 +2268,35 @@ class ModelHandler:
                 ) from e
             self.handler.logger.print_warning(f"Something went wrong on saving {self.model.algorithm.lib.get_full_name()} model to file: {e}")
 
+def _concat_rows(top: pd.DataFrame, bottom: pd.DataFrame) -> pd.DataFrame:
+    """301b (found with 300y): stack two blocks of Dark Numbers rows. pandas
+    has so far ignored a column that is empty (all missing) in one block when
+    it chose the column's type, and warns that it will stop doing so. Giving
+    the empty column the other block's type first keeps today's result: a
+    float column stays float, a whole-number column becomes float (it gets
+    missing values), a true/false column becomes object."""
+    top, bottom = top.copy(), bottom.copy()
+    for column in top.columns.intersection(bottom.columns):
+        upper, lower = top[column], bottom[column]
+        if upper.isna().all() and not lower.isna().all():
+            top[column] = _empty_as(upper, lower.dtype)
+        elif lower.isna().all() and not upper.isna().all():
+            bottom[column] = _empty_as(lower, upper.dtype)
+    return pd.concat([top, bottom], axis=0)
+
+
+def _empty_as(series: pd.Series, dtype) -> pd.Series:
+    kind = getattr(dtype, "kind", "O")
+    if kind == "b":
+        return series.astype(object)
+    if kind in "iu":
+        return series.astype("float64")
+    try:
+        return series.astype(dtype)
+    except (TypeError, ValueError):
+        return series.astype(object)
+
+
 @dataclass
 class PredictionsHandler:
     LIMIT_MISPREDICTED = 50
@@ -3653,7 +3682,8 @@ class PredictionsHandler:
         if self.dark_numbers.empty:
             self.dark_numbers = pd.concat([model_name_col, model_dark_numbers.copy(deep=True)], axis = 1)
         else:
-            self.dark_numbers = pd.concat([self.dark_numbers, pd.concat([model_name_col, model_dark_numbers], axis=1)], axis=0)
+            self.dark_numbers = _concat_rows(
+                self.dark_numbers, pd.concat([model_name_col, model_dark_numbers], axis=1))   # 301b
 
         return None
 

@@ -47,7 +47,7 @@ decision.
   300k test came from a real fault: an infinite upper bound of c read 1, and
   the quality "reliable" (fixed). The skip is container-only: `dill` is
   installed on Windows, where the gate skips nothing.
-- [ ] A pandas `FutureWarning` in `PredictionsHandler._update_dark_numbers`
+- [x] 301b: a pandas `FutureWarning` in `PredictionsHandler._update_dark_numbers`
   (found with 300y): joining an estimate's rows when some columns are empty or
   undefined. Harmless with pandas 2.3. Exclude the empty columns before joining.
 - [ ] The interim configuration catalog (285d, design gap 10): project runs
