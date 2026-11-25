@@ -1373,6 +1373,17 @@ class ModelHandler:
         estimators remain valid candidates instead of failing on a missing probability API.
         """
         scorer = self.handler.config.get_scoring_mechanism()
+        from JBGScorers import AveragePrecisionScorer, smallest_class
+        if isinstance(scorer, AveragePrecisionScorer):
+            # 300w: with two classes, the positive class is the Dark Numbers
+            # target if chosen, otherwise the smallest class (as in 299i).
+            labels = np.asarray(Y).reshape(-1)
+            if np.unique(labels).size == 2:
+                wanted = str(getattr(self.handler.config.mode, "dark_number_target", "") or "")
+                present = {str(value) for value in labels}
+                return scorer.for_positive_class(
+                    wanted if wanted in present else smallest_class(labels))
+            return scorer
         if scorer != 'roc_auc_ovo':
             return scorer
 

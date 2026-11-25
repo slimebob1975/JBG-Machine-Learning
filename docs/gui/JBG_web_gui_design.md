@@ -543,6 +543,7 @@ The map above is the target. What exists after revision 285m3:
 | `/ui/about` | 300t | The user guides' Dark Numbers section: "Vad som kommer" brought up to date, the flip test's parts the same on every computer |
 | `/ui/results` | 300u | c's upper bound is infinite, not 1, when resamples of the flip test's parts are; "∞" in the calculation table |
 | `/ui/configuration`, `/ui/results` | 300v | Default limits for c: upper bound 20, warning level 10 (were 10 and 2) |
+| `/ui/results` | 300w | The Dark Number presented as an estimate (a note, "Skattat mörkertal"); Average Precision on probabilities |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

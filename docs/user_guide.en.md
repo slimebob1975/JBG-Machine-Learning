@@ -279,6 +279,11 @@ shown sorted from the lowest to the highest, each labelled with its model
 variant, and together form an interval with subintervals. Below are the
 calculations and the confusion matrices.
 
+The Dark Number is an estimate, not a statistically proven share. It rests on
+the model's errors and on assumptions that cannot be tested with the data at
+hand. Use it to compare orders of magnitude and to follow changes over time,
+not as an exact count. The view says so too.
+
 An estimate can be **Undefined**. That happens when the part of the data it
 is made on lacks rows of the target class or of the other classes, or when
 the correction factor c could not be estimated or lies outside 1 to the upper

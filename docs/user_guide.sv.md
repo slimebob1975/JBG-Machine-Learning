@@ -281,6 +281,11 @@ från lägst till högst, var och en märkt med sin modellvariant, och bildar
 tillsammans ett intervall med delintervall. Därunder finns beräkningarna och
 förväxlingsmatriserna.
 
+Mörkertalet är en skattning, inte en statistiskt säkerställd andel. Den
+bygger på modellens fel och på antaganden som inte kan prövas med de egna
+data. Använd den för att jämföra storleksordningar och följa förändringar över
+tid, inte som ett exakt antal. Vyn säger det också.
+
 En skattning kan vara **Odefinierad**. Det händer när den del av data som den
 görs på saknar rader av målklassen eller av de övriga klasserna, eller när
 korrektionsfaktorn c inte kunde skattas eller ligger utanför intervallet från

@@ -1,3 +1,30 @@
+## Revision 300w - Average Precision on probabilities, D presented as an estimate (2026-11-24)
+
+- Average Precision (micro, macro, weighted) scored the predicted classes, where
+  it needs the model's probabilities, and with scikit-learn 1.9 it refused text
+  classes (found 2026-11-23). It is now scored by `JBGScorers.AveragePrecisionScorer`
+  on `predict_proba` (or `decision_function` for models without probabilities):
+  - two classes: the Average Precision of one positive class, the Dark Numbers
+    target if one is chosen, otherwise the smallest class (as in the feature
+    investigation). The three variants then give the same value;
+  - more than two classes: the micro, macro or weighted average over each class
+    against the rest.
+  The stored values of the metric choices are unchanged, so older models and
+  configurations load as before.
+- Decided 2026-11-24: the Dark Number is presented as an estimate, not a
+  statistically proven share. The Mörkertal view has a note under its
+  introduction, in both languages, and the estimates' column is "Skattat
+  mörkertal" ("Estimated Dark Number"). The same text is in both guides.
+- `docs/dependencies.md` records Python 3.13.7.
+- BACKLOG, decided 2026-11-24: the full rename next (300x), then the standard
+  estimator for Dark Numbers (logistic regression when `c` is above the upper
+  bound or cannot be estimated, on by default with a checkbox, always flagged),
+  then the sampling sliders (specified). `c` per pipeline in the model
+  comparison is not wanted. Run history is kept for rerun, comparison and the
+  settings difference. SQL sign-ins across restarts are not needed. The interim
+  catalog stays for now. The SQL protocol is to be rewritten for the web GUI.
+- Tests: `tests/test_revision_300w_average_precision_estimate.py`.
+
 ## Revision 300v - Default limits for c: upper bound 20, warning level 10 (2026-11-24)
 
 - Asked 2026-11-24: the default upper bound for `c` (beyond it the Dark Number

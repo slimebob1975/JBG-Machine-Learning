@@ -31,19 +31,17 @@ decision.
   group. The 1381 expected after 300p was a miscount (it was 1379).
 - [x] 300u: the tested versions (agreed 2026-11-24): `constraints-tested.txt`
   and `docs/dependencies.md`. The requirements files stay unpinned.
-- [ ] Record the exact Python version in `docs/dependencies.md` (3.11 or later
-  is known from NumPy 2.3 and JAX 0.7).
+- [x] 300w: the exact Python version, 3.13.7, in `docs/dependencies.md`.
 - [x] 300s: Precision and Recall (micro, macro, weighted) failed on text
   classes with scikit-learn 1.9 (found 2026-11-23).
-- [ ] Average Precision (micro, macro, weighted) fails on text classes too,
-  and scores hard predictions, where it needs probabilities (found
-  2026-11-23). Make it score `predict_proba` with the target class as the
-  positive one, or take it out of the list.
+- [x] 300w: Average Precision scores probabilities and works with text
+  classes. With two classes the positive class is the Dark Numbers target, or
+  else the smallest class.
 - [x] 300s: `.coverage` is no longer tracked, and `.gitignore` keeps it out.
-- [ ] After the rename (2026-11-20): decide whether "JBG
-  Machine Learning" becomes the product name in the README, the masthead and
-  the title of this file, and whether a separate production repository is
-  renamed too.
+- [ ] Next (300x, decided 2026-11-24): the full rename to "JBG Machine
+  Learning", in English in the masthead in both languages, the README, the page
+  titles, the guides and the title of this file. The production repository is
+  renamed by the user.
 - [x] 300u: the gate's warnings and skips. The NumPy `RuntimeWarning` in the
   300k test came from a real fault: an infinite upper bound of c read 1, and
   the quality "reliable" (fixed). The skip is container-only: `dill` is
@@ -53,30 +51,30 @@ decision.
   Voilà's saved configurations (`GET /api/configurations`,
   `JBGSavedConfigurations`), runs submitted by a Voilà configuration name and
   the SQL sign-in for a Voilà configuration. Nothing in the web GUI uses
-  them. Remove them when Voilà is retired. The open 285d item on marking
-  unusable SQL configurations in that list goes with them.
+  them. Remove them when Voilà is retired, which is not yet planned (kept,
+  decided 2026-11-24). The open 285d item on marking unusable SQL
+  configurations in that list goes with them.
 - [ ] SQL acceptance (from 272 and 279ai): the container gate cannot test SQL.
-  Check that the operator protocol `tests/SQL_REGRESSION_PROTOCOL_248.md`
-  matches the web GUI (train, save, reload in a new process, predict,
-  write results, correct, delete), then run it once before Voilà is retired.
+  Agreed 2026-11-24: daily use of the web GUI on SQL projects covers most of
+  `tests/SQL_REGRESSION_PROTOCOL_248.md` (written for Voilà). Rewrite it as a
+  shorter checklist for the web GUI, and run it once when Voilà's retirement is
+  planned.
 
 ### Pending decision
 
-- [ ] Dark Numbers after the validation study (300c, 300l): how `D` is
-  presented (a note that it is not a validated share, the growth view), and
-  with it DN-06's decision on which estimators go on. The user decides when.
+- [x] 300w (decided 2026-11-24): `D` is presented as an estimate, not a
+  statistically proven share, on the Mörkertal view and in both guides.
+- [ ] DN-06's decision on which estimators go on (300c, 300l). The user
+  decides when.
 
 ### Deferred: future development (in rough order)
 
 **Runs and results**
 
-- [ ] The model comparison shows each pipeline's tendency to overtrain (`c`
-  or the memorisation measure), so that a pipeline with `c` close to 1 can be
-  chosen (noted 2026-11-20, after 300n: the user compares pipelines by hand
-  for this).
-- [ ] Run history and rerun (Körhistorik, tab 8 of the design in
-  `docs/gui/JBG_web_gui_design.md`, a minor item of the Voilà gap check
-  2026-11-12).
+- [ ] Run history (Körhistorik, tab 8 of the design in
+  `docs/gui/JBG_web_gui_design.md`). Kept (decided 2026-11-24) for what the
+  Training and Results tabs do not have: rerun any run, compare two runs side
+  by side, and the settings a run used against the current configuration.
 - [ ] Pausing and resuming a feature investigation (299i; the engine keeps a
   snapshot), if Standard and Extended searches prove long.
 - [ ] The group-disjoint holdout for more than two classes (noted with 298g):
@@ -111,9 +109,9 @@ decision.
 - [ ] Per-project retention (design decision 3): model files (288a), per-run
   result folders (295a) and the CSV file versions from corrections (299b) are
   kept until deleted (299e, 299f).
-- [ ] SQL sign-ins are kept in the server's memory and lost on a restart,
-  which happens after every patch. Keep them across restarts, or sign in
-  automatically with Windows where possible.
+- [x] 300w (decided 2026-11-24): keeping SQL sign-ins across server restarts
+  is not needed. The browser keeps the credentials, so signing in again is one
+  click.
 - [ ] The language choice stored per user on the server (design decision 6).
   Today it is a browser cookie (`jbg_lang`).
 - [ ] A live pipeline picture (listed 2026-11-18, to be described when it
@@ -124,18 +122,28 @@ decision.
 - [ ] A production-like synthetic dataset for the validation study, generated
   from aggregated profiles (2026-11-19). The generator and summary received
   then stay outside the repository.
-- [ ] Ratio controls for over- and undersampling (for example 1 : 1 or
-  2 : 1), for the ordinary pipeline and for the correction test (asked
-  2026-11-16). UNDER is 1 : 1 and the oversamplers use `auto` today.
+- [ ] Sampling sliders (asked 2026-11-16, specified 2026-11-24), one in the
+  Oversampling and one in the Undersampling section, for the ordinary pipeline
+  and the correction test. The slider sets the target class's share after
+  sampling. It starts at the class's current share (minority or majority) and
+  moves only towards 50 %: oversampling from below, undersampling from above,
+  never past 50 % or back past the current share. With more than two classes
+  the sliders are tied to the smallest or the largest class. One value applies
+  to every chosen sampler that can use it. A sampler that cannot uses its
+  default, and the user is told. The undersampling presets (R20, R10, R05,
+  R02) are removed.
 - [ ] DN-05: mixture-proportion estimation (PU-SCAR, calibrated
   probabilities), tested with the study before any engine work (300c).
-- [ ] An opt-in standard estimator (for example logistic regression with
-  standard scaling), used for the whole Dark Numbers computation (`TP_r`,
-  `TN_r` and `c`) when the pipeline's own `c` is unusable (asked 2026-11-16).
-  With it, the rest of the "Mörkertal: avancerat" group: `c_max` and the
-  warning level are settings since 300n, the memorisation rule (fit 0.95 and
-  a gap of 5 percentage points, 0.99 without an unseen accuracy) is still
-  fixed in `JBGDarkNumbers.py`.
+- [ ] Next after the rename (specified 2026-11-24): a standard estimator,
+  logistic regression with standard scaling, used for the whole Dark Numbers
+  computation (`TP_r`, `TN_r`, the alphas and `c`) when the pipeline's own `c`
+  is above the upper bound (20 by default) or cannot be estimated. On by
+  default, with a new checkbox in the Mörkertal section to switch it off. The
+  user is always told when it was used. Not wanted (2026-11-24): `c` for each
+  pipeline in the model comparison. The test-data performance is enough for
+  choosing a pipeline. Still fixed in `JBGDarkNumbers.py`: the memorisation
+  rule (fit 0.95 and a gap of 5 percentage points, 0.99 without an unseen
+  accuracy).
 - [ ] An adaptive flip fraction, adjusted to the class size, settable in the
   Dark Numbers section (asked 2026-11-18; a fixed 0.2 by default today).
 - [ ] Dark Numbers per subgroup of a categorical column, chosen in the Dark

@@ -227,6 +227,7 @@ img.logo { display: block; height: 40px; width: auto; }
 
 /* 297d: copying column roles from another dataset */
 .message.warn { background: #fdf3dc; color: #7a5200; }
+.message.note { background: #eaf2fb; color: #0e3a66; font-weight: 400; }      /* 300w */
 form.copy-roles { margin-bottom: 10px; }
 
 /* 298c: the Dark Numbers formula card. */

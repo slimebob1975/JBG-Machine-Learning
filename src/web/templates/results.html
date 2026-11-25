@@ -164,12 +164,14 @@
         {% else %}
         <p class="hint">{{ _("The estimated share of hidden cases of each target class, for four model variants sorted from the lowest to the highest. Together they form an interval with subintervals.") }}</p>
         {% endif %}
+        {# 300w (agreed 2026-11-24): D is presented as an estimate. #}
+        <p class="message note">{{ _("The Dark Number is an estimate, not a statistically proven share. It rests on the model's errors and on assumptions that cannot be tested with the data at hand. Use it to compare orders of magnitude and to follow changes over time, not as an exact count.") }}</p>
         {% for interval in dark_summary %}
           <h3>{{ _("Target class") }}: {{ interval.target }} <span class="muted">· {{ interval.formula | replace("_", " ") }}</span></h3>
           {% if dark_view == "growth" %}
           {# 299v: the growth of the target class, with the counts behind it. #}
           <table class="grid dark-range">
-            <thead><tr><th>{{ _("Estimate") }}</th><th class="num">{{ _("Dark Number") }}</th><th>{{ _("Growth of the target class") }}</th><th>{{ _("Counts") }}</th></tr></thead>
+            <thead><tr><th>{{ _("Estimate") }}</th><th class="num">{{ _("Estimated Dark Number") }}</th><th>{{ _("Growth of the target class") }}</th><th>{{ _("Counts") }}</th></tr></thead>
             <tbody>{% for p in interval.growth_points %}<tr><td>{{ _(dark_estimates.get(p.label, p.label)) }}</td>
               <td class="num">{% if p.value is not none %}{{ p.value | num(language) }}{% else %}{{ _(dark_reasons.get(p.reason, p.reason)) }}{% endif %}</td>
               <td class="dark-bar-cell">{% if p.growth is not none %}<span class="dark-track"><span class="dark-bar" style="width: {{ p.growth_bar }}%"></span></span><span class="dark-percent">{{ p.growth_text }}</span>{% endif %}</td>
@@ -180,7 +182,7 @@
           {% if parts | length > 1 %}<p class="hint">{{ _("Subintervals") }}: {% for p in parts %}{{ _(dark_estimates.get(p.label, p.label)) }} <b>+{{ p.growth_text.split(" (")[0][1:] }}</b>{{ " → " if not loop.last }}{% endfor %}</p>{% endif %}
           {% else %}
           <table class="grid dark-range">
-            <thead><tr><th>{{ _("Estimate") }}</th><th class="num">{{ _("Dark Number") }}</th><th>{{ _("In percent") }}</th></tr></thead>
+            <thead><tr><th>{{ _("Estimate") }}</th><th class="num">{{ _("Estimated Dark Number") }}</th><th>{{ _("In percent") }}</th></tr></thead>
             <tbody>{% for p in interval.points %}<tr><td>{{ _(dark_estimates.get(p.label, p.label)) }}</td>
               <td class="num">{% if p.value is not none %}{{ p.value | num(language) }}{% else %}{{ _(dark_reasons.get(p.reason, p.reason)) }}{% endif %}</td>
               <td class="dark-bar-cell">{% if p.percent %}<span class="dark-track"><span class="dark-bar" style="width: {{ p.bar }}%"></span></span><span class="dark-percent">{{ p.percent }}</span>{% endif %}</td></tr>{% endfor %}</tbody>

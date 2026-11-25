@@ -15,8 +15,7 @@ requirements files do not ask for.
 ## The tested environment (300u, 2026-11-24)
 
 The user's Windows environment, in which the gate passed at 300t (`-Quick`,
-1404 tests). Python 3.11 or later: NumPy 2.3 and JAX 0.7 require it. The exact
-Python version is recorded at the next update of this file.
+1404 tests). Python 3.13.7 (recorded 2026-11-24, 300w).
 
 | Package | Version | Role |
 |---|---|---|
@@ -52,7 +51,8 @@ differences were found and handled:
   both since 300s.
 - scikit-learn 1.9 refuses the default positive class for averaged precision
   and recall with text classes. The scorers pass no positive class since 300s.
-  Average Precision still fails with text classes (BACKLOG).
+  Average Precision scores probabilities and works with text classes since
+  300w.
 
 From 300u the container uses the versions in `constraints-tested.txt` for the
 numerical core and the web server, so its gate matches the Windows one.

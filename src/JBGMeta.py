@@ -877,6 +877,11 @@ class ScoreMetric(MetaEnum):
         if isinstance(self.callable, str):
             return self.callable
         
+        elif self.callable is average_precision_score:
+            # 300w (2026-11-24): on probabilities, with any class labels. The
+            # stored values are unchanged (they identify the members).
+            from JBGScorers import AveragePrecisionScorer
+            return AveragePrecisionScorer(average=(self.kwargs or {}).get("average", "macro"))
         else:
             kwargs = dict(self.kwargs or {})
             if self.callable in (precision_score, recall_score):
