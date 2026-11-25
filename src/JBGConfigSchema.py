@@ -122,6 +122,20 @@ def _meta(name: str) -> Callable[[], list]:
     return options
 
 
+def _undersamplers() -> list:
+    """301a: the undersampling methods without the removed presets (R02-R20)."""
+    from JBGSampling import UNDERSAMPLING_PRESETS
+    return [option for option in _meta("Undersampling")() if option[0] not in UNDERSAMPLING_PRESETS]
+
+
+def _share_samplers(name: str) -> tuple:
+    """301a: the methods of a sampling section that use its share slider."""
+    from JBGSampling import OVERSAMPLERS_WITH_SHARE, UNDERSAMPLERS_WITH_SHARE
+    import JBGMeta
+    codes = OVERSAMPLERS_WITH_SHARE if name == "Oversampling" else UNDERSAMPLERS_WITH_SHARE
+    return tuple(member.full_name for member in getattr(JBGMeta, name) if member.name in codes)
+
+
 def _dark(name: str) -> Callable[[], list]:
     def options():
         import Config
@@ -203,7 +217,17 @@ for _name, _kind, _label, _options in _INVESTIGATION:
 _f("mode.oversamplers", "oversampling", "multi_choice", "Oversampling methods", nullable=True,
    options=_meta("Oversampling"), allows_all=True)
 _f("mode.undersamplers", "undersampling", "multi_choice", "Undersampling methods", nullable=True,
-   options=_meta("Undersampling"), allows_all=True)
+   options=_undersamplers, allows_all=True)
+# 301a (specified 2026-11-24): one share slider per sampling section. The
+# browser sets its range from the active training dataset's classes.
+_f("mode.oversampling_share", "oversampling", "share",
+   "The smallest class's share after oversampling", None, role="over",
+   applies_to=_share_samplers("Oversampling"),
+   nullable=True, minimum=0.0, maximum=50.0)
+_f("mode.undersampling_share", "undersampling", "share",
+   "The largest class's share after undersampling", None, role="under",
+   applies_to=_share_samplers("Undersampling"),
+   nullable=True, minimum=50.0, maximum=100.0)
 # 298d (asked 2026-11-11): only the lists are shown. The single, older
 # fields (mode.oversampler, mode.undersampler) stay in the stored settings,
 # unchanged, and are the engine's fallback when a list is empty.
@@ -291,6 +315,9 @@ def configuration_schema(source: str, translate: Callable[[str], str], defaults:
         for extra in ("minimum", "maximum"):
             if extra in entry:
                 field[extra] = entry[extra]
+        if "role" in entry:                                      # 301a: a share slider
+            field["role"] = entry["role"]
+            field["applies_to"] = [translate(name) for name in entry.get("applies_to", ())]
         if "subgroup" in entry:
             field["subgroup"] = translate(entry["subgroup"])
         if "options" in entry:

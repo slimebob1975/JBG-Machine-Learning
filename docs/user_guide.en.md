@@ -183,6 +183,21 @@ role on the Dataset tab; the section shows which column is used. Keeping
 groups apart in the holdout split needs two classes. In **Oversampling** and **Undersampling**, tick the
 methods to try; with nothing ticked, no sampling is used.
 
+**The share sliders.** Each sampling section has a slider. In Oversampling it
+sets the smallest class's share of the rows after sampling, and in
+Undersampling the largest class's share. The slider starts at the class's
+current share in the active training dataset and moves only towards 50 %. If a
+method is ticked but the slider is untouched, the configuration is not saved.
+Then move the slider, untick the methods or choose **Use the standard
+values**: the smallest class is raised to the next larger class's share, and
+the largest class is lowered to the next smaller class's share, never past
+50 %. With two classes that is balanced. The same share applies to every ticked
+method that can use it. The cleaning undersampling methods (for example Tomek
+Links) follow their own rules, and the run log says so, as it does when a class
+has already reached its share. The earlier undersampling presets (at most 2, 5,
+10 or 20 times the smallest class) are replaced by the slider. A saved
+configuration with them gets random undersampling with the matching share.
+
 In **Dark Numbers**, the **Target class** is chosen among the classes of the
 active training dataset's class column, or **All classes**. The classes are
 read when the section is opened (SQL projects need a sign-in). Below the

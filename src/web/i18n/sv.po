@@ -2551,3 +2551,43 @@ msgstr "Målklasser"
 
 msgid "Replaced algorithm"
 msgstr "Ersatt algoritm"
+
+# 301a: the share sliders for over- and undersampling.
+msgid "The smallest class's share after oversampling"
+msgstr "Minsta klassens andel efter översampling"
+
+msgid "The largest class's share after undersampling"
+msgstr "Största klassens andel efter undersampling"
+
+msgid "Move the slider towards 50 %, or untick the sampling methods."
+msgstr "Flytta reglaget mot 50 %, eller avmarkera samplingsmetoderna."
+
+msgid "Sampling is ticked, but its slider is still at the class's current share, so it would change nothing. Move the slider towards 50 %, or untick the sampling methods."
+msgstr "Sampling är markerad, men reglaget står kvar på klassens nuvarande andel, så samplingen skulle inte ändra något. Flytta reglaget mot 50 %, eller avmarkera samplingsmetoderna."
+
+msgid "Use the standard values"
+msgstr "Använd standardvärden"
+
+msgid "Oversampling raises the smallest class to the next larger class's share, undersampling lowers the largest class to the next smaller class's share, at most to 50 %."
+msgstr "Översampling höjer minsta klassen till andelen för nästa större klass, och undersampling sänker största klassen till andelen för nästa mindre klass, aldrig förbi 50 %."
+
+msgid "The slider needs at least two classes in the active training dataset."
+msgstr "Reglaget behöver minst två klasser i det aktiva träningsdatasetet."
+
+msgid "The classes are already balanced."
+msgstr "Klasserna är redan balanserade."
+
+msgid "Now"
+msgstr "Nu"
+
+msgid "Move the slider towards 50 %."
+msgstr "Flytta reglaget mot 50 %."
+
+msgid "To use the slider, set the class column of the active training dataset on the Dataset tab."
+msgstr "För att använda reglaget, ange klasskolumnen för det aktiva träningsdatasetet på fliken Dataset."
+
+msgid "Used by"
+msgstr "Används av"
+
+msgid "Other methods use their own rules, and the run log says so."
+msgstr "Övriga metoder följer sina egna regler, och körningens logg säger det."

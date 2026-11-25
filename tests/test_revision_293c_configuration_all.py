@@ -29,7 +29,10 @@ def test_all_means_every_code_including_none(key):
     payload = Config()._config_to_json(username="")
     payload["mode"][key] = ["ALL"]
     exported = _load(payload)._config_to_json(username="")["mode"][key]
-    assert exported == [member.name for member in LISTS[key]]
+    # 301a: "All" undersampling no longer includes the removed presets R02-R20.
+    from JBGSampling import UNDERSAMPLING_PRESETS
+    removed = UNDERSAMPLING_PRESETS if key == "undersamplers" else {}
+    assert exported == [member.name for member in LISTS[key] if member.name not in removed]
 
 
 def test_all_wins_over_other_codes_and_files_without_all_are_unchanged():

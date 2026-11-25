@@ -185,6 +185,21 @@ kolumnroll på fliken Dataset, och avsnittet visar vilken kolumn som används.
 Grupper isär vid uppdelningen av testdata kräver två klasser. I **Översampling** och **Undersampling** kryssar
 du i de metoder som ska prövas. Är inget ikryssat används ingen sampling.
 
+**Andelsreglagen.** Varje samplingsavsnitt har ett reglage. I Översampling
+anger det minsta klassens andel av raderna efter samplingen, och i
+Undersampling största klassens andel. Reglaget börjar på klassens nuvarande
+andel i det aktiva träningsdatasetet och går bara mot 50 %. Är en metod
+ikryssad men reglaget orört, sparas inte konfigurationen. Flytta då reglaget,
+avmarkera metoderna eller välj **Använd standardvärden**: minsta klassen höjs
+till andelen för nästa större klass, och största klassen sänks till andelen
+för nästa mindre klass, aldrig förbi 50 %. Med två klasser blir det balanserat.
+Samma andel gäller alla ikryssade metoder som kan använda den. De rensande
+undersamplingsmetoderna (till exempel Tomek Links) följer sina egna regler, och
+körningens logg säger det, liksom när en klass redan har nått sin andel. De
+tidigare förvalen för undersampling (högst 2, 5, 10 eller 20 gånger minsta
+klassen) har ersatts av reglaget. En sparad konfiguration med dem får slumpvis
+undersampling med motsvarande andel.
+
 I **Mörkertal** väljs **Målklass** bland klasserna i det aktiva
 träningsdatasetets klasskolumn, eller **Alla klasser**. Klasserna läses när
 avsnittet öppnas (i SQL-projekt behövs inloggning). Under fälten visas

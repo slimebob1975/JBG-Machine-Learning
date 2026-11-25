@@ -82,6 +82,11 @@ class DarkNumberMethod(enum.Enum):
         raise ValueError(f"Unsupported Dark Number method: {value}")
 
 
+def _share(value):
+    """301a: a stored share slider value, in percent, or None."""
+    return None if value in (None, "") else float(value)
+
+
 @dataclass
 class Config:
     
@@ -104,10 +109,14 @@ class Config:
         mode = payload.get("mode") if isinstance(payload, dict) else None
         if not isinstance(mode, dict):
             return
+        from JBGSampling import UNDERSAMPLING_PRESETS, convert_undersampling_presets
         for key, codes in lists.items():
             value = mode.get(key)
             if value == cls.ALL_CODE or (isinstance(value, list) and cls.ALL_CODE in value):
-                mode[key] = [member.name for member in codes]
+                mode[key] = [member.name for member in codes
+                             if not (key == "undersamplers"
+                                     and member.name in UNDERSAMPLING_PRESETS)]   # 301a
+        payload["mode"] = convert_undersampling_presets(mode)                       # 301a
 
     # 293a2: section keys added after the schema-v2 baseline, with the default
     # an older file implies. Agreed 2026-11-05; extend only deliberately.
@@ -117,7 +126,9 @@ class Config:
                            "dark_number_sampling_policy": "PIPELINE",        # 299y
                            "dark_number_c_max": 20.0, "dark_number_c_warning": 10.0,     # 300v
                            "dark_number_flip_repeats": 2,                     # 300n
-                           "dark_number_standard_estimator": True}}           # 300y
+                           "dark_number_standard_estimator": True,            # 300y
+                           "oversampling_share": None,                        # 301a
+                           "undersampling_share": None}}                      # 301a
     JSON_CONFIG_SCHEMA_VERSION = 2
 
     CLASS_TABLE_SCRIPT = "./sql/CreatePredictionTables.sql.txt"
@@ -416,6 +427,12 @@ class Config:
         # 300y (asked 2026-11-24): logistic regression replaces the algorithm in
         # the Dark Numbers computation when c cannot be used. On by default.
         dark_number_standard_estimator: bool = True
+        # 301a (specified 2026-11-24): the share sliders, in percent. The
+        # smallest class's share after oversampling (above 0, at most 50) and
+        # the largest class's share after undersampling (at least 50, below
+        # 100). None: balanced, as before 301a.
+        oversampling_share: float = None
+        undersampling_share: float = None
         experimental_perturbed_dark_number_fallback: bool = True
         oversampler: Oversampling = field(default_factory=Oversampling.defaultOversampler)
         undersampler: Undersampling = field(default_factory=Undersampling.defaultUndersampler)
@@ -627,6 +644,10 @@ class Config:
                 raise ValueError("Argument dark_number_flip_repeats must lie between 1 and 10")
             if not isinstance(self.dark_number_standard_estimator, bool):
                 raise TypeError("Argument dark_number_standard_estimator must be true or false")
+            if self.oversampling_share is not None and not 0.0 < float(self.oversampling_share) <= 50.0:
+                raise ValueError("Argument oversampling_share must be above 0 and at most 50")
+            if self.undersampling_share is not None and not 50.0 <= float(self.undersampling_share) < 100.0:
+                raise ValueError("Argument undersampling_share must be at least 50 and below 100")
 
             if not (isinstance(self.algorithm, AlgorithmTuple)):
                 raise TypeError("Argument algorithm is invalid")
@@ -1264,7 +1285,9 @@ class Config:
                 config.mode, "dark_number_sampling_policy", "PIPELINE")                # 299y
             for name, default in (("dark_number_c_max", 20.0), ("dark_number_c_warning", 10.0),
                                   ("dark_number_flip_repeats", 2),                    # 300n
-                                  ("dark_number_standard_estimator", True)):          # 300y
+                                  ("dark_number_standard_estimator", True),           # 300y
+                                  ("oversampling_share", None),                       # 301a
+                                  ("undersampling_share", None)):                     # 301a
                 setattr(saved_config.mode, name, getattr(config.mode, name, default))
             # Saved model metadata deliberately contains no SQL password. Inject the
             # credentials from the current runtime configuration when loading a model.
@@ -1371,6 +1394,8 @@ class Config:
                 dark_number_c_warning=float(module.mode.get("dark_number_c_warning", 10.0)),
                 dark_number_flip_repeats=int(module.mode.get("dark_number_flip_repeats", 2)),
                 dark_number_standard_estimator=bool(module.mode.get("dark_number_standard_estimator", True)),
+                oversampling_share=_share(module.mode.get("oversampling_share")),          # 301a
+                undersampling_share=_share(module.mode.get("undersampling_share")),        # 301a
                 preprocessor=(PreprocessTuple.from_string(module.mode["preprocessor"])
                               if isinstance(module.mode["preprocessor"], str)
                               else PreprocessTuple(module.mode["preprocessor"])),

@@ -1,3 +1,34 @@
+## Revision 301a - Share sliders for over- and undersampling (2026-11-24)
+
+- Specified 2026-11-24: one slider in each sampling section of the
+  configuration. In Oversampling it sets the smallest class's share of the rows
+  after sampling, in Undersampling the largest class's share. Both start at the
+  class's current share in the active training dataset (read when the section
+  opens, as for the Dark Numbers target) and move only towards 50 %. Two
+  classes or more alike. The shares are stored in percent
+  (`mode.oversampling_share`, `mode.undersampling_share`). Empty means balanced,
+  as before, so older configurations and runs behave as they did.
+- A ticked method with an untouched slider would change nothing, so the
+  configuration is not saved: the form asks to move the slider or untick, or to
+  use the standard values (agreed 2026-11-24). Those raise the smallest class to
+  the next larger class's share and lower the largest class to the next smaller
+  class's share, never past 50 % (balanced with two classes). When the classes
+  cannot be read (an SQL project while signed out) the save is not checked.
+- One share applies to every chosen method that can use it: all oversamplers,
+  and Random, Cluster Centroids, Near Miss and Instance Hardness Threshold among
+  the undersamplers. The cleaning undersamplers keep their own rules. The run
+  log says so, and when a class has already reached its share. The pipeline
+  picture shows the share. The Dark Numbers correction test follows the sliders
+  with its default "Som pipelinen". Its own SMOTE and 1 : 1 choices keep their
+  fixed ratios.
+- The undersampling presets R02, R05, R10 and R20 are removed from the choices,
+  and "All" no longer includes them. They stay in the code, since saved models
+  refer to them. A stored configuration with them gets Random undersampling and
+  the largest-class share of the most balancing preset chosen (R02 66.7 %, R05
+  83.3 %, R10 90.9 %, R20 95.2 %), unless it already has a share.
+- User guides: the Configuration section.
+- Tests: `tests/test_revision_301a_share_sliders.py`.
+
 ## Revision 300y - Logistic regression for Dark Numbers when c cannot be used (2026-11-24)
 
 - Asked 2026-11-24: when `c` cannot be used for some target class (above the

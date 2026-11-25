@@ -34,7 +34,31 @@ FIELD_ERRORS = {
     "required": "A value is required.",
     "choice": "Choose one of the options.",
     "list": "Enter whole numbers separated by commas.",
+    # 301a: a share slider left at the class's current share.
+    "unchanged": "Move the slider towards 50 %, or untick the sampling methods.",
 }
+
+
+SHARE_FIELDS = {"over": ("mode.oversampling_share", "oversamplers", "NOG"),
+                "under": ("mode.undersampling_share", "undersamplers", "NUG")}
+
+
+def unchanged_shares(settings: dict, shares: dict) -> list:
+    """301a (agreed 2026-11-24): the roles ("over", "under") whose chosen
+    sampling would do nothing: a method that uses the share is ticked, but the
+    slider is still at the class's current share."""
+    from JBGSampling import OVERSAMPLERS_WITH_SHARE, UNDERSAMPLERS_WITH_SHARE, share_unchanged
+    if not shares:
+        return []
+    mode = settings.get("mode") or {}
+    found = []
+    for role, (key, listed, none) in SHARE_FIELDS.items():
+        chosen = set(mode.get(listed) or [])
+        uses = OVERSAMPLERS_WITH_SHARE if role == "over" else UNDERSAMPLERS_WITH_SHARE
+        if ("ALL" in chosen or chosen & uses) and \
+                share_unchanged(mode.get(key.split(".", 1)[1]), shares, role):
+            found.append(role)
+    return found
 
 
 def _number(text: str, kind: str):
@@ -80,7 +104,7 @@ def convert_form(schema: dict, form) -> tuple[dict, dict]:
                 if raw not in allowed:
                     raise LookupError("choice")
                 value = raw
-            elif kind in ("integer", "number"):
+            elif kind in ("integer", "number", "share"):        # 301a: a share in percent
                 text = (raw or "").strip()
                 if not text:
                     if not field["nullable"]:
@@ -218,6 +242,10 @@ def add_configuration_tab(app, *, principal_dependency, render, redirect, active
                     except Exception:
                         stored = None
                     context["values"] = effective_sampling(selected["settings"], stored)
+                    # 301a: the removed undersampling presets as Random with a share.
+                    from JBGSampling import convert_undersampling_presets
+                    context["values"] = dict(context["values"], mode=convert_undersampling_presets(
+                        context["values"].get("mode") or {}))
                 context["combinations"] = combinations(context["schema"], context["values"])
                 # 298c: the Dark Numbers formula, and where the target classes come from.
                 from JBGWebUIDarkNumbers import calculation_type, formula_cards
@@ -243,6 +271,22 @@ def add_configuration_tab(app, *, principal_dependency, render, redirect, active
                                        "after": steps[last + 1:]}
         return render(request, principal, "configuration.html", "configuration",
                       status_code=status_code, **context)
+
+    def class_shares_for(principal, pid) -> dict:
+        """301a: the shares of the active training dataset's smallest and
+        largest classes, and the standard values; empty when they cannot be
+        read (then the save is not checked)."""
+        from JBGSampling import class_shares
+        active, roles = training_roles(principal, pid)
+        if active is None or roles is None or not roles.class_column:
+            return {}
+        try:
+            distribution = inspection.class_distribution(principal, pid, active["dataset_id"],
+                                                         roles.class_column)
+        except Exception:
+            return {}
+        return class_shares({str(c["value"]): c["count"]
+                             for c in distribution.get("classes") or []})
 
     def training_roles(principal, pid):
         """The active training dataset and its roles (either may be None).
@@ -342,6 +386,20 @@ def add_configuration_tab(app, *, principal_dependency, render, redirect, active
             return page(request, principal, configuration=configuration_id,
                         values=_merged(settings, schema), field_errors=errors,
                         form_message="fields", status_code=422)
+        # 301a (agreed 2026-11-24): ticked sampling with a slider left at the
+        # class's current share would do nothing. Ask the user to move it or
+        # untick, or use the standard values.
+        shares = class_shares_for(principal, pid)
+        unchanged = unchanged_shares(settings, shares)
+        if unchanged and form.get("sampling_standard"):
+            for role in unchanged:
+                key = SHARE_FIELDS[role][0].split(".", 1)[1]
+                settings["mode"][key] = round(shares["standard_" + role], 1)
+        elif unchanged:
+            return page(request, principal, configuration=configuration_id,
+                        values=_merged(settings, schema),
+                        field_errors={SHARE_FIELDS[role][0]: "unchanged" for role in unchanged},
+                        form_message="sampling", status_code=422)
         try:
             configurations.save(principal.principal_key, pid, configuration_id,
                                 settings=settings, expected_version=expected)

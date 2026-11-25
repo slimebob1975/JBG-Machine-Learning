@@ -202,6 +202,68 @@
     load();
   }
 
+  /* 301a (specified 2026-11-24): the share sliders. The range runs from the
+     class's current share towards 50 %: oversampling raises the smallest class,
+     undersampling lowers the largest. The hidden field carries the value that
+     is saved. It stays empty until the slider is moved, so an untouched slider
+     is caught when the configuration is saved. */
+  function wireShareSlider(box) {
+    var url = box.getAttribute("data-classes-url");
+    var section = box.closest("details");
+    var range = box.querySelector("input[type=range]");
+    var hidden = box.querySelector("[data-share-value]");
+    var output = box.querySelector("[data-share-output]");
+    var status = box.parentNode.querySelector("[data-share-status]");
+    var role = box.getAttribute("data-role");
+    var comma = box.getAttribute("data-decimal") === ",";
+    if (!url || !section || !range || !hidden) { return; }
+    function text(value) {
+      var shown = (Math.round(value * 10) / 10).toFixed(1);
+      return (comma ? shown.replace(".", ",") : shown) + " %";
+    }
+    function say(message) { if (status) { status.textContent = message || ""; status.hidden = !message; } }
+    var loaded = false;
+    function load() {
+      if (loaded || !section.open) { return; }
+      loaded = true;
+      say(box.getAttribute("data-loading"));
+      fetch(url, { credentials: "same-origin" })
+        .then(function (response) {
+          if (!response.ok) { throw new Error(String(response.status)); }
+          return response.json();
+        })
+        .then(function (data) {
+          var counts = (data.classes || []).map(function (entry) { return Number(entry.count) || 0; })
+            .filter(function (count) { return count > 0; });
+          var total = counts.reduce(function (sum, count) { return sum + count; }, 0);
+          if (counts.length < 2 || !total) { say(box.getAttribute("data-unavailable")); return; }
+          var shares = counts.map(function (count) { return 100 * count / total; })
+            .sort(function (a, b) { return a - b; });
+          var current = role === "over" ? shares[0] : shares[shares.length - 1];
+          if (Math.abs(current - 50) < 0.05) { say(box.getAttribute("data-balanced")); return; }
+          var low = role === "over" ? current : 50;
+          var high = role === "over" ? 50 : current;
+          var stored = parseFloat(String(hidden.value || "").replace(",", "."));
+          var start = isNaN(stored) ? current : Math.min(Math.max(stored, low), high);
+          range.min = String(low);
+          range.max = String(high);
+          range.value = String(start);
+          range.disabled = false;
+          output.textContent = text(start);
+          say(box.getAttribute("data-now") + " " + text(current) + ". " + box.getAttribute("data-towards"));
+          range.addEventListener("input", function () {
+            var value = Number(range.value);
+            hidden.value = (Math.round(value * 10) / 10).toFixed(1);
+            output.textContent = text(value);
+            hidden.dispatchEvent(new Event("input", { bubbles: true }));
+          });
+        })
+        .catch(function () { say(box.getAttribute("data-failed")); });
+    }
+    section.addEventListener("toggle", load);
+    load();
+  }
+
   /* 298c: every section starts closed; the ones open when the form is saved
      open again on the page that follows (also after a refused save). */
   function keepOpenSections(form) {
@@ -386,6 +448,7 @@
     if (configuration) { keepOpenSections(configuration); }
     document.querySelectorAll("[data-dark-formula]").forEach(wireDarkFormula);
     document.querySelectorAll("select[data-class-choice]").forEach(wireClassChoice);
+    document.querySelectorAll("[data-share-slider]").forEach(wireShareSlider);     /* 301a */
     wireSectionLinks();
     document.querySelectorAll("[data-top-actions]").forEach(wireTopActions);
     document.querySelectorAll("input[data-name-from]").forEach(wireDefaultName);   /* 300s */

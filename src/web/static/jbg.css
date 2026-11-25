@@ -341,3 +341,8 @@ svg.chart { width: 100%; height: auto; display: block; }
 /* 300p: the Dark Numbers confusion matrices, one per estimate */
 .dark-matrices { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px 24px; }
 .dark-matrix h4 { margin: 6px 0 4px; font-size: 13px; }
+/* 301a: the share sliders */
+.share-slider { display: flex; align-items: center; gap: 12px; max-width: 520px; }
+.share-slider input[type="range"] { flex: 1; accent-color: var(--blue); }
+.share-slider input[type="range"]:disabled { opacity: 0.45; }
+.share-slider output { min-width: 5.5em; font-variant-numeric: tabular-nums; font-weight: 600; }

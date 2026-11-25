@@ -126,7 +126,7 @@ decision.
 - [ ] A production-like synthetic dataset for the validation study, generated
   from aggregated profiles (2026-11-19). The generator and summary received
   then stay outside the repository.
-- [ ] Sampling sliders (asked 2026-11-16, specified 2026-11-24), one in the
+- [x] 301a: sampling sliders (asked 2026-11-16, specified 2026-11-24), one in the
   Oversampling and one in the Undersampling section, for the ordinary pipeline
   and the correction test. The slider sets the target class's share after
   sampling. It starts at the class's current share (minority or majority) and

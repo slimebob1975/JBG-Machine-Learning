@@ -28,6 +28,7 @@ def build_model_pipeline(
     *, decision_policy: str = "default", probability_threshold: float = 0.5,
     positive_label=None, catboost_schema_initialized: bool = False,
     catboost_original_columns=None, catboost_categorical_columns=None,
+    oversampling_share: float = None, undersampling_share: float = None,
 ) -> Union[Pipeline, Estimator]:
     policy, threshold = validate_decision_policy(
         decision_policy,
@@ -74,6 +75,16 @@ def build_model_pipeline(
         # Keep over before under and disambiguate the shared RND enum name.
         over = oversampler.get_callable_oversampler()
         under = undersampler.get_callable_undersampler()
+        # 301a (specified 2026-11-24): the share sliders. Methods that take no
+        # share keep their own rules (the run log says so).
+        from functools import partial
+        from JBGSampling import OVERSAMPLERS_WITH_SHARE, UNDERSAMPLERS_WITH_SHARE, share_counts
+        if oversampling_share is not None and oversampler.name in OVERSAMPLERS_WITH_SHARE:
+            over.set_params(sampling_strategy=partial(
+                share_counts, share=float(oversampling_share), role="over"))
+        if undersampling_share is not None and undersampler.name in UNDERSAMPLERS_WITH_SHARE:
+            under.set_params(sampling_strategy=partial(
+                share_counts, share=float(undersampling_share), role="under"))
 
         categorical_feature_indices = tuple(categorical_feature_indices or ())
         if oversampler in (Oversampling.SNC, Oversampling.SNN):

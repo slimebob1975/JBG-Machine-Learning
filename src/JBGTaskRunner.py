@@ -309,6 +309,12 @@ class TaskRunner:
             Or just use the model previously trained.
         """
         self.logger.print_task_header(title="Train model")
+        try:                                                    # 301a: the share sliders
+            from JBGSampling import share_notes
+            for note in share_notes(self.config.mode, self.dh.Y):
+                self.logger.print_warning(note)
+        except Exception:
+            pass
         
         # NOTICE: This major task uses another progressbar share inside DatasetHandler.spot_check_machine_learning_models,
         # so the number of progress bar shares will be the total number of "Major task":s + 1.

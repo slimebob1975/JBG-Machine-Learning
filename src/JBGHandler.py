@@ -2126,6 +2126,10 @@ class ModelHandler:
             catboost_schema_initialized=hasattr(self, "_catboost_original_columns"),
             catboost_original_columns=getattr(self, "_catboost_original_columns", None),
             catboost_categorical_columns=getattr(self, "_catboost_categorical_columns", None),
+            oversampling_share=getattr(getattr(self.handler.config, "mode", None),
+                                       "oversampling_share", None),                 # 301a
+            undersampling_share=getattr(getattr(self.handler.config, "mode", None),
+                                        "undersampling_share", None),               # 301a
         )
 
     # Find number of components in reduction step in Pipeline

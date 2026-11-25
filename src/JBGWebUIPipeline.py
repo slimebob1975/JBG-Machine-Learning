@@ -96,9 +96,16 @@ def pipeline_steps(schema: dict, values: dict, *, translate, language: str = "sv
             split += f" ({roles.group_column})"                   # 298g
     steps.append(step("splitting", USED, split))
 
+    shares = {"oversampling": mode.get("oversampling_share"),                   # 301a
+              "undersampling": mode.get("undersampling_share")}
     for key in ("scaling", "oversampling", "undersampling", "reduction"):
         choose, none_code = LISTS[key]
-        steps.append(choices(key, none_code, choose))
+        entry = choices(key, none_code, choose)
+        share = shares.get(key)
+        if share is not None and entry["state"] != UNUSED:
+            shown = f"{float(share):.1f}"
+            entry["subtitle"] += f" · {shown.replace('.', ',') if language == 'sv' else shown} %"
+        steps.append(entry)
 
     algorithms = list(mode.get("algorithm") or [])
     metric = label_of("mode.scoring", mode.get("scoring"))

@@ -39,6 +39,24 @@
         <label class="check"><input type="checkbox" name="f:{{ f.key }}" value="{{ column }}" {{ 'checked' if value and column in value }}> {{ column }}</label>
       {% endfor %}
     </fieldset>
+  {% elif f.kind == "share" %}
+    {# 301a (specified 2026-11-24): the range is set by jbg.js from the active
+       training dataset's classes when the section opens. The hidden field is
+       what is saved; it stays empty until the slider is moved. #}
+    <label for="{{ id }}">{{ f.label }}</label>
+    <div class="share-slider" data-share-slider data-role="{{ f.role }}" data-decimal="{{ ',' if language == 'sv' else '.' }}"
+      {% if class_source %}data-classes-url="/api/projects/{{ class_source.project_id }}/datasets/{{ class_source.dataset_id }}/class-distribution?column={{ class_source.column | urlencode }}"{% endif %}
+      data-loading="{{ _('Reading the classes ...') }}" data-failed="{{ _('The classes could not be read. For SQL projects, sign in on the Dataset tab.') }}"
+      data-unavailable="{{ _('The slider needs at least two classes in the active training dataset.') }}"
+      data-balanced="{{ _('The classes are already balanced.') }}"
+      data-now="{{ _('Now') }}" data-towards="{{ _('Move the slider towards 50 %.') }}">
+      <input type="range" id="{{ id }}" min="0" max="100" step="0.1" value="{{ value if value is not none else 50 }}" disabled>
+      <output data-share-output for="{{ id }}">{% if value is not none %}{{ value | num(language) }} %{% else %}–{% endif %}</output>
+      <input type="hidden" name="f:{{ f.key }}" value="{{ value if value is not none else '' }}" data-share-value>
+    </div>
+    {% if class_source %}<p class="hint" data-share-status hidden></p>
+    {% else %}<p class="hint">{{ _("To use the slider, set the class column of the active training dataset on the Dataset tab.") }}</p>{% endif %}
+    <p class="hint">{{ _("Used by") }}: {{ f.applies_to | join(", ") }}. {{ _("Other methods use their own rules, and the run log says so.") }}</p>
   {% elif f.key == "mode.dark_number_target" %}
     {# 298c: the classes of the active training dataset, read by jbg.js when
        the section opens; without it, "All classes" and the saved class. #}
@@ -176,6 +194,9 @@
     </div>
     {% if form_message == "fields" %}<p class="message error">{{ _("Some values were not accepted. See the marked fields.") }}</p>
     {% elif form_message == "invalid" %}<p class="message error">{{ _("The configuration was not accepted. Check the settings and save again.") }}</p>
+    {% elif form_message == "sampling" %}<p class="message warn">{{ _("Sampling is ticked, but its slider is still at the class's current share, so it would change nothing. Move the slider towards 50 %, or untick the sampling methods.") }}
+      <button class="btn sub" form="config-form" name="sampling_standard" value="1">{{ _("Use the standard values") }}</button>
+      <span class="hint">{{ _("Oversampling raises the smallest class to the next larger class's share, undersampling lowers the largest class to the next smaller class's share, at most to 50 %.") }}</span></p>
     {% elif form_message == "changed" %}<p class="message error">{{ _("Someone saved a newer version.") }}
       <a href="/ui/configuration?configuration={{ selected.configuration_id }}">{{ _("Load the latest version") }}</a></p>{% endif %}
     <p class="hint">{{ _("Column roles are set on the Dataset tab.") }}</p>

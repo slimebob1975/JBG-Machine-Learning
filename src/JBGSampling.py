@@ -110,3 +110,129 @@ def validate_categorical_oversampling(method_name, categorical_indices, n_featur
         raise ValueError(f"Unsupported categorical oversampler contract: {method_name}")
 
     return indices
+
+
+# --- 301a: the share sliders (specified 2026-11-24) -------------------------------------
+# The oversampling slider sets the smallest class's share of all rows after
+# sampling, raised towards 50 %. The undersampling slider sets the largest
+# class's share, lowered towards 50 %. Shares are stored in percent.
+
+OVERSAMPLERS_WITH_SHARE = frozenset({"RND", "SME", "SNC", "SNN", "ADA", "BRD", "KMS", "SVM"})
+# The cleaning undersamplers (CNN, ENN, RNN, AKN, NCR, OSS, TKL) choose rows by
+# their own rules and take no share.
+UNDERSAMPLERS_WITH_SHARE = frozenset({"RND", "CCS", "IHT", "NMS"})
+
+# 301a: the removed presets kept the majority at most k times the smallest class.
+# With two classes that is a largest-class share of k / (k + 1).
+UNDERSAMPLING_PRESETS = {"R02": 2, "R05": 5, "R10": 10, "R20": 20}
+
+
+def _smallest(counts):
+    return min(counts, key=lambda label: (counts[label], str(label)))
+
+
+def _largest(counts):
+    return max(counts, key=lambda label: (counts[label], str(label)))
+
+
+def share_counts(y, share, role):
+    """The ``sampling_strategy`` for a share slider: the class count to sample
+    to, so that the smallest class (``role="over"``) or the largest class
+    (``role="under"``) makes up ``share`` percent of the rows. A class already
+    at or beyond the share is left as it is. A top-level function, used with
+    ``functools.partial``, so pipelines with it pickle."""
+    counts = Counter(y)
+    if len(counts) < 2:
+        return {}
+    fraction = min(max(float(share) / 100.0, 1e-6), 1 - 1e-6)
+    total = sum(counts.values())
+    if role == "over":
+        label = _smallest(counts)
+        rest = total - counts[label]
+        return {label: max(counts[label], int(round(fraction * rest / (1 - fraction))))}
+    if role == "under":
+        label = _largest(counts)
+        rest = total - counts[label]
+        return {label: min(counts[label], max(1, int(round(fraction * rest / (1 - fraction)))))}
+    raise ValueError(f"Unknown sampling role: {role!r}")
+
+
+def class_shares(counts) -> dict:
+    """The smallest and the largest class's share in percent, and the standard
+    values (agreed 2026-11-24): oversampling raises the smallest class to the
+    next larger class's share, undersampling lowers the largest class to the
+    next smaller class's share, both stopping at 50 %."""
+    counts = {label: int(count) for label, count in dict(counts).items() if int(count) > 0}
+    if len(counts) < 2:
+        return {}
+    total = sum(counts.values())
+    shares = sorted(100.0 * count / total for count in counts.values())
+    return {"smallest": shares[0], "largest": shares[-1],
+            "standard_over": min(50.0, shares[1]), "standard_under": max(50.0, shares[-2])}
+
+
+def share_unchanged(share, shares: dict, role: str, tolerance: float = 0.05) -> bool:
+    """True when the slider would change nothing: no share, or a share at or
+    beyond the class's current share."""
+    if share is None:
+        return True
+    if role == "over":
+        return float(share) <= shares["smallest"] + tolerance
+    return float(share) >= shares["largest"] - tolerance
+
+
+def convert_undersampling_presets(mode: dict) -> dict:
+    """301a: the undersampling presets R02-R20 are removed from the choices. A
+    stored configuration that uses them gets Random undersampling and, unless a
+    share is already set, the largest-class share of the most balancing preset
+    chosen (R02 gives 66.7 %)."""
+    mode = dict(mode or {})
+    listed = list(mode.get("undersamplers") or [])
+    single = mode.get("undersampler")
+    found = [code for code in listed + [single] if code in UNDERSAMPLING_PRESETS]
+    if not found:
+        return mode
+    if listed:
+        converted = []
+        for code in listed:
+            code = "RND" if code in UNDERSAMPLING_PRESETS else code
+            if code not in converted:
+                converted.append(code)
+        mode["undersamplers"] = converted
+    if single in UNDERSAMPLING_PRESETS:
+        mode["undersampler"] = "RND"
+    if mode.get("undersampling_share") is None:
+        k = min(UNDERSAMPLING_PRESETS[code] for code in found)
+        mode["undersampling_share"] = round(100.0 * k / (k + 1), 1)
+    return mode
+
+
+def share_notes(mode, labels) -> list:
+    """301a: what the run log says about the share sliders for these training
+    labels: a share the class has already reached (the sampling changes
+    nothing in this run), and chosen methods that take no share."""
+    from JBGMeta import Oversampling, Undersampling
+    shares = class_shares(Counter(labels))
+    notes = []
+    for role, enum_type, fallback, uses, attribute in (
+            ("over", Oversampling, getattr(mode, "oversampler", Oversampling.NOG),
+             OVERSAMPLERS_WITH_SHARE, "oversampling_share"),
+            ("under", Undersampling, getattr(mode, "undersampler", Undersampling.NUG),
+             UNDERSAMPLERS_WITH_SHARE, "undersampling_share")):
+        share = getattr(mode, attribute, None)
+        listed = getattr(mode, role + "samplers", None)
+        try:
+            chosen = sampling_names(listed, enum_type, fallback)
+        except ValueError:
+            continue
+        with_share = [name for name in chosen if name in uses]
+        without = [name for name in chosen if name not in uses and name not in ("NOG", "NUG")]
+        word = "oversampling" if role == "over" else "undersampling"
+        if share is not None and with_share and shares and share_unchanged(share, shares, role, 0.0):
+            which = "smallest" if role == "over" else "largest"
+            notes.append(f"The {which} class is already at {shares[which]:.1f} %, so the "
+                         f"{word} share {float(share):.1f} % changes nothing in this run.")
+        if share is not None and without:
+            notes.append(f"These {word} methods take no share and use their own rules: "
+                         f"{', '.join(without)}.")
+    return notes
