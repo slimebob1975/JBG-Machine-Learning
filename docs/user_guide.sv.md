@@ -1,4 +1,4 @@
-# JBG Automatisk klassificering
+# JBG Machine Learning
 
 Programmet tränar maskininlärningsmodeller som sorterar rader i en tabell i
 klasser. Det lär sig av rader som redan har en klass och kan sedan föreslå

@@ -1,4 +1,4 @@
-# JBG Automatic Classification
+# JBG Machine Learning
 
 The program trains machine learning models that sort the rows of a table
 into classes. It learns from rows that already have a class and can then

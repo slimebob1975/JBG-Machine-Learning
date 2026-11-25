@@ -1,3 +1,21 @@
+## Revision 300x - The product is called JBG Machine Learning (2026-11-24)
+
+- Decided 2026-11-24: the full rename, after the repository's rename on
+  2026-11-20. The masthead reads "JBG Machine Learning" in English in both
+  languages (the Swedish "Automatisk klassificering" is gone from `sv.po`). Also
+  renamed: the application name in logs (`JBGVersion.APP_NAME`), the welcome line
+  of the Voilà loggers, the README, both user guides, the BACKLOG, the design
+  document and the gate script's header.
+- Kept on purpose: `MODEL_ARTIFACT_FORMAT` ("JBGAutoClassification.model"),
+  which saved models are checked against when they load; module names such as
+  `AutomaticClassifier`; the CHANGELOG, the BACKLOG archive and the design
+  mockups, which are records of their time.
+- The README now starts with the web GUI and how to start it. Most of its
+  sections still describe the Voilà GUI (a new BACKLOG item).
+- The production repository is renamed by the user.
+- Tests: `tests/test_revision_300x_rename.py`. The tests of 175, 295d and 300q
+  that checked the old name use the new one.
+
 ## Revision 300w - Average Precision on probabilities, D presented as an estimate (2026-11-24)
 
 - Average Precision (micro, macro, weighted) scored the predicted classes, where

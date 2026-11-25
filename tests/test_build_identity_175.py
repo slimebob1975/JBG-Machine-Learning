@@ -14,7 +14,7 @@ DEFAULT_SETTINGS = (ROOT / "src" / "GUI" / "default_settings.json").read_text(en
 
 def test_product_version_is_stable_and_separate_from_repository_state():
     identity = BuildIdentity(branch="dev", commit="abc1234", dirty=True)
-    assert APP_NAME == "JBG AutoClassification"
+    assert APP_NAME == "JBG Machine Learning"                         # 300x
     assert APP_VERSION == "0.19.1"
     assert identity.compact_label == "v0.19.1 · Git: dev @ abc1234 (modified)"
 
@@ -66,7 +66,7 @@ def test_runtime_log_records_application_and_repository_identity(tmp_path):
         log_file = TimestampedLogFile(log_dir=tmp_path, filename="identity.log")
     try:
         text = log_file.path.read_text(encoding="utf-8")
-        assert "[INFO] Application: JBG AutoClassification v0.19.1" in text
+        assert "[INFO] Application: JBG Machine Learning v0.19.1" in text          # 300x
         assert "[INFO] Repository: Git: dev @ abcdef123456 (modified)" in text
     finally:
         log_file.close()

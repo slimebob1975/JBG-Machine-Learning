@@ -19,6 +19,8 @@ from typing import Any, Mapping
 
 from JBGPaths import relocate_saved_config_paths
 
+# 300x: the format identifier keeps the earlier product name. Saved models are
+# checked against it when loaded, so it must not change with the rename.
 MODEL_ARTIFACT_FORMAT = "JBGAutoClassification.model"
 MODEL_ARTIFACT_VERSION = 2
 MODEL_ARTIFACT_DEFAULT_SERIALIZER = "pickle"

@@ -1,8 +1,10 @@
-# JBG AutoClassification
+# JBG Machine Learning
 
-JBG AutoClassification is a Windows-oriented machine-learning application for rapid classifier
-spot-checking, pipeline comparison, training, evaluation and prediction from SQL Server data. The
-primary interface is a Jupyter/Voilà GUI backed by the Python modules in `src/`.
+JBG Machine Learning (formerly JBG AutoClassification) is a Windows-oriented machine-learning
+application for rapid classifier spot-checking, pipeline comparison, training, evaluation and
+prediction from SQL Server data and CSV files. The primary interface is a web GUI (FastAPI) backed
+by the Python modules in `src/`. The earlier Jupyter/Voilà GUI still works and is being retired;
+much of this README still describes it.
 
 JBG is designed for mixed tabular datasets containing numerical, categorical and text features. It
 combines preprocessing, resampling, dimensionality reduction, model selection, cross-validation,
@@ -104,7 +106,18 @@ model metadata. Schema-versioned JSON configuration files remain password-free.
 Do not commit a local `.env` file or credentials to source control. Keep GUI credential prefill disabled
 in production.
 
-## Starting the GUI
+## Starting the web GUI
+
+From the repository root, in the environment where JBG is installed:
+
+```powershell
+& .\scripts\start_fastapi_local.ps1 -Port 8000
+```
+
+Then open `http://127.0.0.1:8000/ui/overview`. The user guide is under the Om (About) tab, and
+`docs/dependencies.md` lists the tested package versions.
+
+## Starting the Voilà GUI
 
 The repository contains `start_application_template.ps1`. Make a local copy and edit the paths in
 the configuration block at the top of the script:

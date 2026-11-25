@@ -115,7 +115,7 @@ class JBGLogger(terminal.Logger):
         """ Only when show info is True, this prints out information about the config and run """
         # Print welcoming message
         if self.in_terminal:
-            title = "\n *** WELCOME TO JBG AUTOMATIC CLASSIFICATION SCRIPT ***\n"
+            title = "\n *** WELCOME TO JBG MACHINE LEARNING ***\n"
             self.print_unformatted(title)
         
         self.print_unformatted("Execution started at: {0:>30s} \n".format(str(date_now)))

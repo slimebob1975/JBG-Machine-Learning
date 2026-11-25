@@ -86,7 +86,7 @@ def test_the_title_links_to_the_overview(tmp_path, path):
         page = client.get(path).text
     brand = page.split('<div class="brand">')[1].split("</div>")[0]
     link = re.search(r'<a href="/ui/overview" class="brand-link"[^>]*>(.*?)</a>', brand, re.S)
-    assert link and "JBG" in link.group(1) and "Automatisk klassificering" in link.group(1)
+    assert link and "JBG" in link.group(1) and "Machine Learning" in link.group(1)   # 300x
 
 
 # --- Overview ----------------------------------------------------------------------------------

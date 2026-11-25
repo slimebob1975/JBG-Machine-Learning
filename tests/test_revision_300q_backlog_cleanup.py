@@ -11,7 +11,7 @@ ARCHIVE_PATH = ROOT / "docs" / "backlog_archive_300p.md"
 
 def test_the_sections():
     headings = [line for line in BACKLOG.splitlines() if line.startswith("#")]
-    assert headings[0].startswith("# JBG AutoClassification - Active BACKLOG")
+    assert headings[0].startswith("# JBG Machine Learning - Active BACKLOG")      # 300x
     for heading in ("## Current priorities", "### Now: stabilisation", "### Pending decision",
                     "### Deferred: future development", "## Standing rules",
                     "## Closed in the 300q cleanup"):

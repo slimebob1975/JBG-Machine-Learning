@@ -1,4 +1,4 @@
-# JBG AutoClassification - Active BACKLOG (revision 300q)
+# JBG Machine Learning - Active BACKLOG
 
 This file lists open work only, with the rules for keeping it. Done work is
 recorded in `CHANGELOG.md` (newest first). The BACKLOG as it stood at revision
@@ -38,10 +38,11 @@ decision.
   classes. With two classes the positive class is the Dark Numbers target, or
   else the smallest class.
 - [x] 300s: `.coverage` is no longer tracked, and `.gitignore` keeps it out.
-- [ ] Next (300x, decided 2026-11-24): the full rename to "JBG Machine
-  Learning", in English in the masthead in both languages, the README, the page
-  titles, the guides and the title of this file. The production repository is
+- [x] 300x (decided 2026-11-24): the full rename to "JBG Machine Learning",
+  in English in the masthead in both languages. The production repository is
   renamed by the user.
+- [ ] The README still describes the Voilà GUI in most sections (found with
+  300x). Rewrite it for the web GUI when Voilà's retirement is planned.
 - [x] 300u: the gate's warnings and skips. The NumPy `RuntimeWarning` in the
   300k test came from a real fault: an infinite upper bound of c read 1, and
   the quality "reliable" (fixed). The skip is container-only: `dill` is

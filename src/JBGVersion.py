@@ -14,7 +14,7 @@ import subprocess
 from typing import Optional
 
 
-APP_NAME = "JBG AutoClassification"
+APP_NAME = "JBG Machine Learning"          # 300x: was JBG AutoClassification
 APP_VERSION = "0.19.1"
 
 

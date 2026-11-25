@@ -1,4 +1,4 @@
-# JBG AutoClassification – Web GUI Design Outline
+# JBG Machine Learning – Web GUI Design Outline
 
 Status: **locked design**, agreed 2026-11-03 (revision 283a). This document is the binding reference for the new web GUI (BACKLOG Phase 4). The mockups use fictional projects, datasets, users and figures; their HTML sources are in [`mockups/html/`](mockups/html/).
 
@@ -544,6 +544,7 @@ The map above is the target. What exists after revision 285m3:
 | `/ui/results` | 300u | c's upper bound is infinite, not 1, when resamples of the flip test's parts are; "∞" in the calculation table |
 | `/ui/configuration`, `/ui/results` | 300v | Default limits for c: upper bound 20, warning level 10 (were 10 and 2) |
 | `/ui/results` | 300w | The Dark Number presented as an estimate (a note, "Skattat mörkertal"); Average Precision on probabilities |
+| (all pages) | 300x | The masthead reads "JBG Machine Learning" in both languages |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |
