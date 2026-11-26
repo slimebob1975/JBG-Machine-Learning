@@ -70,6 +70,12 @@ Prediction or Mixed.
 - **CSV projects**: choose a file (at most 25 MB, with a header row; the
   delimiter and the encoding, UTF-8 or the Windows-1252 that Excel saves, are
   detected automatically), enter a name and a role and choose **Upload**.
+  With **Add from Excel** you choose a workbook (.xlsx) and, in the next step,
+  the sheets that become datasets, each with a name and a role (for example
+  one sheet for training and one for prediction). A sheet's first row is the
+  header, formulas give the values Excel last computed and empty rows are
+  left out. Each sheet is added as a CSV dataset. Older .xls files need to be
+  saved as .xlsx.
 - **SQL projects**: sign in with a user name and password or with Windows
   authentication. Choose a catalog and a role, **Show tables**, choose a
   table, enter a name and choose **Register**. The sign-in is kept only in

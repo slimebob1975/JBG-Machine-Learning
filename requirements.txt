@@ -23,3 +23,5 @@ jax
 optax
 flax
 catboost>=1.2.8,<2
+# 301k: Excel workbooks (.xlsx) as datasets
+openpyxl

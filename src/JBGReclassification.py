@@ -197,6 +197,7 @@ class ReclassificationService:
         import tempfile
         from JBGProjectStorage import (csv_upload_format, project_csv_storage,
                                        register_csv_upload)
+        from Storage.CSVDatasetCatalog import csv_file_name_for
         project_run = record.spec["project_run"]
         connection = record.spec["configuration"]["connection"]
         try:
@@ -237,7 +238,7 @@ class ReclassificationService:
             try:
                 upload = register_csv_upload(repository, scope, path, delimiter=form["delimiter"],
                                              encoding=form["encoding"],
-                                             original_name=f"{dataset.name}.csv")
+                                             original_name=csv_file_name_for(dataset.name))   # 301k
             except ValueError:
                 raise CorrectionFailed("the corrected file could not be stored") from None
         self._datasets.replace_csv_file(owner, project_run["project_id"],

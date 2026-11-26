@@ -17,6 +17,7 @@ from typing import Any, BinaryIO
 from JBGApplicationContracts import DataSourceKind
 from JBGDatasets import Dataset, DatasetRepository, DatasetRole, DuplicateDatasetName
 from JBGProjectService import ProjectService
+from Storage.CSVDatasetCatalog import csv_file_name_for
 from JBGProjectStorage import (DEFAULT_CSV_ROOT, MAX_UPLOAD_BYTES, detect_delimiter,
                                detect_encoding,
                                project_csv_storage, register_csv_upload)
@@ -157,6 +158,115 @@ class DatasetService:
             raise
         return dataset_response(dataset, upload=upload)
 
+    # --- 301k: Excel workbooks, one CSV dataset per chosen sheet -------------------
+
+    EXCEL_ROOT = Path(tempfile.gettempdir()) / "jbg_excel"
+    EXCEL_KEEP_SECONDS = 24 * 3600
+
+    def _excel_folder(self, owner: str) -> Path:
+        import hashlib
+        return self.EXCEL_ROOT / hashlib.sha256(owner.encode("utf-8")).hexdigest()[:24]
+
+    def _excel_paths(self, owner: str, token: str) -> tuple[Path, Path]:
+        import re
+        if not re.fullmatch(r"[0-9a-f]{32}", token or ""):
+            raise ExcelUnavailable("workbook unavailable")
+        folder = self._excel_folder(owner)
+        return folder / f"{token}.xlsx", folder / f"{token}.json"
+
+    def read_excel(self, owner: str, project_id: str, *, stream: BinaryIO,
+                   filename: str | None) -> dict[str, Any]:
+        """301k (asked 2026-11-26): keep an uploaded workbook for its owner for a
+        day and list its sheets. ``add_excel_sheets`` then adds the chosen ones."""
+        import json
+        import time
+        from uuid import uuid4
+        from JBGExcelImport import sheet_overview
+        self._project(owner, project_id, DataSourceKind.CSV)
+        folder = self._excel_folder(owner)
+        folder.mkdir(parents=True, exist_ok=True)
+        for old in folder.iterdir():                      # workbooks left from before
+            try:
+                if time.time() - old.stat().st_mtime > self.EXCEL_KEEP_SECONDS:
+                    old.unlink()
+            except OSError:
+                pass
+        token = uuid4().hex
+        book, meta = self._excel_paths(owner, token)
+        with book.open("wb") as target:
+            copied = _copy_limited(stream, target, MAX_UPLOAD_BYTES + 1)
+        if copied > MAX_UPLOAD_BYTES:
+            book.unlink(missing_ok=True)
+            raise UploadTooLarge("Excel file exceeds 25 MB")
+        try:
+            sheets = sheet_overview(book)
+        except ValueError:
+            book.unlink(missing_ok=True)
+            raise
+        state = {"project_id": project_id, "filename": Path(filename or "arbetsbok.xlsx").name,
+                 "sheets": sheets, "results": []}
+        meta.write_text(json.dumps(state), encoding="utf-8")
+        return dict(state, token=token)
+
+    def excel_state(self, owner: str, project_id: str, token: str) -> dict[str, Any]:
+        import json
+        book, meta = self._excel_paths(owner, token)
+        try:
+            state = json.loads(meta.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            raise ExcelUnavailable("workbook unavailable") from None
+        if state.get("project_id") != project_id:
+            raise ExcelUnavailable("workbook unavailable")
+        return dict(state, token=token, available=book.exists())
+
+    def add_excel_sheets(self, owner: str, project_id: str, token: str, choices: list,
+                         principal=None) -> list:
+        """301k: each chosen sheet ({"sheet", "name", "role"}) as a CSV dataset,
+        through the ordinary CSV upload. One result per sheet: the dataset, or
+        why it was not added."""
+        import json
+        from JBGDatasetRoles import IncompatibleDataset
+        from JBGExcelImport import ExcelRefused, sheet_to_csv
+        state = self.excel_state(owner, project_id, token)
+        book, meta = self._excel_paths(owner, token)
+        if not book.exists():
+            raise ExcelUnavailable("workbook unavailable")
+        known = {s["sheet"] for s in state["sheets"]}
+        results = []
+        for choice in choices:
+            sheet, name, role = choice.get("sheet"), choice.get("name"), choice.get("role")
+            entry = {"sheet": sheet, "name": name, "role": role}
+            if sheet not in known:
+                results.append(dict(entry, error="no_sheet"))
+                continue
+            try:
+                with tempfile.TemporaryDirectory(prefix="jbg_sheet_") as folder:
+                    csv_path = Path(folder) / "sheet.csv"
+                    sheet_to_csv(book, sheet, csv_path)
+                    with csv_path.open("rb") as stream:
+                        created = self.upload_csv(owner, project_id, name=name, role=role,
+                                                  stream=stream, filename=csv_file_name_for(name),
+                                                  delimiter=";", encoding="utf-8-sig",
+                                                  principal=principal)
+                results.append(dict(entry, dataset_id=created["dataset_id"],
+                                    rows=created["upload"]["rows"],
+                                    id_candidates=created["upload"]["id_candidates"]))
+            except ExcelRefused as refused:
+                results.append(dict(entry, error=str(refused)))
+            except DatasetConflict:
+                results.append(dict(entry, error="duplicate"))
+            except UploadTooLarge:
+                results.append(dict(entry, error="too_large"))
+            except IncompatibleDataset:
+                results.append(dict(entry, error="incompatible"))
+            except (ValueError, TypeError):
+                results.append(dict(entry, error="bad_sheet"))
+        state.pop("token", None)
+        state.pop("available", None)
+        state["results"] = results
+        meta.write_text(json.dumps(state), encoding="utf-8")
+        return results
+
     ID_COLUMN = "JBG_RadId"                    # 301i (decided 2026-11-26)
 
     def add_id_column(self, owner: str, project_id: str, dataset_id: str) -> dict[str, Any]:
@@ -207,7 +317,7 @@ class DatasetService:
             target.write_bytes(out.getvalue().encode(form["encoding"]))
             upload = register_csv_upload(repository, scope, target, delimiter=form["delimiter"],
                                          encoding=form["encoding"],
-                                         original_name=f"{dataset.name}.csv")
+                                         original_name=csv_file_name_for(dataset.name))
         updated = self._repository.replace_csv_file(owner, project_id, dataset_id,
                                                     upload.artifact_id)
         return dataset_response(updated, upload=upload)
@@ -258,6 +368,10 @@ class DatasetService:
             raise DatasetConflict("dataset name already exists") from None
         except KeyError:
             raise DatasetUnavailable("dataset unavailable") from None
+
+
+class ExcelUnavailable(LookupError):
+    """301k: the uploaded workbook is gone (older than a day) or not this owner's."""
 
 
 class IdColumnRefused(ValueError):

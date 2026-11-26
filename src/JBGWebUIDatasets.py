@@ -9,6 +9,8 @@ driver messages are never echoed. Preview values go to the page only.
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import Depends, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse
 
@@ -36,6 +38,14 @@ MESSAGES = {
     "id_not_needed": ("error", "A column can already be the ID column."),
     "id_exists": ("error", "The dataset already has a JBG_RadId column."),
     "id_failed": ("error", "The ID column could not be added."),
+    # 301k (asked 2026-11-26): sheets of an Excel workbook as datasets.
+    "excel_not_xlsx": ("error", "The file could not be read as an Excel workbook (.xlsx). "
+                                "Save an older .xls file as .xlsx first."),
+    "excel_too_large": ("error", "The workbook is larger than 25 MB."),
+    "excel_gone": ("error", "The workbook is no longer available. Choose the file again."),
+    "excel_none_chosen": ("error", "Choose at least one sheet."),
+    "excel_added": ("ok", "The chosen sheets were added as datasets."),
+    "excel_partly": ("error", "Some sheets were not added. The list says why."),
     "activated": ("ok", "Dataset activated for training."),
     "signed_in": ("ok", "Signed in to SQL Server."),
     "signed_out": ("ok", "Signed out of SQL Server."),
@@ -54,6 +64,16 @@ MESSAGES = {
     "cannot_change_role": ("error", "Only training and mixed datasets can switch role."),
     "renamed": ("ok", "Dataset renamed."),                                   # 300r
     "bad_name": ("error", "The name was not accepted (1-200 characters)."),
+}
+
+# 301k: why a sheet was not added.
+EXCEL_ERRORS = {
+    "no_sheet": "The sheet is not in the workbook.",
+    "empty_sheet": "The sheet has no rows below its header.",
+    "duplicate": "A dataset with that name exists in the project.",
+    "too_large": "The sheet is larger than 25 MB as CSV.",
+    "incompatible": "The sheet does not fit the training dataset's columns.",
+    "bad_sheet": "The sheet could not be read as a table with a header row.",
 }
 READ_ERRORS = {
     "signin_required": "Sign in to SQL Server to read this dataset.",
@@ -100,7 +120,7 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
 
     def page(request, principal, *, dataset="", view="preview", column="", validation=None,
              status_code=200, incompatible=None, roles_error=None, roles_draft=None,
-             roles_from="", from_run=""):
+             roles_from="", from_run="", excel=""):
         owner = principal.principal_key
         project = active_project(request, owner)
         context = {"no_project": project is None, "datasets": [], "selected": None,
@@ -109,9 +129,20 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
                    "read_error": None, "read_errors": READ_ERRORS, "sql": None,
                    "tab_messages": MESSAGES, "incompatible": incompatible,
                    "role_choices": ROLE_CHOICES, "roles_error": roles_error,
-                   "catalogs": None, "catalog": "", "add_role": "training", "table_choice": None}
+                   "catalogs": None, "catalog": "", "add_role": "training", "table_choice": None,
+                   "excel_errors": EXCEL_ERRORS}
         if project is not None:
             pid = project["project_id"]
+            if excel:                                                       # 301k
+                from JBGDatasetService import ExcelUnavailable
+                try:
+                    state = datasets.excel_state(owner, pid, excel)
+                    stem = Path(state["filename"]).stem
+                    for sheet in state["sheets"]:
+                        sheet["suggested"] = f"{stem} – {sheet['sheet']}"[:200]
+                    context["excel"] = state
+                except ExcelUnavailable:
+                    context["excel_gone"] = True
             try:
                 items = datasets.list(owner, pid)
             except ProjectUnavailable:
@@ -262,10 +293,56 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
 
     @app.get("/ui/dataset", response_class=HTMLResponse, include_in_schema=False)
     def dataset_tab(request: Request, dataset: str = "", view: str = "preview", column: str = "",
-                    roles_from: str = "", recommendation: str = "",
+                    roles_from: str = "", recommendation: str = "", excel: str = "",
                     principal=Depends(principal_dependency)):
         return page(request, principal, dataset=dataset, view=view, column=column,
-                    roles_from=roles_from, from_run=recommendation)
+                    roles_from=roles_from, from_run=recommendation, excel=excel)
+
+    @app.post("/ui/dataset/excel", include_in_schema=False)
+    def read_excel(request: Request, file: UploadFile = File(...),
+                   principal=Depends(principal_dependency)):
+        """301k (asked 2026-11-26): step 1, the workbook's sheets."""
+        from JBGExcelImport import ExcelRefused
+        pid = project_id(request, principal)
+        if pid is None:
+            return redirect("/ui/dataset")
+        try:
+            state = datasets.read_excel(principal.principal_key, pid, stream=file.file,
+                                        filename=file.filename)
+        except UploadTooLarge:
+            return redirect("/ui/dataset", message="excel_too_large")
+        except (ExcelRefused, ValueError):
+            return redirect("/ui/dataset", message="excel_not_xlsx")
+        finally:
+            file.file.close()
+        return redirect("/ui/dataset", excel=state["token"])
+
+    @app.post("/ui/dataset/excel/{token}", include_in_schema=False)
+    async def add_excel_sheets(request: Request, token: str,
+                               principal=Depends(principal_dependency)):
+        """301k: step 2, each ticked sheet as a CSV dataset with its name and role."""
+        from JBGDatasetService import ExcelUnavailable
+        pid = project_id(request, principal)
+        if pid is None:
+            return redirect("/ui/dataset")
+        form = await request.form()
+        try:
+            state = datasets.excel_state(principal.principal_key, pid, token)
+        except ExcelUnavailable:
+            return redirect("/ui/dataset", message="excel_gone")
+        choices = [{"sheet": sheet["sheet"], "name": str(form.get(f"name_{i}", "")).strip(),
+                    "role": str(form.get(f"role_{i}", "training"))}
+                   for i, sheet in enumerate(state["sheets"]) if form.get(f"sheet_{i}")]
+        if not choices:
+            return redirect("/ui/dataset", excel=token, message="excel_none_chosen")
+        try:
+            results = datasets.add_excel_sheets(principal.principal_key, pid, token, choices,
+                                                principal=principal)
+        except ExcelUnavailable:
+            return redirect("/ui/dataset", message="excel_gone")
+        failed = any("error" in r for r in results)
+        return redirect("/ui/dataset", excel=token,
+                        message="excel_partly" if failed else "excel_added")
 
     @app.post("/ui/dataset/csv", include_in_schema=False)
     def upload_csv(request: Request, file: UploadFile = File(...), name: str = Form(""),

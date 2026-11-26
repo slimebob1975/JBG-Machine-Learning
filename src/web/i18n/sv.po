@@ -2815,3 +2815,85 @@ msgstr "Lägg till en ID-kolumn"
 
 msgid "Adds JBG_RadId, numbered 1, 2, 3 ..., first in the file, as a new version of it. Earlier versions are kept."
 msgstr "Lägger till JBG_RadId, numrerad 1, 2, 3 ..., först i filen, som en ny version av den. Tidigare versioner finns kvar."
+
+# 301k: Excel workbooks as datasets.
+msgid "A dataset with that name exists in the project."
+msgstr "Ett dataset med det namnet finns redan i projektet."
+
+msgid "Add"
+msgstr "Lägg till"
+
+msgid "Add from Excel"
+msgstr "Lägg till från Excel"
+
+msgid "Add the chosen sheets"
+msgstr "Lägg till valda flikar"
+
+msgid "Added"
+msgstr "Tillagd"
+
+msgid "At most 25 MB. Choose the sheets in the next step. Each becomes a dataset, with the sheet's first row as the header."
+msgstr "Högst 25 MB. Välj flikar i nästa steg. Varje flik blir ett dataset, med flikens första rad som rubrikrad."
+
+msgid "Choose a workbook first."
+msgstr "Välj en arbetsbok först."
+
+msgid "Choose at least one sheet."
+msgstr "Välj minst en flik."
+
+msgid "Dataset name"
+msgstr "Datasetets namn"
+
+msgid "Each chosen sheet is added as a CSV dataset, as an uploaded CSV file would be. Formulas give the values Excel last computed. Empty rows are left out."
+msgstr "Varje vald flik läggs till som ett CSV-dataset, som en uppladdad CSV-fil. Formler ger de värden Excel senast räknade fram. Tomma rader utelämnas."
+
+msgid "Header"
+msgstr "Rubrikrad"
+
+msgid "Not added"
+msgstr "Inte tillagd"
+
+msgid "Read the sheets"
+msgstr "Läs flikarna"
+
+msgid "Sheet"
+msgstr "Flik"
+
+msgid "Sheets in"
+msgstr "Flikar i"
+
+msgid "Some sheets were not added. The list says why."
+msgstr "Några flikar lades inte till. Listan säger varför."
+
+msgid "The chosen sheets were added as datasets."
+msgstr "De valda flikarna lades till som dataset."
+
+msgid "The file could not be read as an Excel workbook (.xlsx). Save an older .xls file as .xlsx first."
+msgstr "Filen kunde inte läsas som en Excel-arbetsbok (.xlsx). Spara en äldre .xls-fil som .xlsx först."
+
+msgid "The sheet could not be read as a table with a header row."
+msgstr "Fliken kunde inte läsas som en tabell med rubrikrad."
+
+msgid "The sheet does not fit the training dataset's columns."
+msgstr "Fliken passar inte träningsdatasetets kolumner."
+
+msgid "The sheet has no rows below its header."
+msgstr "Fliken har inga rader under rubrikraden."
+
+msgid "The sheet is larger than 25 MB as CSV."
+msgstr "Fliken är större än 25 MB som CSV."
+
+msgid "The sheet is not in the workbook."
+msgstr "Fliken finns inte i arbetsboken."
+
+msgid "The workbook is larger than 25 MB."
+msgstr "Arbetsboken är större än 25 MB."
+
+msgid "The workbook is no longer available. Choose the file again."
+msgstr "Arbetsboken finns inte längre. Välj filen igen."
+
+msgid "Workbook (.xlsx)"
+msgstr "Arbetsbok (.xlsx)"
+
+msgid "no column can be the ID column, see Column roles"
+msgstr "ingen kolumn kan vara ID-kolumn, se Kolumnroller"

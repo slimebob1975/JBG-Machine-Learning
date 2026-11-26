@@ -1,3 +1,31 @@
+## Revision 301k - Excel workbooks as datasets (2026-11-26)
+
+- Asked 2026-11-26: **Lägg till från Excel** on the Dataset tab of CSV projects.
+  Step 1 reads an .xlsx workbook (at most 25 MB) and lists its sheets with rows,
+  columns and header. Step 2 adds each ticked sheet as a CSV dataset with its
+  own name (the file and sheet by default) and role (prediction when the sheet's
+  name says so, else training), through the ordinary CSV upload, so encoding,
+  ID candidates (301i) and the prediction check work as for CSV files. The page
+  lists what was added and why a sheet was not.
+  - The first row is the header (blank or repeated names made unique), formulas
+    give the values Excel last computed, dates are written as ISO dates, and
+    empty rows are left out. Empty sheets cannot be chosen.
+  - The workbook is kept for its owner for a day between the two steps (in the
+    server's temporary folder), then removed.
+  - Older .xls files are refused with a message to save them as .xlsx.
+  - New module `JBGExcelImport`, routes `POST /ui/dataset/excel`,
+    `POST /ui/dataset/excel/{token}`, `POST .../datasets/excel` and
+    `POST .../datasets/excel/{token}`.
+- `openpyxl` in `requirements.txt`, and openpyxl 3.1.5 and et_xmlfile 2.0.0 in
+  `constraints-tested.txt` (the versions on the user's computer).
+- Fixed, found while testing: the stored file name was made from the dataset's
+  name, and the catalog refuses characters such as an en dash or &, so adding
+  JBG_RadId (301i) or saving class corrections (299b) failed for such names.
+  `csv_file_name_for` makes a safe file name. The dataset keeps its own name.
+- User guides: the Dataset section.
+- Tests: `tests/test_revision_301k_excel_sheets.py`. The 300u test counts 43
+  tested packages.
+
 ## Revision 301j - The dataset picture: free text on hover, remembered, a centred size (2026-11-26)
 
 - Asked 2026-11-26 for the Visualisation view:

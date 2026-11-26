@@ -55,6 +55,14 @@ def restore_csv_dataset(repository, scope: StorageScope, artifact_id: str, desti
         raise
 
 
+def csv_file_name_for(name):
+    """301k: a stored file name made from a dataset's name. Characters the
+    catalog does not accept (such as an en dash or &) become "_", and long
+    names are shortened. The dataset keeps its own name."""
+    stem = re.sub(r"[^\w .()\-]", "_", str(name or ""), flags=re.UNICODE).strip(" .") or "dataset"
+    return clean_csv_display_name(stem[:116] + ".csv")
+
+
 def clean_csv_display_name(value):
     """Accept only a modest, path-free CSV basename for the local catalog."""
     if not isinstance(value, str):

@@ -34,7 +34,7 @@ The user's Windows environment, in which the gate passed at 300t (`-Quick`,
 | pyodbc | 5.2.0 | SQL Server |
 | pytest | 8.4.2 | Tests |
 
-`constraints-tested.txt` has the full list (41 packages, contourpy added in 301g): every package in the
+`constraints-tested.txt` has the full list (43 packages: contourpy added in 301g, openpyxl and et_xmlfile in 301k): every package in the
 requirements files and the libraries the results depend on (joblib,
 threadpoolctl, jaxlib, keras, starlette, pydantic). Windows-only packages such
 as pywin32 are left out, so the file also works elsewhere.

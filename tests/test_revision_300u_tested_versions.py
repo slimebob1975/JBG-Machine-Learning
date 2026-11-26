@@ -48,7 +48,7 @@ def test_the_requirements_stay_unpinned():
 def test_the_constraints_work_everywhere():
     pins = _pins()
     assert "pywin32" not in pins and "pywinpty" not in pins
-    assert len(pins) == 41                     # 301g: contourpy, used directly
+    assert len(pins) == 43                     # 301g: contourpy; 301k: openpyxl, et_xmlfile
     assert "python -m pip install -r requirements.txt -r requirements-fastapi.txt " \
            "-c constraints-tested.txt" in CONSTRAINTS
 

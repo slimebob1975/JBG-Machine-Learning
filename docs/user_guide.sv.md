@@ -70,7 +70,12 @@ Prediktion eller Blandad.
 
 - **CSV-projekt**: välj en fil (högst 25 MB, med rubrikrad – avgränsaren
   och teckenkodningen, UTF-8 eller Windows-1252 som Excel sparar, känns igen
-  automatiskt), ange namn och roll och välj **Ladda upp**.
+  automatiskt), ange namn och roll och välj **Ladda upp**. Med **Lägg till
+  från Excel** väljer du en arbetsbok (.xlsx), och i nästa steg de flikar som
+  ska bli dataset, vart och ett med namn och roll (till exempel en flik för
+  träning och en för prediktion). Flikens första rad är rubrikrad, formler ger
+  de värden Excel senast räknade fram och tomma rader utelämnas. Varje flik
+  läggs till som ett CSV-dataset. Äldre .xls-filer behöver sparas som .xlsx.
 - **SQL-projekt**: logga in med användarnamn och lösenord eller med
   Windows-autentisering. Välj katalog och roll, **Visa tabeller**, välj
   tabell, ange namn och välj **Registrera**. Inloggningen finns bara i

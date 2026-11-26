@@ -322,6 +322,30 @@ def _add_dataset_endpoints(app, principal_dependency, datasets):
                     name=request.name, role=request.role, catalog=request.catalog,
                     table=request.table, principal=principal)
 
+    @app.post("/api/projects/{project_id}/datasets/excel", status_code=201)
+    def read_excel_workbook(project_id: str, file: UploadFile = File(...),
+                            principal: AuthenticatedPrincipal = Depends(principal_dependency)):
+        """301k: keep a workbook for a day and list its sheets."""
+        try:
+            return call(datasets.read_excel, principal.principal_key, project_id,
+                        stream=file.file, filename=file.filename)
+        finally:
+            file.file.close()
+
+    @app.post("/api/projects/{project_id}/datasets/excel/{token}")
+    def add_excel_sheets(project_id: str, token: str, request: dict = Body(...),
+                         principal: AuthenticatedPrincipal = Depends(principal_dependency)):
+        """301k: the chosen sheets ({"sheets": [{"sheet", "name", "role"}]}) as datasets."""
+        from JBGDatasetService import ExcelUnavailable
+        choices = request.get("sheets") if isinstance(request, dict) else None
+        if not isinstance(choices, list) or not choices:
+            raise HTTPException(status_code=422, detail="choose at least one sheet")
+        try:
+            return {"results": call(datasets.add_excel_sheets, principal.principal_key,
+                                    project_id, token, choices, principal=principal)}
+        except ExcelUnavailable:
+            raise HTTPException(status_code=404, detail="workbook unavailable") from None
+
     @app.post("/api/projects/{project_id}/datasets/{dataset_id}/id-column")
     def add_dataset_id_column(project_id: str, dataset_id: str,
                               principal: AuthenticatedPrincipal = Depends(principal_dependency)):
