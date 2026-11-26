@@ -28,6 +28,8 @@ decision.
 - [x] 301j (asked 2026-11-26): the dataset picture shows free text on hover, is
   remembered between views, and its point size starts in the middle.
 - [x] 301k (asked 2026-11-26): Excel workbooks, one dataset per chosen sheet.
+- [x] 301l (asked 2026-11-26): version 0.20.1. The user tags the commit
+  (v0.20.1).
 - [ ] Found with 301i: a prediction CSV for a model trained with JBG_RadId must
   contain JBG_RadId too, and the upload refuses a prediction file that lacks a
   training column. Add JBG_RadId to such a prediction file at upload, numbered

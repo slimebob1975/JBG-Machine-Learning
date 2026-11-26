@@ -1,3 +1,30 @@
+## Version 0.20.1 – the web GUI (2026-11-26)
+
+- The release after 0.19.1 (2026-10-30), revisions 280a to 301k: the web GUI
+  (FastAPI) replaces the Voilà GUI as the main interface. Voilà still works and
+  is being retired.
+- Tabs: Overview, Projects, Dataset (CSV and SQL datasets, Excel workbooks, column
+  roles, a picture of the data), Configuration (versions, the pipeline picture,
+  share sliders for sampling), Training (durable runs in worker processes, feature
+  investigation), Results (model comparison, mispredictions with corrections,
+  feature importance, Dark Numbers), Models, Prediction, Run History and About,
+  in Swedish and English, with the user guide under About.
+- Dark Numbers JBG 1.3: the overtraining correction c from a flip test on unseen
+  parts, with an interval and a quality, logistic regression when c cannot be
+  used, and the result presented as an estimate.
+- The product is called JBG Machine Learning (300x). Tested versions are recorded
+  in `constraints-tested.txt` and `docs/dependencies.md` (Python 3.13.7).
+- The full gate at 301k: 17 groups, 1542 tests (64 + 154 + 1303 + 21).
+
+## Revision 301l - Version 0.20.1 (2026-11-26)
+
+- Asked 2026-11-26: the version is 0.20.1 (`JBGVersion.APP_VERSION`), shown in
+  the masthead and on the About tab and written to the run logs. Nothing compares
+  it: saved models are checked against their format identifier, which is
+  unchanged.
+- Tests: `tests/test_revision_301l_version.py`. The 175 test checks the new
+  version.
+
 ## Revision 301k - Excel workbooks as datasets (2026-11-26)
 
 - Asked 2026-11-26: **Lägg till från Excel** on the Dataset tab of CSV projects.
