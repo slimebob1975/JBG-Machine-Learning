@@ -43,6 +43,26 @@ def project_csv_storage(project_id: str, *, root: Path = DEFAULT_CSV_ROOT):
     return FileArtifactRepository(root / "objects"), StorageScope(str(tenant), project_id)
 
 
+def detect_encoding(data: bytes) -> str:
+    """301h (reported 2026-11-26): the encoding of an uploaded CSV file. UTF-8
+    (with or without Excel's byte-order mark) if the whole file decodes as UTF-8,
+    else Windows-1252, which Excel's "CSV (semikolonavgränsad)" writes on Swedish
+    Windows, else Latin-1, which decodes any bytes. Before, every upload was
+    read as UTF-8, and a Windows-1252 file with å, ä or ö was refused."""
+    if data.startswith(b"\xef\xbb\xbf"):
+        return "utf-8-sig"
+    try:
+        data.decode("utf-8")
+        return "utf-8-sig"
+    except UnicodeDecodeError:
+        pass
+    try:
+        data.decode("cp1252")
+        return "cp1252"
+    except UnicodeDecodeError:
+        return "latin-1"
+
+
 def detect_delimiter(sample: bytes, encoding: str = "utf-8-sig") -> str:
     """The same detection as Voila's CSV panel; comma when undecidable."""
     try:

@@ -1,3 +1,19 @@
+## Revision 301h - CSV uploads in Windows-1252 accepted (2026-11-26)
+
+- Reported 2026-11-26: a CSV file saved by Excel ("CSV (semikolonavgränsad)")
+  was refused with "Filen godtogs inte. Kontrollera att det är en CSV-fil med
+  rubrikrad." Every upload was read as UTF-8, and Excel writes such files in
+  Windows-1252 on Swedish Windows, so the first å, ä or ö failed. The file
+  itself was fine (semicolons, 301 rows, 21 columns).
+- The upload now detects the encoding (`JBGProjectStorage.detect_encoding`):
+  UTF-8 (with or without Excel's byte-order mark) if the whole file decodes as
+  UTF-8, else Windows-1252, else Latin-1, which decodes any bytes. Windows-1252
+  was already a supported stored encoding: the preview, the runs, corrections
+  (which keep the file's encoding) and the download work as for UTF-8 files.
+  An explicitly given encoding is still used as given.
+- User guides: the CSV upload step.
+- Tests: `tests/test_revision_301h_csv_encoding.py` (with a made-up file).
+
 ## Revision 301g - Outliers and lines between clusters in the dataset picture; About fills its panel (2026-11-24)
 
 - Asked 2026-11-24: the About tab's text stopped around the middle of its panel

@@ -69,7 +69,8 @@ Ett projekt kan ha flera dataset. Varje dataset har en roll: Träning,
 Prediktion eller Blandad.
 
 - **CSV-projekt**: välj en fil (högst 25 MB, med rubrikrad – avgränsaren
-  känns igen automatiskt), ange namn och roll och välj **Ladda upp**.
+  och teckenkodningen, UTF-8 eller Windows-1252 som Excel sparar, känns igen
+  automatiskt), ange namn och roll och välj **Ladda upp**.
 - **SQL-projekt**: logga in med användarnamn och lösenord eller med
   Windows-autentisering. Välj katalog och roll, **Visa tabeller**, välj
   tabell, ange namn och välj **Registrera**. Inloggningen finns bara i

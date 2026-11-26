@@ -17,6 +17,7 @@ from JBGApplicationContracts import DataSourceKind
 from JBGDatasets import Dataset, DatasetRepository, DatasetRole, DuplicateDatasetName
 from JBGProjectService import ProjectService
 from JBGProjectStorage import (DEFAULT_CSV_ROOT, MAX_UPLOAD_BYTES, detect_delimiter,
+                               detect_encoding,
                                project_csv_storage, register_csv_upload)
 
 
@@ -116,7 +117,7 @@ class DatasetService:
     def upload_csv(self, owner: str, project_id: str, *, name: str, role: str,
                    stream: BinaryIO, filename: str | None = None,
                    delimiter: str | None = None,
-                   encoding: str = "utf-8-sig", principal=None) -> dict[str, Any]:
+                   encoding: str | None = None, principal=None) -> dict[str, Any]:
         """Store an uploaded CSV in the project's storage and register it."""
         project = self._project(owner, project_id, DataSourceKind.CSV)
         role = _role(role)
@@ -128,6 +129,8 @@ class DatasetService:
                 copied = _copy_limited(stream, target, MAX_UPLOAD_BYTES + 1)
             if copied > MAX_UPLOAD_BYTES:
                 raise UploadTooLarge("CSV file exceeds 25 MB")
+            if encoding is None:                    # 301h: detected, not assumed UTF-8
+                encoding = detect_encoding(path.read_bytes())
             if delimiter is None:
                 with path.open("rb") as reader:
                     delimiter = detect_delimiter(reader.read(64 * 1024), encoding)

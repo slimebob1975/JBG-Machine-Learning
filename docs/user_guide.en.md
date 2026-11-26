@@ -68,8 +68,8 @@ A project can have several datasets. Each dataset has a role: Training,
 Prediction or Mixed.
 
 - **CSV projects**: choose a file (at most 25 MB, with a header row; the
-  delimiter is detected automatically), enter a name and a role and choose
-  **Upload**.
+  delimiter and the encoding, UTF-8 or the Windows-1252 that Excel saves, are
+  detected automatically), enter a name and a role and choose **Upload**.
 - **SQL projects**: sign in with a user name and password or with Windows
   authentication. Choose a catalog and a role, **Show tables**, choose a
   table, enter a name and choose **Register**. The sign-in is kept only in
