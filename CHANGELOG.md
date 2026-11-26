@@ -1,3 +1,21 @@
+## Revision 301e - Paged lists and a wider Models list (2026-11-24)
+
+- Asked 2026-11-24:
+  - The Models tab's list was narrow and the model card left much space empty.
+    The list now gets a third of the width (at least 320 px), the card two
+    thirds.
+  - The lists in the left panels of Models, Results, Training, Configuration
+    and Dataset show seven rows at a time, and Run History ten. The latest come
+    first (all these lists are newest first), with Previous and Next and "1–7
+    av 23" at the bottom right. The page with the selected row opens first. The
+    paging is done in the browser (`jbg.js`), so links and forms are unchanged,
+    and without the script every row shows, as before. Ticked runs on Run
+    History stay ticked on other pages.
+- User guides: one sentence in the introduction. Also fixed: both guides still
+  named the masthead "JBG Automatisk klassificering" (missed by 300x, since the
+  name was split over two lines).
+- Tests: `tests/test_revision_301e_paged_lists.py`.
+
 ## Revision 301d - A picture of the dataset (Visualisering) (2026-11-24)
 
 - Asked 2026-11-24: a Visualisation view on the Dataset tab, to the right of

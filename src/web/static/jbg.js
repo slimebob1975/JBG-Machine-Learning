@@ -455,6 +455,48 @@
     colourBy.addEventListener("change", draw);
   }
 
+  /* 301e (asked 2026-11-24): long lists in the left panels show a page at a
+     time (seven rows, ten on Run History), the newest first, with buttons to
+     the previous and next page. The page with the selected row is shown first.
+     Without the script every row shows, as before. */
+  function wirePager(table) {
+    var size = parseInt(table.getAttribute("data-pager"), 10) || 7;
+    var body = table.tBodies[0];
+    if (!body) { return; }
+    var rows = Array.prototype.slice.call(body.rows);
+    if (rows.length <= size) { return; }
+    var pages = Math.ceil(rows.length / size);
+    var marked = rows.findIndex(function (row) { return row.classList.contains("hl"); });
+    var page = marked >= 0 ? Math.floor(marked / size) : 0;
+    var bar = document.createElement("div");
+    bar.className = "pager";
+    var previous = document.createElement("button");
+    previous.type = "button";
+    previous.className = "btn sub";
+    previous.textContent = "\u2039 " + table.getAttribute("data-pager-previous");
+    var where = document.createElement("span");
+    where.className = "pager-where";
+    var next = document.createElement("button");
+    next.type = "button";
+    next.className = "btn sub";
+    next.textContent = table.getAttribute("data-pager-next") + " \u203a";
+    bar.appendChild(previous);
+    bar.appendChild(where);
+    bar.appendChild(next);
+    var holder = table.parentNode.classList.contains("scroll") ? table.parentNode : table;
+    holder.parentNode.insertBefore(bar, holder.nextSibling);
+    function show() {
+      rows.forEach(function (row, i) { row.hidden = Math.floor(i / size) !== page; });
+      var first = page * size + 1, last = Math.min(rows.length, (page + 1) * size);
+      where.textContent = first + "\u2013" + last + " " + table.getAttribute("data-pager-of") + " " + rows.length;
+      previous.disabled = page === 0;
+      next.disabled = page >= pages - 1;
+    }
+    previous.addEventListener("click", function () { if (page > 0) { page -= 1; show(); } });
+    next.addEventListener("click", function () { if (page < pages - 1) { page += 1; show(); } });
+    show();
+  }
+
   /* 298c: every section starts closed; the ones open when the form is saved
      open again on the page that follows (also after a refused save). */
   function keepOpenSections(form) {
@@ -641,6 +683,7 @@
     document.querySelectorAll("select[data-class-choice]").forEach(wireClassChoice);
     document.querySelectorAll("[data-share-slider]").forEach(wireShareSlider);     /* 301a */
     document.querySelectorAll("form[data-viz-form]").forEach(wireVisualisation);   /* 301d */
+    document.querySelectorAll("table[data-pager]").forEach(wirePager);             /* 301e */
     wireSectionLinks();
     document.querySelectorAll("[data-top-actions]").forEach(wireTopActions);
     document.querySelectorAll("input[data-name-from]").forEach(wireDefaultName);   /* 300s */

@@ -63,7 +63,7 @@
       {% if compare_error %}<p class="message error">{{ _("Tick exactly two runs to compare.") }}</p>{% endif %}
       {% if shown %}
       <p class="hint">{{ shown | length }} {{ _("of") }} {{ items | length }} {{ _("runs") }}. {{ _("Tick two runs and choose Compare.") }}</p>
-      <div class="scroll"><table class="grid">
+      <div class="scroll"><table class="grid" data-pager="10" data-pager-previous="{{ _('Previous') }}" data-pager-next="{{ _('Next') }}" data-pager-of="{{ _('of') }}">
         <thead><tr><th></th><th>{{ _("Started") }}</th><th>{{ _("Dataset / Configuration") }}</th><th>{{ _("Kind") }}</th><th>{{ _("Status") }}</th><th class="num">{{ _("Duration") }}</th></tr></thead>
         <tbody>
         {% for item in shown %}

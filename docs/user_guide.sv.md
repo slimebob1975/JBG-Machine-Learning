@@ -24,15 +24,17 @@ Flikarna följer arbetsgången från vänster till höger:
 
 Raden under rubriken visar det pågående arbetet: öppet projekt, aktivt
 träningsdataset, konfigurationen som är vald för körning och vald modell.
-Programmet öppnas på fliken Översikt, och rubriken ”JBG Automatisk
-klassificering” leder dit.
+Programmet öppnas på fliken Översikt, och rubriken ”JBG Machine Learning”
+leder dit.
 Språket väljs med SV/EN uppe till höger.
 
 Knappar som utför en åtgärd är gröna när de kan användas och röda, nedtonade,
 när det ännu inte finns något att göra, till exempel **Spara** innan något
 har ändrats. Håll muspekaren över en röd knapp för att se varför. Orange
 knappar kan användas men går inte att ångra, till exempel **Ta bort**. På långa
-sidor finns sidans huvudknapp både överst och längst ned.
+sidor finns sidans huvudknapp både överst och längst ned. Långa listor i
+vänsterpanelen visar sju rader åt gången (Körhistorik tio), de senaste först,
+med **Föregående** och **Nästa** nere till höger.
 
 ## Översikt
 

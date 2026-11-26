@@ -24,15 +24,16 @@ The tabs follow the work order from left to right:
 
 The line below the title shows the current work: the open project, the
 active training dataset, the configuration chosen for runs and the chosen
-model. The program opens on the Overview tab, and the title "JBG Automatic
-classification" leads there.
+model. The program opens on the Overview tab, and the title "JBG Machine Learning" leads there.
 Choose the language with SV/EN at the top right.
 
 Buttons that perform an action are green when they can be used and red,
 dimmed, while there is nothing to do yet, for example **Save** before
 anything has changed. Hold the pointer over a red button to see why. Orange
 buttons can be used but cannot be undone, such as **Delete**. On long
-pages, the page's main button is at both the top and the bottom.
+pages, the page's main button is at both the top and the bottom. Long lists in
+the left panel show seven rows at a time (Run History ten), the latest first,
+with **Previous** and **Next** at the bottom right.
 
 ## Overview
 

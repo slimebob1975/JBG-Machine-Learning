@@ -104,7 +104,7 @@
     <div class="card">
       <h2>{{ _("Configurations") }}</h2>
       {% if items %}
-      <table class="grid">
+      <table class="grid" data-pager="7" data-pager-previous="{{ _('Previous') }}" data-pager-next="{{ _('Next') }}" data-pager-of="{{ _('of') }}">
         <thead><tr><th>{{ _("Name") }}</th><th>{{ _("Version") }}</th><th>{{ _("Modified") }}</th></tr></thead>
         <tbody>
         {% for item in items %}

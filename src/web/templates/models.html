@@ -5,12 +5,12 @@
   <div class="card"><p class="empty">{{ _("Open a project in the Projects tab first.") }}
     <a href="/ui/projects">{{ _("Projects") }}</a></p></div>
 {% else %}
-<div class="layout-two run-layout">
+<div class="layout-two run-layout models-layout">
   <section>
     <div class="card">
       <h2>{{ _("Trained models") }}</h2>
       {% if models %}
-      <table class="grid">
+      <table class="grid" data-pager="7" data-pager-previous="{{ _('Previous') }}" data-pager-next="{{ _('Next') }}" data-pager-of="{{ _('of') }}">
         <thead><tr><th>{{ _("Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Created") }}</th></tr></thead>
         <tbody>
         {% for item in models %}

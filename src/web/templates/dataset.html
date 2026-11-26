@@ -20,7 +20,7 @@
     <div class="card">
       <h2>{{ _("Datasets") }}</h2>
       {% if datasets %}
-      <table class="grid">
+      <table class="grid" data-pager="7" data-pager-previous="{{ _('Previous') }}" data-pager-next="{{ _('Next') }}" data-pager-of="{{ _('of') }}">
         <thead><tr><th>{{ _("Name") }}</th><th>{{ _("Role") }}</th><th>{{ _("Status") }}</th></tr></thead>
         <tbody>
         {% for item in datasets %}

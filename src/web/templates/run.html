@@ -22,7 +22,7 @@
     <div class="card">
       <h2>{{ _("Training runs") }}</h2>
       {% if recent %}
-      <table class="grid">
+      <table class="grid" data-pager="7" data-pager-previous="{{ _('Previous') }}" data-pager-next="{{ _('Next') }}" data-pager-of="{{ _('of') }}">
         <thead><tr><th>{{ _("Started") }}</th><th>{{ _("Dataset / Configuration") }}</th><th>{{ _("Status") }}</th></tr></thead>
         <tbody>
         {% for item in recent %}

@@ -365,3 +365,9 @@ table.diff th { font-weight: 600; text-align: left; }
 .viz-tip td:first-child { color: var(--ink3, #5b6b7c); }
 .viz-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 8px 0; font-size: 13px; }
 .viz-key { display: inline-flex; align-items: center; gap: 6px; }
+/* 301e: the Models list gets a third of the width; long lists are paged */
+div.layout-two.run-layout.models-layout { grid-template-columns: minmax(320px, 1fr) minmax(0, 2fr); }
+@media (max-width: 900px) { div.layout-two.run-layout.models-layout { grid-template-columns: 1fr; } }
+.pager { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 8px; font-size: 13px; }
+.pager .btn { padding: 3px 10px; }
+.pager-where { color: var(--ink3, #5b6b7c); font-variant-numeric: tabular-nums; }
