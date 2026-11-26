@@ -18,8 +18,9 @@ def test_the_point_size_redraws_without_recomputing():
     assert 'if (sizer) { sizer.addEventListener("input", draw); }' in SCRIPT
     assert "pointSize(), code.colour(p)" in SCRIPT
     page = (ROOT / "src" / "web" / "templates" / "dataset.html").read_text(encoding="utf-8")
-    assert 'min="1.5" max="10" step="0.5" value="4" data-viz-size' in page
-    assert ' name=' not in page[page.index('<input type="range" min="1.5"'):page.index("data-viz-size")]
+    # 301j: the default is exactly the middle of the range (1 to 10).
+    assert 'min="1" max="10" step="0.5" value="5.5" data-viz-size' in page
+    assert ' name=' not in page[page.index('<input type="range" min="1"'):page.index("data-viz-size")]
 
 
 def test_the_texts():

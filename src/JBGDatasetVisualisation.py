@@ -194,7 +194,7 @@ def _shown(value):
 def visualise(frame: pd.DataFrame, *, id_column: str | None, class_column: str | None,
               numeric: list, categorical: list, method: str, clusters: int,
               outliers: str = "none", outlier_share: float = OUTLIER_SHARE_DEFAULT,
-              boundaries: bool = False, seed: int = SEED) -> dict:
+              boundaries: bool = False, shown: list | None = None, seed: int = SEED) -> dict:
     """The picture's points and what the browser needs to draw them."""
     numeric = [c for c in numeric if c in frame]
     categorical = [c for c in categorical if c in frame]
@@ -208,8 +208,13 @@ def visualise(frame: pd.DataFrame, *, id_column: str | None, class_column: str |
     lines = cluster_boundaries(coordinates, groups, seed) if boundaries and groups else []
     classes = (frame[class_column].astype(object).where(frame[class_column].notna(), None)
                if class_column and class_column in frame else None)
+    # 301j (asked 2026-11-26): ``shown`` columns (free text and dates) are not
+    # used in the computation but shown on hover, right after the ID and the
+    # class, since they tell rows apart best; then the computed columns.
     hover = [c for c in [id_column, class_column] if c and c in frame]
-    hover += [c for c in numeric + categorical if c not in hover][: HOVER_COLUMNS - len(hover)]
+    for c in list(shown or []) + numeric + categorical:
+        if c in frame and c not in hover and len(hover) < HOVER_COLUMNS:
+            hover.append(c)
     points = []
     for i in range(len(frame)):
         label = None if classes is None else classes.iloc[i]

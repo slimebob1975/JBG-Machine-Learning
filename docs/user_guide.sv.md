@@ -99,7 +99,9 @@ K-means grupperar raderna på alla dessa kolumner, inte på bilden, så klustren
 tvärtom med **Färgen visar**. Varje klassvärde, även saknad klass, får en egen
 form. Rader utan klass är grå när färgen visar klassen. **Punktstorlek** gör
 punkterna större eller mindre. Håll muspekaren över en
-punkt för att se radens värden. Samma inställningar ger samma bild.
+punkt för att se radens värden, även fritext- och datumkolumner som inte
+används i beräkningen. Samma inställningar ger samma bild. Bilden och dess
+inställningar finns kvar när du byter vy och kommer tillbaka, för varje dataset.
 
 **Avvikelser** markerar de mest ovanliga raderna med en röd ring, den andel
 som anges (2 % som standard, 0,5 till 10 %). Isolation Forest mäter hur lätt

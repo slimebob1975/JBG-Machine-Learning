@@ -25,6 +25,8 @@ decision.
   refused. The encoding is detected now.
 - [x] 301i (asked 2026-11-26): a JBG_RadId ID column added to a CSV dataset where
   no column can be the ID.
+- [x] 301j (asked 2026-11-26): the dataset picture shows free text on hover, is
+  remembered between views, and its point size starts in the middle.
 - [ ] Found with 301i: a prediction CSV for a model trained with JBG_RadId must
   contain JBG_RadId too, and the upload refuses a prediction file that lacks a
   training column. Add JBG_RadId to such a prediction file at upload, numbered

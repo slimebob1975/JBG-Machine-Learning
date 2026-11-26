@@ -97,8 +97,10 @@ clusters are the same whichever method shows them. Colour shows the class and
 shape the cluster, or the other way round with **Colour shows**. Every class
 value, a missing class included, gets a shape of its own. Rows without a class
 are grey when colour shows the class. **Point size** makes the points larger or
-smaller. Hover over a point to see the row's values. The same
-settings give the same picture.
+smaller. Hover over a point to see the row's values, also free-text and date
+columns, which are not used in the computation. The same settings give the
+same picture. The picture and its settings stay when you switch views and come
+back, for each dataset.
 
 **Outliers** rings the most unusual rows in red, the share given (2 % by
 default, 0.5 to 10 %). Isolation Forest measures how easily a row is split off

@@ -511,8 +511,39 @@
     colourBy.addEventListener("change", draw);
     /* 301f (asked 2026-11-24): the point size, redrawn without recomputing. */
     var sizer = form.querySelector("[data-viz-size]");
-    function pointSize() { return sizer ? Number(sizer.value) || 4 : 4; }
+    function pointSize() { return sizer ? Number(sizer.value) || 5.5 : 5.5; }
     if (sizer) { sizer.addEventListener("input", draw); }
+
+    /* 301j (asked 2026-11-26): the last picture's settings are remembered per
+       dataset in the browser, and the picture is drawn again when the view is
+       opened. The server keeps the computed picture, so it comes back at once. */
+    var memory = "jbg-viz:" + form.getAttribute("data-url");
+    var kept = ["method", "clusters", "sample_size", "sampling", "outliers", "outlier_share"];
+    function remember() {
+      var settings = { colour: colourBy.value, size: sizer ? sizer.value : "",
+                       boundaries: !!(form.querySelector("[name=boundaries]") || {}).checked };
+      kept.forEach(function (name) {
+        var field = form.querySelector("[name=" + name + "]");
+        if (field) { settings[name] = field.value; }
+      });
+      try { window.localStorage.setItem(memory, JSON.stringify(settings)); } catch (error) { /* full or off */ }
+    }
+    form.addEventListener("submit", remember);
+    colourBy.addEventListener("change", remember);
+    if (sizer) { sizer.addEventListener("change", remember); }
+    var saved = null;
+    try { saved = JSON.parse(window.localStorage.getItem(memory) || "null"); } catch (error) { saved = null; }
+    if (saved) {
+      kept.forEach(function (name) {
+        var field = form.querySelector("[name=" + name + "]");
+        if (field && saved[name] !== undefined) { field.value = saved[name]; }
+      });
+      var lines = form.querySelector("[name=boundaries]");
+      if (lines && saved.boundaries !== undefined) { lines.checked = !!saved.boundaries; }
+      if (saved.colour) { colourBy.value = saved.colour; }
+      if (sizer && saved.size) { sizer.value = saved.size; }
+      form.dispatchEvent(new Event("submit", { cancelable: true }));
+    }
   }
 
   /* 301e (asked 2026-11-24): long lists in the left panels show a page at a

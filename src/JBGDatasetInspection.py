@@ -639,8 +639,9 @@ class DatasetInspectionService:
             raise VisualisationRefused("roles")
         class_column = roles.class_column or None
         numeric, categorical = roles.by_role("numeric"), roles.by_role("categorical")
+        shown = roles.by_role("text") + roles.by_role("date")          # 301j: hover only
         columns = list(dict.fromkeys([c for c in (roles.id_column, class_column) if c]
-                                     + numeric + categorical))
+                                     + shown + numeric + categorical))
         key = (owner, dataset_id, str(getattr(dataset, "updated_at", "")), dataset.registration_id,
                tuple(columns), class_column, method, int(clusters), int(sample_size), sampling,
                outliers, float(outlier_share), bool(boundaries))                      # 301g
@@ -659,7 +660,8 @@ class DatasetInspectionService:
         picture = visualise(frame, id_column=roles.id_column or None, class_column=class_column,
                             numeric=numeric, categorical=categorical, method=method,
                             clusters=int(clusters), outliers=outliers,
-                            outlier_share=float(outlier_share), boundaries=bool(boundaries))
+                            outlier_share=float(outlier_share), boundaries=bool(boundaries),
+                            shown=shown)
         picture.update(dataset_id=dataset_id, sampling=sampling, sample_size=int(sample_size))
         if len(cache) >= 16:
             cache.pop(next(iter(cache)))

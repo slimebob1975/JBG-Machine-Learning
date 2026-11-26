@@ -1,3 +1,19 @@
+## Revision 301j - The dataset picture: free text on hover, remembered, a centred size (2026-11-26)
+
+- Asked 2026-11-26 for the Visualisation view:
+  - Free-text and date columns are not used in the computation, but they now
+    show on hover, right after the ID and the class (they tell rows apart
+    best), then the computed columns, up to twelve values a point.
+  - The picture is remembered: its settings (method, clusters, sample, outliers,
+    lines, colour and point size) are kept per dataset in the browser, and the
+    picture is drawn again when the view is opened. The server keeps the
+    computed picture, so it comes back at once.
+  - The point size starts exactly in the middle of its range: 1 to 10, 5.5 by
+    default (it was 1.5 to 10, starting at 4).
+- User guides: the Visualisation paragraph.
+- Tests: `tests/test_revision_301j_picture_memory.py`. The 301f test checks the
+  new range.
+
 ## Revision 301i - An ID column added to a CSV dataset that lacks one (2026-11-26)
 
 - Asked 2026-11-26: a CSV dataset where no column can be the ID column (filled in
