@@ -2761,3 +2761,7 @@ msgstr "rader."
 
 msgid "rows. Choose fewer rows or another method."
 msgstr "rader. Välj färre rader eller en annan metod."
+
+# 301f: the dataset picture's point size.
+msgid "Point size"
+msgstr "Punktstorlek"

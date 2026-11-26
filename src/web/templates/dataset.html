@@ -306,6 +306,9 @@
               <select name="colour" data-viz-colour>
                 <option value="class">{{ _("Class") }}</option><option value="cluster">{{ _("Cluster") }}</option>
               </select></label>
+            <label>{{ _("Point size") }}
+              <input type="range" min="1.5" max="10" step="0.5" value="4" data-viz-size
+                aria-label="{{ _('Point size') }}"></label>
             <button class="btn">{{ _("Draw") }}</button>
           </form>
           <p class="hint" data-viz-status role="status"></p>

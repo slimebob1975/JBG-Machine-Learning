@@ -95,7 +95,9 @@ eller de första raderna. Välj sedan **Rita**. Bilden använder de numeriska
 och kategoriska kolumnerna från kolumnrollerna, så de behöver vara angivna.
 K-means grupperar raderna på alla dessa kolumner, inte på bilden, så klustren
 är desamma oavsett metod. Färgen visar klassen och formen klustret, eller
-tvärtom med **Färgen visar**. Rader utan klass är grå. Håll muspekaren över en
+tvärtom med **Färgen visar**. Varje klassvärde, även saknad klass, får en egen
+form. Rader utan klass är grå när färgen visar klassen. **Punktstorlek** gör
+punkterna större eller mindre. Håll muspekaren över en
 punkt för att se radens värden. Samma inställningar ger samma bild.
 
 Panelen **Byt namn på datasetet** under listan ger det valda datasetet ett

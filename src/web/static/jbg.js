@@ -271,7 +271,8 @@
   var VIZ_COLOURS = ["#005293", "#e07b24", "#1e8c5a", "#c0392b", "#7b4fb0",
                      "#8c6d31", "#d6619f", "#17a2b8", "#b5a300", "#5b6b7c"];
   var VIZ_NONE = "#b8c0c8";
-  var VIZ_SHAPES = ["circle", "square", "triangle", "diamond", "down", "plus", "cross", "star"];
+  var VIZ_SHAPES = ["circle", "square", "triangle", "diamond", "down", "plus", "cross", "star",
+                    "pentagon", "hexagon"];                                     /* 301f: ten */
   var SVG = "http://www.w3.org/2000/svg";
 
   function vizMark(shape, x, y, size, colour) {
@@ -291,6 +292,14 @@
                                        [0.35, 1.1], [-0.35, 1.1], [-0.35, 0.35], [-1.1, 0.35], [-1.1, -0.35], [-0.35, -0.35]]); }
     else if (shape === "cross") { poly([[-1, -0.6], [-0.6, -1], [0, -0.4], [0.6, -1], [1, -0.6], [0.4, 0], [1, 0.6], [0.6, 1],
                                         [0, 0.4], [-0.6, 1], [-1, 0.6], [-0.4, 0]]); }
+    else if (shape === "pentagon" || shape === "hexagon") {                  /* 301f */
+      var corners = shape === "pentagon" ? 5 : 6, around = [];
+      for (var c = 0; c < corners; c++) {
+        var angle = -Math.PI / 2 + c * 2 * Math.PI / corners;
+        around.push([1.15 * Math.cos(angle), 1.15 * Math.sin(angle)]);
+      }
+      poly(around);
+    }
     else if (shape === "star") { poly([[0, -1.25], [0.3, -0.4], [1.2, -0.4], [0.5, 0.15], [0.75, 1.05], [0, 0.5], [-0.75, 1.05],
                                        [-0.5, 0.15], [-1.2, -0.4], [-0.3, -0.4]]); }
     else {
@@ -322,6 +331,12 @@
       var byCluster = colourBy.value === "cluster" && data.clusters > 0;
       var classIndex = {};
       data.classes.forEach(function (name, i) { classIndex[name] = i; });
+      /* 301f: "no class" gets the shape after the known classes, so every
+         class value, missing included, has a shape of its own. */
+      function classShape(name) {
+        var index = name === null ? data.classes.length : classIndex[name];
+        return VIZ_SHAPES[index % VIZ_SHAPES.length];
+      }
       return {
         byCluster: byCluster,
         colour: function (p) {
@@ -329,7 +344,7 @@
           return p["class"] === null ? VIZ_NONE : VIZ_COLOURS[classIndex[p["class"]] % VIZ_COLOURS.length];
         },
         shape: function (p) {
-          if (byCluster) { return p["class"] === null ? "circle" : VIZ_SHAPES[classIndex[p["class"]] % VIZ_SHAPES.length]; }
+          if (byCluster) { return classShape(p["class"]); }
           return p.cluster === null ? "circle" : VIZ_SHAPES[p.cluster % VIZ_SHAPES.length];
         }
       };
@@ -355,7 +370,8 @@
                       code.byCluster ? "#5b6b7c" : code.colour(p)), classLabel + ": " + name);
       });
       if (data.unclassified) {
-        entry(vizMark("circle", 8, 8, 5, code.byCluster ? "#5b6b7c" : VIZ_NONE), form.getAttribute("data-none"));
+        entry(vizMark(code.byCluster ? code.shape({ "class": null, cluster: null }) : "circle", 8, 8, 5,
+                      code.byCluster ? "#5b6b7c" : VIZ_NONE), form.getAttribute("data-none"));
       }
       for (var k = 0; k < data.clusters; k++) {
         var q = { "class": null, cluster: k };
@@ -383,7 +399,7 @@
       frame.setAttribute("fill", "none"); frame.setAttribute("stroke", "#d5dde6");
       svg.appendChild(frame);
       data.points.forEach(function (p, i) {
-        var mark = vizMark(code.shape(p), margin + (p.x - x0) * sx, height - margin - (p.y - y0) * sy, 4.2, code.colour(p));
+        var mark = vizMark(code.shape(p), margin + (p.x - x0) * sx, height - margin - (p.y - y0) * sy, pointSize(), code.colour(p));
         mark.setAttribute("data-i", String(i));
         svg.appendChild(mark);
       });
@@ -453,6 +469,10 @@
         .catch(function () { plot.removeAttribute("aria-busy"); say(form.getAttribute("data-failed")); });
     });
     colourBy.addEventListener("change", draw);
+    /* 301f (asked 2026-11-24): the point size, redrawn without recomputing. */
+    var sizer = form.querySelector("[data-viz-size]");
+    function pointSize() { return sizer ? Number(sizer.value) || 4 : 4; }
+    if (sizer) { sizer.addEventListener("input", draw); }
   }
 
   /* 301e (asked 2026-11-24): long lists in the left panels show a page at a

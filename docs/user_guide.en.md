@@ -94,8 +94,10 @@ default), random, or the first rows. Then choose **Draw**. The picture uses the
 numeric and categorical columns from the column roles, so they must be set.
 K-means groups the rows on all those columns, not on the picture, so the
 clusters are the same whichever method shows them. Colour shows the class and
-shape the cluster, or the other way round with **Colour shows**. Rows without
-a class are grey. Hover over a point to see the row's values. The same
+shape the cluster, or the other way round with **Colour shows**. Every class
+value, a missing class included, gets a shape of its own. Rows without a class
+are grey when colour shows the class. **Point size** makes the points larger or
+smaller. Hover over a point to see the row's values. The same
 settings give the same picture.
 
 The **Rename the dataset** panel below the list gives the selected dataset a

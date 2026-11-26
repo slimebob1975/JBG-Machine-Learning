@@ -1,3 +1,16 @@
+## Revision 301f - The dataset picture: point size, a shape for "no class" (2026-11-24)
+
+- Asked 2026-11-24 for the Visualisation view:
+  - A **Punktstorlek** slider makes the points larger or smaller. It redraws
+    the picture without computing it again.
+  - With colour showing the clusters, rows without a class were drawn as
+    circles, the same shape as the first class. Every class value, a missing
+    class included, now gets a shape of its own: "no class" takes the shape
+    after the known classes, in the plot and in the legend. Two more shapes
+    (pentagon, hexagon) give ten before shapes repeat.
+- User guides: the Visualisation paragraph.
+- Tests: `tests/test_revision_301f_picture_shapes.py`.
+
 ## Revision 301e - Paged lists and a wider Models list (2026-11-24)
 
 - Asked 2026-11-24:

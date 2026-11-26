@@ -551,6 +551,7 @@ The map above is the target. What exists after revision 285m3:
 | `/ui/history`, `POST /ui/history/{run}/rerun` | 301c | Run History: every run with filters, settings and column roles against now, two runs compared, rerun with the same configuration version and dataset |
 | `/ui/dataset?view=visualisation`, `GET .../datasets/{id}/visualisation` | 301d | A picture of a sample: PCA, t-SNE or MDS with K-means, drawn in the browser with the row's values on hover |
 | `/ui/models`, the left-panel lists | 301e | The Models list a third of the width; lists paged seven at a time (Run History ten), latest first |
+| `/ui/dataset?view=visualisation` | 301f | Point size slider; every class value, missing included, its own shape |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |
