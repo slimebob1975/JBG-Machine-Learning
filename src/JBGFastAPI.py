@@ -599,11 +599,14 @@ def _add_dataset_inspection_endpoints(app, principal_dependency, inspection):
     @app.get(base + "/visualisation")
     def dataset_visualisation(project_id: str, dataset_id: str, method: str = "pca",
                               clusters: int = 3, sample_size: int = 1000,
-                              sampling: str = "stratified",
+                              sampling: str = "stratified", outliers: str = "none",
+                              outlier_share: float = 2.0, boundaries: bool = False,
                               principal: AuthenticatedPrincipal = Depends(principal_dependency)):
-        """301d: a 2D picture of a sample of the dataset (points with row values)."""
+        """301d: a 2D picture of a sample of the dataset (points with row values).
+        301g: outliers marked, and dashed lines between the K-means clusters."""
         return call(inspection.visualisation, principal, project_id, dataset_id, method=method,
-                    clusters=clusters, sample_size=sample_size, sampling=sampling)
+                    clusters=clusters, sample_size=sample_size, sampling=sampling,
+                    outliers=outliers, outlier_share=outlier_share, boundaries=boundaries)
 
     @app.get(base + "/class-distribution")
     def class_distribution(project_id: str, dataset_id: str, column: str,

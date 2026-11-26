@@ -19,6 +19,8 @@ decision.
 - [x] 301e (asked 2026-11-24): paged left-panel lists and a wider Models list.
 - [x] 301f (asked 2026-11-24): the dataset picture's point size, and a shape of its
   own for rows without a class.
+- [x] 301g (asked 2026-11-24): outliers and lines between the clusters in the
+  dataset picture, and the About text filling its panel.
 - [x] 300v (asked 2026-11-24): default limits for c, 20 for the upper bound and
   10 for the warning level.
 - [x] 300s (asked 2026-11-23): the Run tab showed nothing during the final

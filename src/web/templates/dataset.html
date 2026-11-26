@@ -284,7 +284,10 @@
             data-reason-too_few_rows="{{ _('The dataset has too few rows for a picture.') }}"
             data-reason-mds_sample_size="{{ _('MDS takes at most') }} {{ picture.mds_max }} {{ _('rows. Choose fewer rows or another method.') }}"
             data-reason-sample_size="{{ _('Choose between') }} {{ picture.sample_min }} {{ _('and') }} {{ picture.sample_max }} {{ _('rows.') }}"
-            data-reason-signin="{{ _('Sign in to SQL Server first.') }}">
+            data-reason-signin="{{ _('Sign in to SQL Server first.') }}"
+            data-reason-outlier_share="{{ _('Choose a share of outliers between 0.5 and 10 %.') }}"
+            data-outlier-label="{{ _('Outlier') }}" data-score-label="{{ _('Outlier score') }}"
+            data-boundary-label="{{ _('Line between clusters') }}">
             <label>{{ _("Method") }}
               <select name="method">
                 <option value="pca">PCA</option><option value="tsne">t-SNE</option><option value="mds">MDS</option>
@@ -306,6 +309,18 @@
               <select name="colour" data-viz-colour>
                 <option value="class">{{ _("Class") }}</option><option value="cluster">{{ _("Cluster") }}</option>
               </select></label>
+            {# 301g (agreed 2026-11-24): outliers on all the prepared columns, and
+               dashed lines between the K-means clusters, traced in the picture. #}
+            <label>{{ _("Outliers") }}
+              <select name="outliers">
+                <option value="none">{{ _("None") }}</option>
+                <option value="iforest">Isolation Forest</option>
+                <option value="lof">Local Outlier Factor</option>
+              </select></label>
+            <label>{{ _("Share of outliers (%)") }}
+              <input type="number" name="outlier_share" min="0.5" max="10" step="0.5" value="2" inputmode="decimal"></label>
+            <label class="check"><input type="checkbox" name="boundaries" value="true" checked>
+              {{ _("Lines between the clusters") }}</label>
             <label>{{ _("Point size") }}
               <input type="range" min="1.5" max="10" step="0.5" value="4" data-viz-size
                 aria-label="{{ _('Point size') }}"></label>
@@ -315,6 +330,7 @@
           <div class="viz-plot" data-viz-plot></div>
           <div class="viz-legend" data-viz-legend></div>
           <p class="hint">{{ _("The picture uses the numeric columns (standardised) and the categorical columns (one column per value) from the column roles. K-means groups the rows on all of them, so the clusters are the same whichever method shows them. PCA keeps the largest directions of variation, t-SNE keeps neighbouring rows close, and MDS keeps the distances between rows. The same settings give the same picture.") }}</p>
+          <p class="hint">{{ _("Outliers are found on all the prepared columns and ringed in red: the chosen share of the most unusual rows. The dashed lines between the clusters are drawn in the picture, not in the data, so they show where the picture's clusters meet. With t-SNE and MDS the distances in the picture are distorted, so take the lines as an illustration.") }}</p>
         {% elif view == "classes" %}
           <form method="get" action="/ui/dataset" class="inline">
             <input type="hidden" name="dataset" value="{{ selected.dataset_id }}">

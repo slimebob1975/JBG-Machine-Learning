@@ -1,3 +1,26 @@
+## Revision 301g - Outliers and lines between clusters in the dataset picture; About fills its panel (2026-11-24)
+
+- Asked 2026-11-24: the About tab's text stopped around the middle of its panel
+  (the guide was limited to 80 characters a line). It now fills the panel.
+- Asked 2026-11-24, agreed the same day, for the Visualisation view:
+  - **Avvikelser:** Isolation Forest or Local Outlier Factor, a choice in the
+    form, computed on all the prepared columns. The chosen share of the most
+    unusual rows (2 % by default, 0.5 to 10 %, at least one row) gets a red
+    ring, and the outlier score shows on hover.
+  - **Linjer mellan klustren** (on by default): dashed lines where the
+    K-means clusters meet in the picture. A nearest-neighbour classifier learns
+    the clusters from the 2D points, and for each pair of clusters a contour is
+    traced (with contourpy) where the two are equally likely, on the part of the
+    picture where they are the two likeliest, so each line is drawn once. The
+    view and the guides say the lines are drawn in the picture, not in the data,
+    so with t-SNE and MDS they are an illustration.
+  - Both in the legend. Computed with the picture and kept with it.
+- `constraints-tested.txt`: contourpy 1.3.3 (matplotlib's own dependency, now
+  used directly).
+- User guides: the Visualisation paragraph.
+- Tests: `tests/test_revision_301g_outliers_boundaries.py`. The 300u test counts
+  41 tested packages.
+
 ## Revision 301f - The dataset picture: point size, a shape for "no class" (2026-11-24)
 
 - Asked 2026-11-24 for the Visualisation view:

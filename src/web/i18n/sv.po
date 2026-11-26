@@ -2765,3 +2765,28 @@ msgstr "rader. Välj färre rader eller en annan metod."
 # 301f: the dataset picture's point size.
 msgid "Point size"
 msgstr "Punktstorlek"
+
+# 301g: outliers and lines between the clusters in the dataset picture.
+msgid "Outliers"
+msgstr "Avvikelser"
+
+msgid "Share of outliers (%)"
+msgstr "Andel avvikelser (%)"
+
+msgid "Lines between the clusters"
+msgstr "Linjer mellan klustren"
+
+msgid "Choose a share of outliers between 0.5 and 10 %."
+msgstr "Välj en andel avvikelser mellan 0,5 och 10 %."
+
+msgid "Outlier"
+msgstr "Avvikelse"
+
+msgid "Outlier score"
+msgstr "Avvikelsepoäng"
+
+msgid "Line between clusters"
+msgstr "Linje mellan kluster"
+
+msgid "Outliers are found on all the prepared columns and ringed in red: the chosen share of the most unusual rows. The dashed lines between the clusters are drawn in the picture, not in the data, so they show where the picture's clusters meet. With t-SNE and MDS the distances in the picture are distorted, so take the lines as an illustration."
+msgstr "Avvikelser hittas på alla förberedda kolumner och ringas in med rött: den valda andelen av de mest ovanliga raderna. De streckade linjerna mellan klustren ritas i bilden, inte i data, så de visar var bildens kluster möts. Med t-SNE och MDS är avstånden i bilden förvrängda, så se linjerna som en illustration."

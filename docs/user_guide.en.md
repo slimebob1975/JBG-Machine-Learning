@@ -100,6 +100,15 @@ are grey when colour shows the class. **Point size** makes the points larger or
 smaller. Hover over a point to see the row's values. The same
 settings give the same picture.
 
+**Outliers** rings the most unusual rows in red, the share given (2 % by
+default, 0.5 to 10 %). Isolation Forest measures how easily a row is split off
+from the others, and Local Outlier Factor how much sparser a row's
+surroundings are than its neighbours'. Both are computed on all the prepared
+columns, and the outlier score shows on hover. **Lines between the clusters**
+draws dashed lines where the picture's K-means clusters meet. The lines are
+traced in the picture, not in the data, so with t-SNE and MDS, where the
+distances are distorted, they are an illustration.
+
 The **Rename the dataset** panel below the list gives the selected dataset a
 new name with **Rename**. Only the name changes: the file or table, the column
 roles and the runs stay, and the runs show the new name. The name must not

@@ -100,6 +100,15 @@ form. Rader utan klass är grå när färgen visar klassen. **Punktstorlek** gö
 punkterna större eller mindre. Håll muspekaren över en
 punkt för att se radens värden. Samma inställningar ger samma bild.
 
+**Avvikelser** markerar de mest ovanliga raderna med en röd ring, den andel
+som anges (2 % som standard, 0,5 till 10 %). Isolation Forest mäter hur lätt
+en rad skiljs från de andra, och Local Outlier Factor hur mycket glesare det
+är runt raden än runt dess grannar. Båda räknas på alla förberedda kolumner,
+och avvikelsepoängen visas när muspekaren hålls över punkten. **Linjer mellan
+klustren** ritar streckade linjer där bildens K-means-kluster möts. Linjerna
+räknas fram i bilden, inte i data, så med t-SNE och MDS, där avstånden är
+förvrängda, är de en illustration.
+
 Panelen **Byt namn på datasetet** under listan ger det valda datasetet ett
 nytt namn med **Byt namn**. Bara namnet ändras: filen eller tabellen,
 kolumnrollerna och körningarna finns kvar, och körningarna visar det nya

@@ -373,6 +373,18 @@
         entry(vizMark(code.byCluster ? code.shape({ "class": null, cluster: null }) : "circle", 8, 8, 5,
                       code.byCluster ? "#5b6b7c" : VIZ_NONE), form.getAttribute("data-none"));
       }
+      if (data.outlier_count) {                                                     /* 301g */
+        var ring = document.createElementNS(SVG, "circle");
+        ring.setAttribute("cx", 8); ring.setAttribute("cy", 8); ring.setAttribute("r", 6);
+        ring.setAttribute("class", "viz-outlier");
+        entry(ring, form.getAttribute("data-outlier-label") + " (" + data.outlier_count + ")");
+      }
+      if (data.boundaries && data.boundaries.length) {
+        var dash = document.createElementNS(SVG, "path");
+        dash.setAttribute("d", "M1 8 L15 8");
+        dash.setAttribute("class", "viz-boundary");
+        entry(dash, form.getAttribute("data-boundary-label"));
+      }
       for (var k = 0; k < data.clusters; k++) {
         var q = { "class": null, cluster: k };
         entry(vizMark(code.byCluster ? "circle" : code.shape(q), 8, 8, 5,
@@ -398,10 +410,32 @@
       frame.setAttribute("width", width - 1); frame.setAttribute("height", height - 1);
       frame.setAttribute("fill", "none"); frame.setAttribute("stroke", "#d5dde6");
       svg.appendChild(frame);
+      /* 301g: dashed lines between the K-means clusters, under the points. */
+      function place(x, y) { return [margin + (x - x0) * sx, height - margin - (y - y0) * sy]; }
+      (data.boundaries || []).forEach(function (line) {
+        var path = document.createElementNS(SVG, "path");
+        path.setAttribute("d", line.map(function (point, k) {
+          var at = place(point[0], point[1]);
+          return (k ? "L" : "M") + at[0].toFixed(1) + " " + at[1].toFixed(1);
+        }).join(" "));
+        path.setAttribute("class", "viz-boundary");
+        svg.appendChild(path);
+      });
       data.points.forEach(function (p, i) {
         var mark = vizMark(code.shape(p), margin + (p.x - x0) * sx, height - margin - (p.y - y0) * sy, pointSize(), code.colour(p));
         mark.setAttribute("data-i", String(i));
         svg.appendChild(mark);
+      });
+      /* 301g: the outliers ringed in red, over the points. */
+      data.points.forEach(function (p, i) {
+        if (!p.outlier) { return; }
+        var at = place(p.x, p.y);
+        var ring = document.createElementNS(SVG, "circle");
+        ring.setAttribute("cx", at[0]); ring.setAttribute("cy", at[1]);
+        ring.setAttribute("r", pointSize() * 1.9);
+        ring.setAttribute("class", "viz-outlier");
+        ring.setAttribute("data-i", String(i));
+        svg.appendChild(ring);
       });
       plot.textContent = "";
       plot.appendChild(svg);
@@ -425,6 +459,12 @@
           row.insertCell().textContent = form.getAttribute("data-cluster-label");
           row.insertCell().textContent = String(point.cluster + 1);
         }
+        if (point.outlier_score !== null && point.outlier_score !== undefined) {      /* 301g */
+          var scored = table.insertRow();
+          scored.insertCell().textContent = form.getAttribute("data-score-label");
+          scored.insertCell().textContent = number(point.outlier_score, 3) +
+            (point.outlier ? " (" + form.getAttribute("data-outlier-label") + ")" : "");
+        }
         tip.appendChild(table);
         var area = plot.getBoundingClientRect();
         tip.style.left = Math.min(event.clientX - area.left + 12, area.width - 260) + "px";
@@ -438,9 +478,9 @@
     form.addEventListener("submit", function (event) {
       event.preventDefault();
       var fields = new FormData(form);
-      var query = ["method", "clusters", "sample_size", "sampling"].map(function (name) {
-        return name + "=" + encodeURIComponent(fields.get(name) || "");
-      }).join("&");
+      var query = ["method", "clusters", "sample_size", "sampling", "outliers", "outlier_share"].map(function (name) {
+        return name + "=" + encodeURIComponent(String(fields.get(name) || "").replace(",", "."));
+      }).join("&") + "&boundaries=" + (fields.get("boundaries") ? "true" : "false");   /* 301g */
       say(form.getAttribute("data-loading"));
       plot.setAttribute("aria-busy", "true");
       fetch(form.getAttribute("data-url") + "?" + query, { credentials: "same-origin" })

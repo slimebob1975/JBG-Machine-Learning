@@ -22,6 +22,9 @@ SAMPLE_MIN, SAMPLE_MAX, SAMPLE_DEFAULT = 100, 3000, 1000
 CLUSTERS_MAX = 8                                    # one marker shape per cluster
 MDS_MAX = 2000      # MDS grows with the square of the rows: 3000 rows took over a minute
 SEED = 42
+OUTLIERS = ("none", "iforest", "lof")               # 301g: as a choice in the form
+OUTLIER_SHARE_MIN, OUTLIER_SHARE_MAX, OUTLIER_SHARE_DEFAULT = 0.5, 10.0, 2.0   # percent
+GRID = (120, 90)                                    # 301g: where boundaries are traced
 HOVER_COLUMNS = 12                                  # values shown per point
 MISSING = ""
 
@@ -30,7 +33,8 @@ class VisualisationRefused(ValueError):
     """The dataset or the settings do not allow a picture (the message says why)."""
 
 
-def check_settings(method: str, clusters: int, sample_size: int, sampling: str) -> None:
+def check_settings(method: str, clusters: int, sample_size: int, sampling: str,
+                   outliers: str = "none", outlier_share: float = OUTLIER_SHARE_DEFAULT) -> None:
     if method not in METHODS:
         raise VisualisationRefused("method")
     if sampling not in SAMPLINGS:
@@ -41,6 +45,10 @@ def check_settings(method: str, clusters: int, sample_size: int, sampling: str) 
         raise VisualisationRefused("sample_size")
     if method == "mds" and int(sample_size) > MDS_MAX:
         raise VisualisationRefused("mds_sample_size")
+    if outliers not in OUTLIERS:
+        raise VisualisationRefused("outliers")
+    if not OUTLIER_SHARE_MIN <= float(outlier_share) <= OUTLIER_SHARE_MAX:
+        raise VisualisationRefused("outlier_share")
 
 
 def draw_sample(frame: pd.DataFrame, size: int, sampling: str, class_column: str | None,
@@ -110,6 +118,71 @@ def clusters_for(X: np.ndarray, clusters: int, seed: int = SEED) -> list | None:
     return [int(label) for label in KMeans(n_clusters=k, n_init=10, random_state=seed).fit_predict(X)]
 
 
+def outlier_scores(X: np.ndarray, method: str, seed: int = SEED) -> np.ndarray | None:
+    """301g: how unusual each row is, on all the prepared columns (higher is
+    more unusual): Isolation Forest (how easily a row is split off) or Local
+    Outlier Factor (how much sparser a row's surroundings are than its
+    neighbours')."""
+    if method == "iforest":
+        from sklearn.ensemble import IsolationForest
+        return -IsolationForest(n_estimators=200, random_state=seed).fit(X).score_samples(X)
+    if method == "lof":
+        from sklearn.neighbors import LocalOutlierFactor
+        model = LocalOutlierFactor(n_neighbors=min(20, len(X) - 1))
+        model.fit(X)
+        return -model.negative_outlier_factor_
+    return None
+
+
+def marked_outliers(scores: np.ndarray, share: float) -> np.ndarray:
+    """The share (percent) of rows with the highest scores, at least one."""
+    count = max(1, int(round(len(scores) * float(share) / 100.0)))
+    marked = np.zeros(len(scores), dtype=bool)
+    marked[np.argsort(-scores, kind="stable")[:count]] = True
+    return marked
+
+
+def cluster_boundaries(coordinates: np.ndarray, groups: list, seed: int = SEED) -> list:
+    """301g: dashed lines between the K-means clusters, traced in the picture.
+    A nearest-neighbour classifier learns the clusters from the 2D points, and
+    for each pair of clusters a contour is drawn where the two are equally
+    likely, on the part of the picture where they are the two likeliest. The
+    lines show the picture, not the data: in t-SNE and MDS the distances are
+    distorted."""
+    import contourpy
+    from sklearn.neighbors import KNeighborsClassifier
+    labels = np.asarray(groups)
+    found = np.unique(labels)
+    if len(found) < 2 or len(labels) < 10:
+        return []
+    low, high = coordinates.min(axis=0), coordinates.max(axis=0)
+    spread = np.where(high - low > 0, high - low, 1.0)
+    scaled = (coordinates - low) / spread
+    model = KNeighborsClassifier(n_neighbors=min(25, len(labels) - 1), weights="distance")
+    model.fit(scaled, labels)
+    gx = np.linspace(0.0, 1.0, GRID[0])
+    gy = np.linspace(0.0, 1.0, GRID[1])
+    mesh_x, mesh_y = np.meshgrid(gx, gy)
+    proba = model.predict_proba(np.column_stack([mesh_x.ravel(), mesh_y.ravel()]))
+    proba = proba.reshape(GRID[1], GRID[0], len(model.classes_))
+    order = np.argsort(-proba, axis=2)
+    top, second = order[:, :, 0], order[:, :, 1]
+    lines = []
+    for a in range(len(model.classes_)):
+        for b in range(a + 1, len(model.classes_)):
+            pair = ((top == a) & (second == b)) | ((top == b) & (second == a))
+            if not pair.any():
+                continue
+            field = np.ma.masked_array(proba[:, :, a] - proba[:, :, b], mask=~pair)
+            generator = contourpy.contour_generator(gx, gy, field)
+            for line in generator.lines(0.0):
+                if len(line) < 2:
+                    continue
+                points = low + np.asarray(line) * spread
+                lines.append([[round(float(x), 5), round(float(y), 5)] for x, y in points])
+    return lines
+
+
 def _shown(value):
     if value is None or (isinstance(value, float) and not math.isfinite(value)):
         return ""
@@ -120,7 +193,8 @@ def _shown(value):
 
 def visualise(frame: pd.DataFrame, *, id_column: str | None, class_column: str | None,
               numeric: list, categorical: list, method: str, clusters: int,
-              seed: int = SEED) -> dict:
+              outliers: str = "none", outlier_share: float = OUTLIER_SHARE_DEFAULT,
+              boundaries: bool = False, seed: int = SEED) -> dict:
     """The picture's points and what the browser needs to draw them."""
     numeric = [c for c in numeric if c in frame]
     categorical = [c for c in categorical if c in frame]
@@ -129,6 +203,9 @@ def visualise(frame: pd.DataFrame, *, id_column: str | None, class_column: str |
     X = prepare(frame, numeric, categorical)
     coordinates, explained = project(X, method, seed)
     groups = clusters_for(X, clusters, seed)
+    scores = outlier_scores(X, outliers, seed)
+    marked = marked_outliers(scores, outlier_share) if scores is not None else None
+    lines = cluster_boundaries(coordinates, groups, seed) if boundaries and groups else []
     classes = (frame[class_column].astype(object).where(frame[class_column].notna(), None)
                if class_column and class_column in frame else None)
     hover = [c for c in [id_column, class_column] if c and c in frame]
@@ -139,10 +216,14 @@ def visualise(frame: pd.DataFrame, *, id_column: str | None, class_column: str |
         points.append({"x": round(float(coordinates[i, 0]), 5), "y": round(float(coordinates[i, 1]), 5),
                        "class": None if label is None or str(label).strip() == "" else str(label),
                        "cluster": None if groups is None else groups[i],
+                       "outlier": None if marked is None else bool(marked[i]),
+                       "outlier_score": None if scores is None else round(float(scores[i]), 4),
                        "values": [_shown(frame[c].iloc[i]) for c in hover]})
     found = sorted({p["class"] for p in points if p["class"] is not None})
     return {"method": method, "rows": len(frame), "points": points, "hover_columns": hover,
             "classes": found, "unclassified": sum(p["class"] is None for p in points),
             "clusters": 0 if groups is None else max(groups) + 1,
             "explained": explained, "features": {"numeric": numeric, "categorical": categorical},
+            "outliers": outliers, "outlier_count": 0 if marked is None else int(marked.sum()),
+            "boundaries": lines,
             "columns_used": X.shape[1]}

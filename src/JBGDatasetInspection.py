@@ -625,12 +625,13 @@ class DatasetInspectionService:
         return {"dataset_id": dataset_id, "basis": basis, "columns": columns}
 
     def visualisation(self, principal, project_id: str, dataset_id: str, *, method: str,
-                      clusters: int, sample_size: int, sampling: str) -> dict[str, Any]:
+                      clusters: int, sample_size: int, sampling: str, outliers: str = "none",
+                      outlier_share: float = 2.0, boundaries: bool = False) -> dict[str, Any]:
         """301d (asked 2026-11-24): a 2D picture of a sample of the dataset, from its
         column roles (numeric and categorical columns). Computed on request and
         kept for the same dataset, roles and settings."""
         from JBGDatasetVisualisation import VisualisationRefused, check_settings, visualise
-        check_settings(method, clusters, sample_size, sampling)
+        check_settings(method, clusters, sample_size, sampling, outliers, outlier_share)
         owner = principal.principal_key
         project, dataset = self._dataset(owner, project_id, dataset_id)
         roles = self._datasets.get_roles(owner, project_id, dataset_id)
@@ -641,7 +642,8 @@ class DatasetInspectionService:
         columns = list(dict.fromkeys([c for c in (roles.id_column, class_column) if c]
                                      + numeric + categorical))
         key = (owner, dataset_id, str(getattr(dataset, "updated_at", "")), dataset.registration_id,
-               tuple(columns), class_column, method, int(clusters), int(sample_size), sampling)
+               tuple(columns), class_column, method, int(clusters), int(sample_size), sampling,
+               outliers, float(outlier_share), bool(boundaries))                      # 301g
         cache = self.__dict__.setdefault("_pictures", {})
         if key in cache:
             return cache[key]
@@ -656,7 +658,8 @@ class DatasetInspectionService:
         frame = self._with_facts(principal, project, dataset, sample)
         picture = visualise(frame, id_column=roles.id_column or None, class_column=class_column,
                             numeric=numeric, categorical=categorical, method=method,
-                            clusters=int(clusters))
+                            clusters=int(clusters), outliers=outliers,
+                            outlier_share=float(outlier_share), boundaries=bool(boundaries))
         picture.update(dataset_id=dataset_id, sampling=sampling, sample_size=int(sample_size))
         if len(cache) >= 16:
             cache.pop(next(iter(cache)))
