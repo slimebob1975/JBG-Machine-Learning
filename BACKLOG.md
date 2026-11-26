@@ -108,6 +108,9 @@ decision.
 - [ ] If wanted (from the Voilà P3 list): the row limit also as a percentage
   or a fraction. The web form takes a whole number, and empty reads all rows.
 
+- [x] 301d (asked 2026-11-24): a Visualisation view on the Dataset tab (PCA,
+  t-SNE, MDS, K-means) for a sample of the dataset.
+
 **Operation**
 
 - [ ] Per-project retention (design decision 3): model files (288a), per-run
@@ -198,12 +201,30 @@ the engine, not scheduled)
 - [ ] `fastapi_offline` and the offline Swagger setup (282b) are temporary and
   may be replaced. The interface itself makes no requests outside the server
   since 300j.
-- [ ] Microsoft Entra ID when the Azure deployment begins, with server-side
-  authorization, project isolation, credential handling, sessions, retention
-  and audit designed before any multi-user rollout. Keep the simple access
-  model (design decision 5): SQL rights come from each user's own login, and
-  JBG only keeps principals' projects and runs apart. Validate deployment,
-  secrets and storage against the actual hosting.
+- [ ] Azure App Service (Linux), decided 2026-11-24. SQL access by Entra login
+  or SQL logins as today. Planned in this order, each a revision:
+  1. Running as a service: a start command without PowerShell
+     (`python -m JBGServe`, host and port from the environment), one setting
+     for the data root (models, results, CSV files, logs; an Azure Files share
+     in Azure, today's folders by default), an option to log to standard
+     output, and the username without `os.getlogin()` (which fails without a
+     terminal).
+  2. Users identified through Entra ID: App Service authentication passes the
+     user's object ID and tenant in headers it sets itself, and every project,
+     run and model is keyed to them. A setting chooses local or Entra mode;
+     local mode stays refused outside development. Needed before a second user
+     signs in (today everyone is the same local user).
+  3. Packaging and documentation: a container definition (Python 3.13, ODBC
+     driver 18, `constraints-tested.txt`), built and checked by the user, and
+     a deployment document, to be docs/deployment/azure.md (App Settings and Key Vault, the Azure Files
+     mount, one instance only since the server starts its own workers, the
+     health check `/api/health`, backups, a checklist).
+  4. Entra sign-in to SQL next to SQL logins: the user's access token from App
+     Service used by pyodbc, so queries run with the user's own rights. Works
+     with Azure SQL Database and Managed Instance, and with SQL Server 2022
+     through Azure Arc. Which SQL server is used is still open.
+  Keep the simple access model (design decision 5): SQL rights come from each
+  user's own login, and JBG only keeps principals' projects and runs apart.
 
 ## Standing rules
 

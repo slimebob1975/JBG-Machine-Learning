@@ -82,8 +82,19 @@ Ett tränings- eller blandat dataset kan byta till den andra rollen med **Byt
 roll till …**. Kolumnrollerna och valideringen behålls. Träningen använder
 bara rader med klass, och ett blandat dataset kan också predikteras på fliken
 Prediktion. Prediktionsdataset kan inte byta roll.
-Under datasetet finns vyerna Förhandsgranskning, Profil, Klasser och
-Kolumnroller.
+Under datasetet finns vyerna Förhandsgranskning, Profil, Klasser,
+Kolumnroller och Visualisering.
+
+**Visualisering** ritar ett urval av datasetets rader i två dimensioner. Välj
+metod (PCA, t-SNE eller MDS), antal kluster för K-means (eller inga), antal
+rader i urvalet (100 till 3000, 1000 som standard, MDS högst 2000) och hur
+urvalet dras: slumpvis med samma andel av varje klass (standard), slumpvis,
+eller de första raderna. Välj sedan **Rita**. Bilden använder de numeriska
+och kategoriska kolumnerna från kolumnrollerna, så de behöver vara angivna.
+K-means grupperar raderna på alla dessa kolumner, inte på bilden, så klustren
+är desamma oavsett metod. Färgen visar klassen och formen klustret, eller
+tvärtom med **Färgen visar**. Rader utan klass är grå. Håll muspekaren över en
+punkt för att se radens värden. Samma inställningar ger samma bild.
 
 Panelen **Byt namn på datasetet** under listan ger det valda datasetet ett
 nytt namn med **Byt namn**. Bara namnet ändras: filen eller tabellen,

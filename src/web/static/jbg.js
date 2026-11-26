@@ -264,6 +264,197 @@
     load();
   }
 
+  /* 301d (asked 2026-11-24): the dataset picture. The server returns the
+     points of a 2D projection of a sample; this draws them as SVG, classes and
+     K-means clusters as colour and shape (switchable without recomputing), and
+     shows a row's values on hover. Built with DOM methods, so values are text. */
+  var VIZ_COLOURS = ["#005293", "#e07b24", "#1e8c5a", "#c0392b", "#7b4fb0",
+                     "#8c6d31", "#d6619f", "#17a2b8", "#b5a300", "#5b6b7c"];
+  var VIZ_NONE = "#b8c0c8";
+  var VIZ_SHAPES = ["circle", "square", "triangle", "diamond", "down", "plus", "cross", "star"];
+  var SVG = "http://www.w3.org/2000/svg";
+
+  function vizMark(shape, x, y, size, colour) {
+    var s = size, el;
+    function poly(points) {
+      el = document.createElementNS(SVG, "polygon");
+      el.setAttribute("points", points.map(function (p) { return (x + p[0] * s) + "," + (y + p[1] * s); }).join(" "));
+    }
+    if (shape === "square") {
+      el = document.createElementNS(SVG, "rect");
+      el.setAttribute("x", x - s * 0.85); el.setAttribute("y", y - s * 0.85);
+      el.setAttribute("width", s * 1.7); el.setAttribute("height", s * 1.7);
+    } else if (shape === "triangle") { poly([[0, -1.15], [1.05, 0.8], [-1.05, 0.8]]); }
+    else if (shape === "down") { poly([[0, 1.15], [1.05, -0.8], [-1.05, -0.8]]); }
+    else if (shape === "diamond") { poly([[0, -1.25], [1.1, 0], [0, 1.25], [-1.1, 0]]); }
+    else if (shape === "plus") { poly([[-0.35, -1.1], [0.35, -1.1], [0.35, -0.35], [1.1, -0.35], [1.1, 0.35], [0.35, 0.35],
+                                       [0.35, 1.1], [-0.35, 1.1], [-0.35, 0.35], [-1.1, 0.35], [-1.1, -0.35], [-0.35, -0.35]]); }
+    else if (shape === "cross") { poly([[-1, -0.6], [-0.6, -1], [0, -0.4], [0.6, -1], [1, -0.6], [0.4, 0], [1, 0.6], [0.6, 1],
+                                        [0, 0.4], [-0.6, 1], [-1, 0.6], [-0.4, 0]]); }
+    else if (shape === "star") { poly([[0, -1.25], [0.3, -0.4], [1.2, -0.4], [0.5, 0.15], [0.75, 1.05], [0, 0.5], [-0.75, 1.05],
+                                       [-0.5, 0.15], [-1.2, -0.4], [-0.3, -0.4]]); }
+    else {
+      el = document.createElementNS(SVG, "circle");
+      el.setAttribute("cx", x); el.setAttribute("cy", y); el.setAttribute("r", s);
+    }
+    el.setAttribute("fill", colour);
+    el.setAttribute("fill-opacity", "0.8");
+    el.setAttribute("stroke", "#ffffff");
+    el.setAttribute("stroke-width", "0.6");
+    return el;
+  }
+
+  function wireVisualisation(form) {
+    var box = form.parentNode;
+    var plot = box.querySelector("[data-viz-plot]");
+    var legend = box.querySelector("[data-viz-legend]");
+    var status = box.querySelector("[data-viz-status]");
+    var colourBy = form.querySelector("[data-viz-colour]");
+    var comma = form.getAttribute("data-decimal") === ",";
+    var data = null;
+    function number(value, digits) {
+      var text = value.toFixed(digits);
+      return comma ? text.replace(".", ",") : text;
+    }
+    function say(text) { status.textContent = text || ""; }
+
+    function encode() {
+      var byCluster = colourBy.value === "cluster" && data.clusters > 0;
+      var classIndex = {};
+      data.classes.forEach(function (name, i) { classIndex[name] = i; });
+      return {
+        byCluster: byCluster,
+        colour: function (p) {
+          if (byCluster) { return VIZ_COLOURS[p.cluster % VIZ_COLOURS.length]; }
+          return p["class"] === null ? VIZ_NONE : VIZ_COLOURS[classIndex[p["class"]] % VIZ_COLOURS.length];
+        },
+        shape: function (p) {
+          if (byCluster) { return p["class"] === null ? "circle" : VIZ_SHAPES[classIndex[p["class"]] % VIZ_SHAPES.length]; }
+          return p.cluster === null ? "circle" : VIZ_SHAPES[p.cluster % VIZ_SHAPES.length];
+        }
+      };
+    }
+
+    function drawLegend(code) {
+      legend.textContent = "";
+      function entry(mark, label) {
+        var item = document.createElement("span");
+        item.className = "viz-key";
+        var icon = document.createElementNS(SVG, "svg");
+        icon.setAttribute("width", "16"); icon.setAttribute("height", "16");
+        icon.appendChild(mark);
+        item.appendChild(icon);
+        item.appendChild(document.createTextNode(label));
+        legend.appendChild(item);
+      }
+      var classLabel = form.getAttribute("data-class-label");
+      var clusterLabel = form.getAttribute("data-cluster-label");
+      data.classes.forEach(function (name, i) {
+        var p = { "class": name, cluster: null };
+        entry(vizMark(code.byCluster ? code.shape(p) : "circle", 8, 8, 5,
+                      code.byCluster ? "#5b6b7c" : code.colour(p)), classLabel + ": " + name);
+      });
+      if (data.unclassified) {
+        entry(vizMark("circle", 8, 8, 5, code.byCluster ? "#5b6b7c" : VIZ_NONE), form.getAttribute("data-none"));
+      }
+      for (var k = 0; k < data.clusters; k++) {
+        var q = { "class": null, cluster: k };
+        entry(vizMark(code.byCluster ? "circle" : code.shape(q), 8, 8, 5,
+                      code.byCluster ? code.colour(q) : "#5b6b7c"), clusterLabel + " " + (k + 1));
+      }
+    }
+
+    function draw() {
+      if (!data) { return; }
+      var width = 760, height = 520, margin = 28;
+      var xs = data.points.map(function (p) { return p.x; });
+      var ys = data.points.map(function (p) { return p.y; });
+      var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+      var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+      var sx = (width - 2 * margin) / ((x1 - x0) || 1), sy = (height - 2 * margin) / ((y1 - y0) || 1);
+      var code = encode();
+      var svg = document.createElementNS(SVG, "svg");
+      svg.setAttribute("viewBox", "0 0 " + width + " " + height);
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", status.textContent);
+      var frame = document.createElementNS(SVG, "rect");
+      frame.setAttribute("x", 0.5); frame.setAttribute("y", 0.5);
+      frame.setAttribute("width", width - 1); frame.setAttribute("height", height - 1);
+      frame.setAttribute("fill", "none"); frame.setAttribute("stroke", "#d5dde6");
+      svg.appendChild(frame);
+      data.points.forEach(function (p, i) {
+        var mark = vizMark(code.shape(p), margin + (p.x - x0) * sx, height - margin - (p.y - y0) * sy, 4.2, code.colour(p));
+        mark.setAttribute("data-i", String(i));
+        svg.appendChild(mark);
+      });
+      plot.textContent = "";
+      plot.appendChild(svg);
+      var tip = document.createElement("div");
+      tip.className = "viz-tip";
+      tip.hidden = true;
+      plot.appendChild(tip);
+      svg.addEventListener("mouseover", function (event) {
+        var i = event.target.getAttribute && event.target.getAttribute("data-i");
+        if (i === null || i === undefined) { return; }
+        var point = data.points[Number(i)];
+        tip.textContent = "";
+        var table = document.createElement("table");
+        data.hover_columns.forEach(function (name, j) {
+          var row = table.insertRow();
+          row.insertCell().textContent = name;
+          row.insertCell().textContent = point.values[j];
+        });
+        if (point.cluster !== null) {
+          var row = table.insertRow();
+          row.insertCell().textContent = form.getAttribute("data-cluster-label");
+          row.insertCell().textContent = String(point.cluster + 1);
+        }
+        tip.appendChild(table);
+        var area = plot.getBoundingClientRect();
+        tip.style.left = Math.min(event.clientX - area.left + 12, area.width - 260) + "px";
+        tip.style.top = (event.clientY - area.top + 12) + "px";
+        tip.hidden = false;
+      });
+      svg.addEventListener("mouseout", function () { tip.hidden = true; });
+      drawLegend(code);
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var fields = new FormData(form);
+      var query = ["method", "clusters", "sample_size", "sampling"].map(function (name) {
+        return name + "=" + encodeURIComponent(fields.get(name) || "");
+      }).join("&");
+      say(form.getAttribute("data-loading"));
+      plot.setAttribute("aria-busy", "true");
+      fetch(form.getAttribute("data-url") + "?" + query, { credentials: "same-origin" })
+        .then(function (response) {
+          return response.json().then(function (body) { return { ok: response.ok, status: response.status, body: body }; });
+        })
+        .then(function (answer) {
+          plot.removeAttribute("aria-busy");
+          if (!answer.ok) {
+            var reason = String((answer.body && answer.body.detail) || "");
+            var text = reason === "SQL sign-in required" ? form.getAttribute("data-reason-signin")
+              : form.getAttribute("data-reason-" + reason);
+            data = null; plot.textContent = ""; legend.textContent = "";
+            say(text || form.getAttribute("data-failed"));
+            return;
+          }
+          data = answer.body;
+          var text = data.rows + " " + form.getAttribute("data-done") + ".";
+          if (data.explained) {
+            text += " " + form.getAttribute("data-explained") + ": " + data.explained.map(function (v) {
+              return number(v * 100, 1) + " %"; }).join(", ") + ".";
+          }
+          say(text);
+          draw();
+        })
+        .catch(function () { plot.removeAttribute("aria-busy"); say(form.getAttribute("data-failed")); });
+    });
+    colourBy.addEventListener("change", draw);
+  }
+
   /* 298c: every section starts closed; the ones open when the form is saved
      open again on the page that follows (also after a refused save). */
   function keepOpenSections(form) {
@@ -449,6 +640,7 @@
     document.querySelectorAll("[data-dark-formula]").forEach(wireDarkFormula);
     document.querySelectorAll("select[data-class-choice]").forEach(wireClassChoice);
     document.querySelectorAll("[data-share-slider]").forEach(wireShareSlider);     /* 301a */
+    document.querySelectorAll("form[data-viz-form]").forEach(wireVisualisation);   /* 301d */
     wireSectionLinks();
     document.querySelectorAll("[data-top-actions]").forEach(wireTopActions);
     document.querySelectorAll("input[data-name-from]").forEach(wireDefaultName);   /* 300s */

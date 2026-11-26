@@ -1,3 +1,30 @@
+## Revision 301d - A picture of the dataset (Visualisering) (2026-11-24)
+
+- Asked 2026-11-24: a Visualisation view on the Dataset tab, to the right of
+  Column roles. It draws a sample of the dataset's rows in two dimensions.
+  - Methods: PCA, t-SNE and MDS. K-means (2 to 8 clusters, or none) groups the
+    rows on all the prepared columns, not on the picture, so the clusters are
+    the same whichever method shows them.
+  - Data (decided 2026-11-24): the numeric columns, standardised with missing
+    values as the median, and the categorical columns one-hot encoded, from the
+    column roles. Text and date columns are left out.
+  - Sample (decided 2026-11-24): random with the same share of each class by
+    default, or random, or the first rows. 100 to 3000 rows, 1000 by default.
+    MDS takes at most 2000 rows (3000 took over a minute on one core). SQL
+    tables are sampled in the query, CSV files in memory. A fixed seed gives
+    the same picture for the same settings.
+  - Drawn in the browser (decided 2026-11-24): `jbg.js` draws the points as
+    SVG, the class as colour and the cluster as shape or the other way round
+    (switchable without recomputing), rows without a class in grey, a legend,
+    and the row's values (ID, class and up to ten more columns) on hover. Values
+    are inserted as text. No outside library is loaded.
+  - Computed on request (`GET .../datasets/{id}/visualisation`) and kept for the
+    same dataset, roles and settings.
+- BACKLOG: the Azure plan (App Service on Linux, decided 2026-11-24) in four
+  steps.
+- User guides: the Dataset section.
+- Tests: `tests/test_revision_301d_dataset_picture.py`.
+
 ## Revision 301c - Run History (Körhistorik) (2026-11-24)
 
 - Decided 2026-11-24: the Run History tab, tab 8 of the design, for what the

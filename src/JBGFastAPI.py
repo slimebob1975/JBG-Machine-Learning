@@ -596,6 +596,15 @@ def _add_dataset_inspection_endpoints(app, principal_dependency, inspection):
                         principal: AuthenticatedPrincipal = Depends(principal_dependency)):
         return call(inspection.profile, principal, project_id, dataset_id)
 
+    @app.get(base + "/visualisation")
+    def dataset_visualisation(project_id: str, dataset_id: str, method: str = "pca",
+                              clusters: int = 3, sample_size: int = 1000,
+                              sampling: str = "stratified",
+                              principal: AuthenticatedPrincipal = Depends(principal_dependency)):
+        """301d: a 2D picture of a sample of the dataset (points with row values)."""
+        return call(inspection.visualisation, principal, project_id, dataset_id, method=method,
+                    clusters=clusters, sample_size=sample_size, sampling=sampling)
+
     @app.get(base + "/class-distribution")
     def class_distribution(project_id: str, dataset_id: str, column: str,
                            principal: AuthenticatedPrincipal = Depends(principal_dependency)):

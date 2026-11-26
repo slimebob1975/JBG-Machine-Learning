@@ -2688,3 +2688,76 @@ msgstr "Med samma konfigurationsversion och dataset."
 
 msgid "runs"
 msgstr "körningar"
+
+# 301d: the dataset picture (Visualisering).
+msgid "Visualisation"
+msgstr "Visualisering"
+
+msgid "Choose between"
+msgstr "Välj mellan"
+
+msgid "Cluster"
+msgstr "Kluster"
+
+msgid "Clusters (K-means)"
+msgstr "Kluster (K-means)"
+
+msgid "Colour shows"
+msgstr "Färgen visar"
+
+msgid "Computing the picture ..."
+msgstr "Beräknar bilden ..."
+
+msgid "Draw"
+msgstr "Rita"
+
+msgid "MDS takes at most"
+msgstr "MDS tar högst"
+
+msgid "No class"
+msgstr "Ingen klass"
+
+msgid "Random sample"
+msgstr "Slumpvis"
+
+msgid "Random, the same share of each class"
+msgstr "Slumpvis, samma andel av varje klass"
+
+msgid "Rows in the sample"
+msgstr "Rader i urvalet"
+
+msgid "Sample"
+msgstr "Urval"
+
+msgid "Set the column roles first: the picture uses the numeric and categorical columns."
+msgstr "Ange kolumnrollerna först. Bilden använder de numeriska och kategoriska kolumnerna."
+
+msgid "Share of the variance explained"
+msgstr "Andel av variationen som förklaras"
+
+msgid "The column roles have no numeric or categorical columns."
+msgstr "Kolumnrollerna har inga numeriska eller kategoriska kolumner."
+
+msgid "The dataset has too few rows for a picture."
+msgstr "Datasetet har för få rader för en bild."
+
+msgid "The first rows"
+msgstr "De första raderna"
+
+msgid "The picture could not be computed."
+msgstr "Bilden kunde inte beräknas."
+
+msgid "The picture uses the numeric columns (standardised) and the categorical columns (one column per value) from the column roles. K-means groups the rows on all of them, so the clusters are the same whichever method shows them. PCA keeps the largest directions of variation, t-SNE keeps neighbouring rows close, and MDS keeps the distances between rows. The same settings give the same picture."
+msgstr "Bilden använder de numeriska kolumnerna (standardiserade) och de kategoriska kolumnerna (en kolumn per värde) från kolumnrollerna. K-means grupperar raderna på alla dessa, så klustren är desamma oavsett vilken metod som visar dem. PCA behåller de största riktningarna av variation, t-SNE håller närliggande rader nära varandra och MDS behåller avstånden mellan raderna. Samma inställningar ger samma bild."
+
+msgid "and"
+msgstr "och"
+
+msgid "rows shown"
+msgstr "rader visas"
+
+msgid "rows."
+msgstr "rader."
+
+msgid "rows. Choose fewer rows or another method."
+msgstr "rader. Välj färre rader eller en annan metod."

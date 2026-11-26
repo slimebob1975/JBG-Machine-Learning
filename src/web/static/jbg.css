@@ -352,3 +352,16 @@ svg.chart { width: 100%; height: auto; display: block; }
 .history-layout aside .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .history-layout aside h3 { margin-top: 18px; }
 table.diff th { font-weight: 600; text-align: left; }
+/* 301d: the dataset picture */
+.viz-controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; margin: 12px 0; }
+.viz-controls label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.viz-controls input[type="number"] { width: 7em; }
+.viz-plot { position: relative; max-width: 780px; }
+.viz-plot svg { width: 100%; height: auto; display: block; }
+.viz-tip { position: absolute; z-index: 5; max-width: 260px; background: #fff; border: 1px solid #c9d3de;
+           border-radius: 6px; padding: 6px 8px; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+           pointer-events: none; }
+.viz-tip td { padding: 1px 6px 1px 0; vertical-align: top; }
+.viz-tip td:first-child { color: var(--ink3, #5b6b7c); }
+.viz-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 8px 0; font-size: 13px; }
+.viz-key { display: inline-flex; align-items: center; gap: 6px; }

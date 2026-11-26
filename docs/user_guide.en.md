@@ -82,8 +82,20 @@ Choose **Activate for training** on the dataset the model is to be trained
 on. A training or mixed dataset can switch to the other role with **Change
 role to …**; its column roles and validation are kept. Training uses only
 rows with a class, and a mixed dataset can also be predicted on the
-Prediction tab. Prediction datasets cannot switch role. Below the dataset are the views Preview, Profile, Classes and Column
-roles.
+Prediction tab. Prediction datasets cannot switch role. Below the dataset are the views Preview, Profile, Classes, Column
+roles and Visualisation.
+
+**Visualisation** draws a sample of the dataset's rows in two dimensions.
+Choose the method (PCA, t-SNE or MDS), the number of clusters for K-means (or
+none), the rows in the sample (100 to 3000, 1000 by default, MDS at most 2000)
+and how the sample is drawn: random with the same share of each class (the
+default), random, or the first rows. Then choose **Draw**. The picture uses the
+numeric and categorical columns from the column roles, so they must be set.
+K-means groups the rows on all those columns, not on the picture, so the
+clusters are the same whichever method shows them. Colour shows the class and
+shape the cluster, or the other way round with **Colour shows**. Rows without
+a class are grey. Hover over a point to see the row's values. The same
+settings give the same picture.
 
 The **Rename the dataset** panel below the list gives the selected dataset a
 new name with **Rename**. Only the name changes: the file or table, the column

@@ -176,6 +176,16 @@ class _CSVFacts:
         return ordered, missing
 
 
+    def sample_frame(self, columns, size, sampling, class_column):
+        """301d: up to ``size`` rows of ``columns`` (uploads are small: exact)."""
+        import pandas as pd
+        from JBGDatasetVisualisation import draw_sample
+        indexes = [self.columns.index(c) for c in columns]
+        rows = [[(row[i].strip() if i < len(row) else "") or None for i in indexes]
+                for row in self._all_rows()]
+        return draw_sample(pd.DataFrame(rows, columns=columns), size, sampling, class_column)
+
+
 class _SQLFacts:
     def __init__(self, layer, catalog: str, table: str):
         self._layer, self._catalog, self._table = layer, catalog, table
@@ -276,6 +286,33 @@ class _SQLFacts:
                            f"FROM {self._source()} WHERE NOT ({missing}) "
                            f"GROUP BY {value} ORDER BY COUNT(*) DESC, {value}")
         return [(str(r[0]), int(r[1])) for r in rows], int(totals[1] or 0)
+
+
+def _sql_sample(facts, columns, size, sampling, class_column):
+    """301d: up to ``size`` rows of ``columns`` from an SQL table: the first
+    rows, a random sample (ORDER BY NEWID()), or a random sample with the same
+    share of each class (a row number per class, in one query). Within the
+    usual query time limit."""
+    import pandas as pd
+    from JBGDatasetVisualisation import SEED, draw_sample
+    listed = ", ".join(_quote(c) for c in columns)
+    source = _table(facts._catalog, facts._table)
+    if sampling == "first":
+        query = f"SELECT TOP({int(size)}) {listed} FROM {source}"
+    elif sampling == "random" or not class_column:
+        query = f"SELECT TOP({int(size)}) {listed} FROM {source} ORDER BY NEWID()"
+    else:
+        fraction = min(1.0, int(size) / max(1, facts.rows))
+        group = _quote(class_column)
+        query = (f"SELECT {listed} FROM (SELECT {listed}, "
+                 f"ROW_NUMBER() OVER (PARTITION BY {group} ORDER BY NEWID()) AS jbg_row, "
+                 f"COUNT(*) OVER (PARTITION BY {group}) AS jbg_count FROM {source}) AS jbg_sample "
+                 f"WHERE jbg_row <= CEILING(jbg_count * {fraction:.8f})")
+    rows = [[_json_value(value) for value in row] for row in facts._query(query)]
+    frame = pd.DataFrame(rows, columns=columns)
+    # The query's sample may round up by a row per class: trim to the size.
+    return draw_sample(frame, int(size), "random" if sampling != "first" else "first",
+                       class_column, SEED)
 
 
 class _QuietLogger:
@@ -586,6 +623,45 @@ class DatasetInspectionService:
         for column in columns:
             column["missing_share"] = round(column["missing"] / used, 6) if used else None
         return {"dataset_id": dataset_id, "basis": basis, "columns": columns}
+
+    def visualisation(self, principal, project_id: str, dataset_id: str, *, method: str,
+                      clusters: int, sample_size: int, sampling: str) -> dict[str, Any]:
+        """301d (asked 2026-11-24): a 2D picture of a sample of the dataset, from its
+        column roles (numeric and categorical columns). Computed on request and
+        kept for the same dataset, roles and settings."""
+        from JBGDatasetVisualisation import VisualisationRefused, check_settings, visualise
+        check_settings(method, clusters, sample_size, sampling)
+        owner = principal.principal_key
+        project, dataset = self._dataset(owner, project_id, dataset_id)
+        roles = self._datasets.get_roles(owner, project_id, dataset_id)
+        if roles is None or not (roles.by_role("numeric") or roles.by_role("categorical")):
+            raise VisualisationRefused("roles")
+        class_column = roles.class_column or None
+        numeric, categorical = roles.by_role("numeric"), roles.by_role("categorical")
+        columns = list(dict.fromkeys([c for c in (roles.id_column, class_column) if c]
+                                     + numeric + categorical))
+        key = (owner, dataset_id, str(getattr(dataset, "updated_at", "")), dataset.registration_id,
+               tuple(columns), class_column, method, int(clusters), int(sample_size), sampling)
+        cache = self.__dict__.setdefault("_pictures", {})
+        if key in cache:
+            return cache[key]
+
+        def sample(facts):
+            missing = [c for c in columns if c not in facts.columns]
+            if missing:
+                raise VisualisationRefused("columns")
+            if isinstance(facts, _CSVFacts):
+                return facts.sample_frame(columns, sample_size, sampling, class_column)
+            return _sql_sample(facts, columns, sample_size, sampling, class_column)
+        frame = self._with_facts(principal, project, dataset, sample)
+        picture = visualise(frame, id_column=roles.id_column or None, class_column=class_column,
+                            numeric=numeric, categorical=categorical, method=method,
+                            clusters=int(clusters))
+        picture.update(dataset_id=dataset_id, sampling=sampling, sample_size=int(sample_size))
+        if len(cache) >= 16:
+            cache.pop(next(iter(cache)))
+        cache[key] = picture
+        return picture
 
     def class_distribution(self, principal, project_id: str, dataset_id: str,
                            column: str) -> dict[str, Any]:

@@ -12,7 +12,7 @@ from __future__ import annotations
 from fastapi import Depends, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse
 
-VIEWS = ("preview", "profile", "classes", "roles")
+VIEWS = ("preview", "profile", "classes", "roles", "visualisation")          # 301d
 ROLE_CHOICES = (("id", "ID column"), ("class", "Class column"), ("numeric", "Numeric feature"),
                 ("text", "Text feature"), ("categorical", "Categorical feature"),
                 ("date", "Date feature"), ("group", "Group column"), ("ignored", "Ignored"))
@@ -132,6 +132,14 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
             # 293b2: the views stay available below a validation result.
             if selected is not None:
                 v = context["view"]
+                if v == "visualisation":                                   # 301d
+                    from JBGDatasetVisualisation import (CLUSTERS_MAX, MDS_MAX, SAMPLE_DEFAULT,
+                                                         SAMPLE_MAX, SAMPLE_MIN)
+                    context["picture"] = {
+                        "url": f"/api/projects/{pid}/datasets/{dataset}/visualisation",
+                        "clusters_max": CLUSTERS_MAX, "sample_min": SAMPLE_MIN,
+                        "sample_max": SAMPLE_MAX, "sample_default": SAMPLE_DEFAULT,
+                        "mds_max": MDS_MAX}
                 if v == "preview":
                     context["data"], context["read_error"] = read(
                         inspection.preview, principal, pid, dataset)

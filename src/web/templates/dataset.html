@@ -177,7 +177,7 @@
         </div>
       {% endif %}
         <nav class="subtabs" aria-label="{{ _('Dataset') }}">
-          {% for key, label in (("preview", "Preview"), ("profile", "Profile"), ("classes", "Classes"), ("roles", "Column roles")) %}
+          {% for key, label in (("preview", "Preview"), ("profile", "Profile"), ("classes", "Classes"), ("roles", "Column roles"), ("visualisation", "Visualisation")) %}
             {# 298a: the column shown on the Classes view goes along to Column roles. #}
             <a href="/ui/dataset?dataset={{ selected.dataset_id }}&view={{ key }}{% if column %}&column={{ column | urlencode }}{% endif %}" class="{{ 'on' if view == key }}">{{ _(label) }}</a>
           {% endfor %}
@@ -270,6 +270,48 @@
                 data-wait-reason="{{ _('Nothing has been changed yet.') }}">{{ _("Save column roles") }}</button>
             </form>
           {% endif %}
+        {% elif view == "visualisation" and picture %}
+          {# 301d (asked 2026-11-24): a 2D picture of a sample, drawn by jbg.js from the
+             points the server computes. Hover shows the row's values. #}
+          <form class="viz-controls" data-viz-form data-url="{{ picture.url }}"
+            data-decimal="{{ ',' if language == 'sv' else '.' }}"
+            data-loading="{{ _('Computing the picture ...') }}"
+            data-done="{{ _('rows shown') }}" data-explained="{{ _('Share of the variance explained') }}"
+            data-class-label="{{ _('Class') }}" data-cluster-label="{{ _('Cluster') }}" data-none="{{ _('No class') }}"
+            data-failed="{{ _('The picture could not be computed.') }}"
+            data-reason-roles="{{ _('Set the column roles first: the picture uses the numeric and categorical columns.') }}"
+            data-reason-no_features="{{ _('The column roles have no numeric or categorical columns.') }}"
+            data-reason-too_few_rows="{{ _('The dataset has too few rows for a picture.') }}"
+            data-reason-mds_sample_size="{{ _('MDS takes at most') }} {{ picture.mds_max }} {{ _('rows. Choose fewer rows or another method.') }}"
+            data-reason-sample_size="{{ _('Choose between') }} {{ picture.sample_min }} {{ _('and') }} {{ picture.sample_max }} {{ _('rows.') }}"
+            data-reason-signin="{{ _('Sign in to SQL Server first.') }}">
+            <label>{{ _("Method") }}
+              <select name="method">
+                <option value="pca">PCA</option><option value="tsne">t-SNE</option><option value="mds">MDS</option>
+              </select></label>
+            <label>{{ _("Clusters (K-means)") }}
+              <select name="clusters"><option value="0">{{ _("None") }}</option>
+                {% for k in range(2, picture.clusters_max + 1) %}<option value="{{ k }}" {{ 'selected' if k == 3 }}>{{ k }}</option>{% endfor %}
+              </select></label>
+            <label>{{ _("Rows in the sample") }}
+              <input type="number" name="sample_size" min="{{ picture.sample_min }}" max="{{ picture.sample_max }}"
+                step="100" value="{{ picture.sample_default }}" inputmode="numeric"></label>
+            <label>{{ _("Sample") }}
+              <select name="sampling">
+                <option value="stratified">{{ _("Random, the same share of each class") }}</option>
+                <option value="random">{{ _("Random sample") }}</option>
+                <option value="first">{{ _("The first rows") }}</option>
+              </select></label>
+            <label>{{ _("Colour shows") }}
+              <select name="colour" data-viz-colour>
+                <option value="class">{{ _("Class") }}</option><option value="cluster">{{ _("Cluster") }}</option>
+              </select></label>
+            <button class="btn">{{ _("Draw") }}</button>
+          </form>
+          <p class="hint" data-viz-status role="status"></p>
+          <div class="viz-plot" data-viz-plot></div>
+          <div class="viz-legend" data-viz-legend></div>
+          <p class="hint">{{ _("The picture uses the numeric columns (standardised) and the categorical columns (one column per value) from the column roles. K-means groups the rows on all of them, so the clusters are the same whichever method shows them. PCA keeps the largest directions of variation, t-SNE keeps neighbouring rows close, and MDS keeps the distances between rows. The same settings give the same picture.") }}</p>
         {% elif view == "classes" %}
           <form method="get" action="/ui/dataset" class="inline">
             <input type="hidden" name="dataset" value="{{ selected.dataset_id }}">
