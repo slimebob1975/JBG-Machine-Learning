@@ -202,6 +202,16 @@
           {% if selected.role == "prediction" %}
             <p class="hint">{{ _("Prediction datasets use the column roles of the training dataset.") }}</p>
           {% elif data %}
+            {% if id_missing %}
+              {# 301i (asked 2026-11-26): no column can be the ID; one can be added. #}
+              <div class="message warn id-missing">
+                <p>{{ _("No column can be the ID column: none is filled in and unique on every row. The column roles cannot be saved without one.") }}</p>
+                <form method="post" action="/ui/dataset/{{ selected.dataset_id }}/id-column" class="inline">
+                  <button class="btn">{{ _("Add an ID column") }}</button>
+                  <span class="hint">{{ _("Adds JBG_RadId, numbered 1, 2, 3 ..., first in the file, as a new version of it. Earlier versions are kept.") }}</span>
+                </form>
+              </div>
+            {% endif %}
             {% if roles_sources %}
               {# 297d: fill the form in from another dataset's roles; nothing is saved. #}
               <form method="get" action="/ui/dataset" class="inline copy-roles">

@@ -29,6 +29,13 @@ ROLE_ERRORS = (
 
 MESSAGES = {
     "added": ("ok", "Dataset added."),
+    # 301i (asked 2026-11-26): an ID column added under Column roles.
+    "added_no_id": ("ok", "Dataset added. No column can be the ID column (filled in and unique "
+                          "on every row). An ID column can be added under Column roles."),
+    "id_added": ("ok", "The ID column JBG_RadId was added, numbered from 1. Save the column roles."),
+    "id_not_needed": ("error", "A column can already be the ID column."),
+    "id_exists": ("error", "The dataset already has a JBG_RadId column."),
+    "id_failed": ("error", "The ID column could not be added."),
     "activated": ("ok", "Dataset activated for training."),
     "signed_in": ("ok", "Signed in to SQL Server."),
     "signed_out": ("ok", "Signed out of SQL Server."),
@@ -152,6 +159,13 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
                         stored, _ = read(inspection.get_roles, principal, pid, dataset)
                         context["data"] = profile
                         context["roles"] = roles_draft or (stored.as_mapping() if stored else {})
+                        # 301i: a CSV dataset where no column can be the ID (filled in
+                        # and unique on every row) is offered a JBG_RadId column.
+                        if profile and selected["source"] == "csv":
+                            used = profile["basis"].get("rows_used") or 0
+                            context["id_missing"] = used > 0 and not any(
+                                c.get("missing") == 0 and c.get("distinct") == used
+                                for c in profile["columns"])
                         context["roles_stored"] = stored is not None
                         from JBGDatasetRoles import INTEGER_SQL_TYPES
                         context["sql_integer_types"] = sorted(INTEGER_SQL_TYPES)       # 298i
@@ -274,7 +288,9 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
             return redirect("/ui/dataset", message="bad_csv")
         finally:
             file.file.close()
-        return redirect("/ui/dataset", dataset=created["dataset_id"], message="added")
+        no_id = not (created.get("upload") or {}).get("id_candidates", ["?"])      # 301i
+        return redirect("/ui/dataset", dataset=created["dataset_id"],
+                        message="added_no_id" if no_id else "added")
 
     @app.post("/ui/dataset/sql", include_in_schema=False)
     def register_sql(request: Request, name: str = Form(""), role: str = Form("training"),
@@ -327,6 +343,25 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
         return Response(content, media_type="text/csv", headers={
             "Content-Disposition": f'attachment; filename="{plain}"; '
                                    f"filename*=UTF-8''{quote(name)}"})
+
+    @app.post("/ui/dataset/{dataset_id}/id-column", include_in_schema=False)
+    def add_id_column(request: Request, dataset_id: str, principal=Depends(principal_dependency)):
+        """301i (asked 2026-11-26): JBG_RadId, when no column can be the ID."""
+        from JBGDatasetService import IdColumnRefused
+        pid = project_id(request, principal)
+        if pid is None:
+            return redirect("/ui/dataset")
+        try:
+            datasets.add_id_column(principal.principal_key, pid, dataset_id)
+        except (DatasetUnavailable, ProjectUnavailable):
+            return redirect("/ui/dataset", message="unavailable")
+        except IdColumnRefused as refused:
+            code = {"has_id_candidate": "id_not_needed", "exists": "id_exists"}.get(
+                str(refused), "id_failed")
+            return redirect("/ui/dataset", dataset=dataset_id, view="roles", message=code)
+        except (ValueError, OSError, UnicodeError):
+            return redirect("/ui/dataset", dataset=dataset_id, view="roles", message="id_failed")
+        return redirect("/ui/dataset", dataset=dataset_id, view="roles", message="id_added")
 
     @app.post("/ui/dataset/{dataset_id}/rename", include_in_schema=False)
     def rename(request: Request, dataset_id: str, name: str = Form(""),

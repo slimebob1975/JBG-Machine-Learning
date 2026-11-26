@@ -129,7 +129,14 @@ feature or a categorical feature. Ignored columns are not used.
 In SQL datasets the ID column must be a whole-number column (int, bigint,
 smallint or tinyint), not for example uniqueidentifier or text. Otherwise
 **Treated as** shows a warning, validation fails the ID column and a run does
-not start. In CSV datasets the ID column can hold anything.
+not start. In CSV datasets the ID column can hold anything, but it must be
+filled in and unique on every row.
+
+If a CSV dataset has no such column, the upload says so, and Column roles
+offers **Add an ID column**. It adds the column JBG_RadId, numbered 1, 2, 3
+and so on, first in the file, as a new version of the file. Earlier versions
+are kept. JBG_RadId is then suggested as the ID column. SQL tables are never
+changed, so there the ID column must be in the table.
 
 A date column can have the role **Date feature**. It then becomes the year
 (a number), month and weekday (points on a circle, so that December lies

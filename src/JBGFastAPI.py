@@ -322,13 +322,21 @@ def _add_dataset_endpoints(app, principal_dependency, datasets):
                     name=request.name, role=request.role, catalog=request.catalog,
                     table=request.table, principal=principal)
 
+    @app.post("/api/projects/{project_id}/datasets/{dataset_id}/id-column")
+    def add_dataset_id_column(project_id: str, dataset_id: str,
+                              principal: AuthenticatedPrincipal = Depends(principal_dependency)):
+        """301i: a JBG_RadId column, when no column of a CSV dataset can be the ID."""
+        return call(datasets.add_id_column, principal.principal_key, project_id, dataset_id)
+
     @app.post("/api/projects/{project_id}/datasets/csv", status_code=201)
     def upload_csv_dataset(project_id: str, file: UploadFile = File(...),
                            name: str = Form(...),
                            role: Literal["training", "prediction", "mixed"] = Form(...),
                            delimiter: Optional[Literal[",", ";", "\t", "|"]] = Form(None),
-                           encoding: Literal["utf-8-sig", "utf-8", "cp1252", "latin-1"]
-                           = Form("utf-8-sig"),
+                           # 301i: none given means detected (301h); the default
+                           # "utf-8-sig" here bypassed the detection for API uploads.
+                           encoding: Optional[Literal["utf-8-sig", "utf-8", "cp1252", "latin-1"]]
+                           = Form(None),
                            principal: AuthenticatedPrincipal = Depends(principal_dependency)):
         try:
             return call(datasets.upload_csv, principal.principal_key, project_id, name=name,

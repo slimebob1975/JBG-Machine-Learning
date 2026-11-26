@@ -1,3 +1,24 @@
+## Revision 301i - An ID column added to a CSV dataset that lacks one (2026-11-26)
+
+- Asked 2026-11-26: a CSV dataset where no column can be the ID column (filled in
+  and unique on every row) could not get its column roles saved. Decided
+  2026-11-26:
+  - The upload says so: "Datasetet lades till. Ingen kolumn kan vara ID-kolumn
+    ... En ID-kolumn kan läggas till under Kolumnroller." The upload's result
+    lists the columns that can be the ID (`id_candidates`).
+  - Column roles offers **Lägg till en ID-kolumn**, only when no column can be
+    the ID. It adds `JBG_RadId`, numbered 1, 2, 3 ..., first in the file,
+    written as a new version of the file in the file's own encoding and
+    delimiter, as corrections are (299b). Earlier versions stay, the validation
+    starts over, and JBG_RadId is then suggested as the ID column. Refused when
+    a column can already be the ID, when JBG_RadId exists, and for SQL datasets
+    (JBG never changes tables). Also `POST .../datasets/{id}/id-column`.
+- Fixed, found while testing: API uploads (`POST .../datasets/csv`) defaulted to
+  UTF-8 and bypassed the encoding detection of 301h, which only the form used.
+  With no encoding given, the API detects it too.
+- User guides: the Column roles section.
+- Tests: `tests/test_revision_301i_id_column.py` (with a made-up file).
+
 ## Revision 301h - CSV uploads in Windows-1252 accepted (2026-11-26)
 
 - Reported 2026-11-26: a CSV file saved by Excel ("CSV (semikolonavgränsad)")

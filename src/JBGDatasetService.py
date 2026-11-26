@@ -9,6 +9,7 @@ datasets stay "unverified".
 """
 from __future__ import annotations
 
+import shutil
 import tempfile
 from pathlib import Path
 from typing import Any, BinaryIO
@@ -49,7 +50,8 @@ def dataset_response(dataset: Dataset, *, upload=None) -> dict[str, Any]:
     if upload is not None:
         # Structure of the stored file, for the GUI's preview step.
         response["upload"] = {"rows": upload.rows, "columns": list(upload.columns),
-                              "delimiter": upload.delimiter, "encoding": upload.encoding}
+                              "delimiter": upload.delimiter, "encoding": upload.encoding,
+                              "id_candidates": list(upload.id_candidates)}       # 301i
     return response
 
 
@@ -155,6 +157,61 @@ class DatasetService:
             raise
         return dataset_response(dataset, upload=upload)
 
+    ID_COLUMN = "JBG_RadId"                    # 301i (decided 2026-11-26)
+
+    def add_id_column(self, owner: str, project_id: str, dataset_id: str) -> dict[str, Any]:
+        """301i (asked 2026-11-26): a CSV dataset where no column can be the ID
+        (filled in and unique on every row) gets one: JBG_RadId, numbered 1, 2,
+        3 ... first in the file, written as a new version of the file (decided
+        2026-11-26), as corrections are. Earlier versions stay, as runs and
+        models refer to them. Refused for SQL datasets (JBG never changes
+        tables), when a column can already be the ID, or when JBG_RadId exists."""
+        import csv
+        import io
+        from CSVColumnSchema import inspect_csv_columns
+        from JBGProjectStorage import csv_upload_format
+        project = self._project(owner, project_id, DataSourceKind.CSV)
+        try:
+            dataset = self._repository.get_owned(owner, project_id, dataset_id)
+        except KeyError:
+            raise DatasetUnavailable("dataset unavailable") from None
+        if dataset.source is not DataSourceKind.CSV:
+            raise IdColumnRefused("not_csv")
+        repository, scope = project_csv_storage(project.project_id, root=self._csv_root)
+        form = csv_upload_format(repository, scope, dataset.registration_id)
+        with tempfile.TemporaryDirectory(prefix="jbg_id_") as folder:
+            source = Path(folder) / "current.csv"
+            with repository.open_artifact(scope, dataset.registration_id) as stream, \
+                    source.open("wb") as target:
+                shutil.copyfileobj(stream, target)
+            schema = inspect_csv_columns(source, delimiter=form["delimiter"],
+                                         encoding=form["encoding"])
+            if self.ID_COLUMN in schema.columns:
+                raise IdColumnRefused("exists")
+            if schema.unique_id_candidates:
+                raise IdColumnRefused("has_id_candidate")
+            text = source.read_bytes().decode(form["encoding"])
+            rows = list(csv.reader(io.StringIO(text, newline=""), delimiter=form["delimiter"],
+                                   quotechar=form["quotechar"]))
+            numbered = [[self.ID_COLUMN] + rows[0]]
+            number = 0
+            for row in rows[1:]:
+                if not any(cell.strip() for cell in row):
+                    continue                       # blank lines are not rows
+                number += 1
+                numbered.append([str(number)] + row)
+            out = io.StringIO(newline="")
+            csv.writer(out, delimiter=form["delimiter"], quotechar=form["quotechar"],
+                       lineterminator="\r\n").writerows(numbered)
+            target = Path(folder) / "with_id.csv"
+            target.write_bytes(out.getvalue().encode(form["encoding"]))
+            upload = register_csv_upload(repository, scope, target, delimiter=form["delimiter"],
+                                         encoding=form["encoding"],
+                                         original_name=f"{dataset.name}.csv")
+        updated = self._repository.replace_csv_file(owner, project_id, dataset_id,
+                                                    upload.artifact_id)
+        return dataset_response(updated, upload=upload)
+
     def csv_file(self, owner: str, project_id: str, dataset_id: str) -> tuple[bytes, str]:
         """299b: a CSV dataset's current file (with any corrected classes) and a
         file name, for its owner."""
@@ -201,6 +258,10 @@ class DatasetService:
             raise DatasetConflict("dataset name already exists") from None
         except KeyError:
             raise DatasetUnavailable("dataset unavailable") from None
+
+
+class IdColumnRefused(ValueError):
+    """301i: an ID column cannot be added (the reason is a code)."""
 
 
 def _copy_limited(source: BinaryIO, target: BinaryIO, limit: int) -> int:

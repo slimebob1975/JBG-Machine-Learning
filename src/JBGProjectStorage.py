@@ -79,6 +79,7 @@ class UploadedCSV:
     columns: tuple[str, ...]
     delimiter: str
     encoding: str
+    id_candidates: tuple[str, ...] = ()        # 301i: columns that can be the ID
 
 
 def register_csv_upload(repository, scope: StorageScope, path: Path, *, delimiter: str,
@@ -118,7 +119,7 @@ def register_csv_upload(repository, scope: StorageScope, path: Path, *, delimite
                                  "application/json", dataset_id=dataset_id)
     repository.save_artifact(scope, manifest, BytesIO(json.dumps(meta).encode("utf-8")))
     return UploadedCSV(reference.artifact_id, schema.rows, tuple(schema.columns),
-                       delimiter, encoding)
+                       delimiter, encoding, tuple(schema.unique_id_candidates))
 
 
 def csv_upload_format(repository, scope: StorageScope, artifact_id: str) -> dict:

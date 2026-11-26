@@ -23,6 +23,12 @@ decision.
   dataset picture, and the About text filling its panel.
 - [x] 301h (reported 2026-11-26): CSV uploads in Windows-1252 (Excel's CSV) were
   refused. The encoding is detected now.
+- [x] 301i (asked 2026-11-26): a JBG_RadId ID column added to a CSV dataset where
+  no column can be the ID.
+- [ ] Found with 301i: a prediction CSV for a model trained with JBG_RadId must
+  contain JBG_RadId too, and the upload refuses a prediction file that lacks a
+  training column. Add JBG_RadId to such a prediction file at upload, numbered
+  the same way, when the training dataset's ID column is JBG_RadId.
 - [x] 300v (asked 2026-11-24): default limits for c, 20 for the upper bound and
   10 for the warning level.
 - [x] 300s (asked 2026-11-23): the Run tab showed nothing during the final

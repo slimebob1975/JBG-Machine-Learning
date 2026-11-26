@@ -2790,3 +2790,28 @@ msgstr "Linje mellan kluster"
 
 msgid "Outliers are found on all the prepared columns and ringed in red: the chosen share of the most unusual rows. The dashed lines between the clusters are drawn in the picture, not in the data, so they show where the picture's clusters meet. With t-SNE and MDS the distances in the picture are distorted, so take the lines as an illustration."
 msgstr "Avvikelser hittas på alla förberedda kolumner och ringas in med rött: den valda andelen av de mest ovanliga raderna. De streckade linjerna mellan klustren ritas i bilden, inte i data, så de visar var bildens kluster möts. Med t-SNE och MDS är avstånden i bilden förvrängda, så se linjerna som en illustration."
+
+# 301i: an ID column added to a CSV dataset.
+msgid "Dataset added. No column can be the ID column (filled in and unique on every row). An ID column can be added under Column roles."
+msgstr "Datasetet lades till. Ingen kolumn kan vara ID-kolumn (ifylld och unik på varje rad). En ID-kolumn kan läggas till under Kolumnroller."
+
+msgid "The ID column JBG_RadId was added, numbered from 1. Save the column roles."
+msgstr "ID-kolumnen JBG_RadId lades till, numrerad från 1. Spara kolumnrollerna."
+
+msgid "A column can already be the ID column."
+msgstr "En kolumn kan redan vara ID-kolumn."
+
+msgid "The dataset already has a JBG_RadId column."
+msgstr "Datasetet har redan en kolumn JBG_RadId."
+
+msgid "The ID column could not be added."
+msgstr "ID-kolumnen kunde inte läggas till."
+
+msgid "No column can be the ID column: none is filled in and unique on every row. The column roles cannot be saved without one."
+msgstr "Ingen kolumn kan vara ID-kolumn: ingen är ifylld och unik på varje rad. Kolumnrollerna kan inte sparas utan en."
+
+msgid "Add an ID column"
+msgstr "Lägg till en ID-kolumn"
+
+msgid "Adds JBG_RadId, numbered 1, 2, 3 ..., first in the file, as a new version of it. Earlier versions are kept."
+msgstr "Lägger till JBG_RadId, numrerad 1, 2, 3 ..., först i filen, som en ny version av den. Tidigare versioner finns kvar."

@@ -96,7 +96,8 @@ def test_csv_upload_is_stored_under_the_project_id(tmp_path):
         assert response.status_code == 201, response.text
         body = response.json()
         assert body["upload"] == {"rows": 4, "columns": ["id", "sepal", "petal", "species"],
-                                  "delimiter": ";", "encoding": "utf-8-sig"}
+                                  "delimiter": ";", "encoding": "utf-8-sig",
+                                  "id_candidates": ["id", "sepal"]}           # 301i
         assert "registration_id" not in body and "catalog" not in body
         client.patch(f"/api/projects/{project}", json={"name": "Iris renamed"})
     labels = _stored(tmp_path, project)

@@ -131,7 +131,14 @@ kategorisk variabel. Kolumner som ignoreras används inte.
 I SQL-dataset måste ID-kolumnen vara en heltalskolumn (int, bigint, smallint
 eller tinyint), till exempel inte uniqueidentifier eller text. Annars visas en
 varning under **Behandlas som**, valideringen underkänner ID-kolumnen och en
-körning startar inte. I CSV-dataset kan ID-kolumnen innehålla vad som helst.
+körning startar inte. I CSV-dataset kan ID-kolumnen innehålla vad som helst,
+men den måste vara ifylld och unik på varje rad.
+
+Har ett CSV-dataset ingen sådan kolumn säger uppladdningen det, och
+Kolumnroller erbjuder **Lägg till en ID-kolumn**. Den lägger till kolumnen
+JBG_RadId, numrerad 1, 2, 3 och så vidare, först i filen, som en ny version av
+filen. Tidigare versioner finns kvar. JBG_RadId föreslås sedan som ID-kolumn.
+SQL-tabeller ändras aldrig, så där måste ID-kolumnen finnas i tabellen.
 
 En datumkolumn kan få rollen **Datumvariabel**. Den blir då år (som tal),
 månad och veckodag (som punkter på en cirkel, så att december ligger nära
