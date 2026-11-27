@@ -44,6 +44,12 @@ def production_model_loader():
           'keras': SimpleNamespace(models=SimpleNamespace(load_model=Mock(side_effect=AssertionError('keras forbidden')))),
           'resolve_keras_model_sidecar_path': Mock(side_effect=AssertionError('keras forbidden')),
           'attach_keras_model_to_pipeline': Mock(side_effect=AssertionError('keras forbidden'))}
+    # 301m: the load runs through JBGModelArtifactService (load_checked_model_artifact,
+    # restore_model_from_artifact_payload), which the extracted method now names.
+    import JBGHandler as _handler_module
+    ns.setdefault('load_checked_model_artifact', _handler_module.load_checked_model_artifact)
+    ns.setdefault('restore_model_from_artifact_payload',
+                  _handler_module.restore_model_from_artifact_payload)
     exec(compile(ast.fix_missing_locations(ast.Module(body=methods, type_ignores=[])),
                  str(path), 'exec'), ns)
     return ns

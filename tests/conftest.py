@@ -5,6 +5,14 @@ import os
 # Tests never send mail: the real environment's empty values override .env.
 os.environ["DEFAULT_SMTP_SERVER"] = ""
 os.environ["DEFAULT_NOTIFICATION_EMAIL"] = ""
+
+# 301m (found with the full regression at 0.20.1): importing GUIHandler loads
+# the developer's .env into the process environment (load_dotenv at module
+# level), so in one long pytest session every later test saw the real SQL and
+# metadata settings, and CSV runs, the run worker and the API settings test
+# failed only there. The environment as it is now, before any test module is
+# imported, is restored before each test.
+_ENVIRONMENT = dict(os.environ)
 from types import SimpleNamespace
 import pytest
 from Config import Config
@@ -101,6 +109,8 @@ class MockConfig():
             experimental_perturbed_dark_number_fallback=True,
         )
         self.debug = False
+
+    def get_categorical_limit(self): return 30  # 301m: Config has had this since 293a2
 
     def get_dark_number_flip_fraction(self) -> float:
         return self.mode.dark_number_flip_fraction
@@ -502,3 +512,11 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if is_native_test_class(getattr(item, "cls", None)):
             item.add_marker(pytest.mark.native)
+
+
+@pytest.fixture(autouse=True)
+def _environment_before_the_tests():
+    """301m: each test starts from the environment before any .env was loaded."""
+    os.environ.clear()
+    os.environ.update(_ENVIRONMENT)
+    yield

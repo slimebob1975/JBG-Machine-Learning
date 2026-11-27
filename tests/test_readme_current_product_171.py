@@ -17,7 +17,8 @@ def test_readme_is_current_product_guide_not_numbered_revision_history():
         "## Main capabilities",
         "## Requirements",
         "## Configuration",
-        "## Starting the GUI",
+        "## Starting the web GUI",          # 300x: the web GUI first
+        "## Starting the Voilà GUI",
         "## Core workflow",
         "## Feature selection modelling",
         "## Files and runtime output",

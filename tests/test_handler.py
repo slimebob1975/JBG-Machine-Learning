@@ -1456,6 +1456,14 @@ class TestModelHandler():
     # None of them easy to test, so will postpone
 
 
+# 301m (found with the full regression at 0.20.1): these tests describe the Dark
+# Numbers method before JBG 1.1 (c = 1 / recovery without bounds, the perturbed
+# and same-model fallbacks, the three estimates of that time). That method is
+# gone; JBG 1.3 replaced it, and its tests are in tests/test_revision_299o_*,
+# 300e, 300k, 300l, 300m, 300n, 300v and 300y. Kept for the record, not run.
+RETIRED_DARK_NUMBERS = ("Dark Numbers before JBG 1.1, replaced by JBG 1.3 "
+                        "(tests 299o, 300e, 300k-300n, 300v, 300y)")
+
 class TestPredictionsHandler:
     """ Tests functions in the predictions handler """
 
@@ -1486,6 +1494,7 @@ class TestPredictionsHandler:
         (np.nan, 25.0, False),
         (None, 25.0, False),
     ])
+    @pytest.mark.skip(reason=RETIRED_DARK_NUMBERS)
     def test_dark_number_direct_low_recovery_warns_but_keeps_direct_result(
         self, default_predictions_handler, monkeypatch, recovery, correction, warn
     ):
@@ -1552,6 +1561,7 @@ class TestPredictionsHandler:
             assert "investigate the correctness and quality of the training dataset" in logger.warnings[0]
             assert "retained unchanged" in logger.warnings[0]
 
+    @pytest.mark.skip(reason=RETIRED_DARK_NUMBERS)
     def test_dark_number_zero_recovery_does_not_trigger_sample_size_regression(
         self, default_predictions_handler, monkeypatch
     ):
@@ -1605,6 +1615,7 @@ class TestPredictionsHandler:
         assert sources == {"B": "fallback/unestimable"}
         assert corr_models == {"B": "Target model"}
 
+    @pytest.mark.skip(reason=RETIRED_DARK_NUMBERS)
     def test_dark_number_zero_recovery_uses_experimental_perturbed_fallback_when_enabled(
         self, default_predictions_handler, monkeypatch
     ):
@@ -1684,6 +1695,7 @@ class TestPredictionsHandler:
         assert events.iloc[0]["direct_status"] == "zero_recovery"
         assert events.iloc[0]["corr_source"] == "perturbed_same_model"
 
+    @pytest.mark.skip(reason=RETIRED_DARK_NUMBERS)
     def test_dark_number_resource_failure_uses_same_model_regression(
         self, default_predictions_handler, monkeypatch
     ):
@@ -1827,6 +1839,7 @@ class TestPredictionsHandler:
         assert all("does not support predict_proba()" in warning for warning in logger.warnings)
 
 
+    @pytest.mark.skip(reason=RETIRED_DARK_NUMBERS)
     def test_dark_numbers_report_three_estimates_with_model_specific_corrections(
         self, default_predictions_handler, monkeypatch
     ):

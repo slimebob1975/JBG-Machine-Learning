@@ -29,6 +29,7 @@ class SyntheticCompatibilityConfig(predecessor.bridge.bridge.handlers.fixture216
     def use_stop_words(self): return False
     def should_hex_encode(self): return False
     def use_categorization(self): return False
+    def get_categorical_limit(self): return 30  # 301m: Config has had this since 293a2
 
 
 def fitted_converter():

@@ -25,7 +25,8 @@ def handler_methods():
     wanted = {
         'JBGHandler': ('get_handler', 'save_predictions'),
         'PredictionsHandler': ('get_prediction_results', 'get_probablities_as_string',
-                               'save_predictions', 'get_rate_type'),
+                               'save_predictions', 'get_rate_type',
+                               '_keep_predictions_in_run_folder'),   # 301m: since 296b
         'ModelHandler': ('get_class_labels',),
     }
     out = {}
@@ -76,7 +77,8 @@ class CSVRealHandlers221(unittest.TestCase):
         self.predictions.rates = np.max(self.predictions.probabilites, axis=1)
         self.predictions.could_predict_proba = True
         for method in ('get_prediction_results', 'get_probablities_as_string',
-                       'save_predictions', 'get_rate_type'):
+                       'save_predictions', 'get_rate_type',
+                       '_keep_predictions_in_run_folder'):     # 301m: since 296b
             setattr(self.predictions, method,
                     METHODS['PredictionsHandler', method].__get__(self.predictions))
         self.handler.handlers.update(dataset=self.dataset, model=self.model,

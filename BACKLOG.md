@@ -30,6 +30,8 @@ decision.
 - [x] 301k (asked 2026-11-26): Excel workbooks, one dataset per chosen sheet.
 - [x] 301l (asked 2026-11-26): version 0.20.1. The user tags the commit
   (v0.20.1).
+- [x] 301m (found 2026-11-26): the full pytest regression repaired (tests
+  disturbing each other, old tests behind the code). Run it before each release.
 - [ ] Found with 301i: a prediction CSV for a model trained with JBG_RadId must
   contain JBG_RadId too, and the upload refuses a prediction file that lacks a
   training column. Add JBG_RadId to such a prediction file at upload, numbered

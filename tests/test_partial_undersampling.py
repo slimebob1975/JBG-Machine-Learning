@@ -71,8 +71,11 @@ def test_config_snapshot_generated_file_and_real_widget_roundtrip(tmp_path):
     path = tmp_path / 'config.json'
     config.save_to_file(path)
     loaded = Config.load_config_from_json(path)
-    assert loaded.get_undersampler_abbreviations() == CHOICES
-    assert loaded.mode.undersampler is Undersampling.R05
+    # 301a: a stored configuration with the presets loads as Random
+    # undersampling with the share of the most balancing preset (R02: 66.7 %).
+    assert loaded.get_undersampler_abbreviations() == ['NUG', 'RND']
+    assert loaded.mode.undersampler is Undersampling.RND
+    assert loaded.mode.undersampling_share == 66.7
     params = {name: getattr(config, name) for name in ('connection', 'mode', 'io', 'debug', 'mail', 'name', 'save')}
     snapshot = GUIHandler._config_params_to_last_run_snapshot(params)
     restored = GUIHandler._last_run_snapshot_to_config_params(snapshot, 'user', 'password')

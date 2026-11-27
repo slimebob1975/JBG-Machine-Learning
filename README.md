@@ -115,7 +115,7 @@ From the repository root, in the environment where JBG is installed:
 ```
 
 Then open `http://127.0.0.1:8000/ui/overview`. The user guide is under the Om (About) tab, and
-`docs/dependencies.md` lists the tested package versions.
+`constraints-tested.txt` holds the tested package versions.
 
 ## Starting the Voilà GUI
 

@@ -32,6 +32,7 @@ class FakeConfig:
     def get_ngram_range(self): return SimpleNamespace(ngram_range=(1, 2))
     def should_hex_encode(self): return False
     def use_categorization(self): return True
+    def get_categorical_limit(self): return 30  # 301m: Config has had this since 293a2
 
 
 class FakeConverter:
@@ -240,7 +241,10 @@ def test_save_path_fails_closed_when_compatibility_contract_cannot_be_built():
     assert "Model was not saved because source/schema compatibility metadata could not be established" in block
     # Compatibility must be built before any artifact is persisted, and failures
     # must propagate rather than silently returning or continuing.
-    assert block.index("build_model_save_compatibility(") < block.index("save_model_artifact(")
+    # 301m: the save goes through save_checked_model_artifact(...), which is
+    # given save_model_artifact; the order is what this test protects.
+    assert block.index("build_model_save_compatibility(") < block.index("save_checked_model_artifact(")
+    assert "save_artifact=save_model_artifact" in block
     assert "raise ModelInitializationException(" in block
     assert "except ModelCompatibilityError as compatibility_error:" in block
 

@@ -199,6 +199,8 @@ def test_prepare_failure_does_not_repeat_cv(default_model_handler, monkeypatch):
         mh._last_execution_n_jobs = 1
         return {'test_score': np.array([0.5, 0.75, 0.6]), 'fit_time': [1, 1, 1], 'score_time': [0.1] * 3}
     monkeypatch.setattr(JBGHandler, 'prepare_runtime_cv', broken)
+    import JBGCrossValidationExecution     # 301m: where it is called since its extraction
+    monkeypatch.setattr(JBGCrossValidationExecution, 'prepare_runtime_cv', broken)
     mh.execute_n_job = cv_call
     X, y, cv = data()
     original = pipeline()

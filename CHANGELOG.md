@@ -1,3 +1,34 @@
+## Revision 301m - The full regression repaired (2026-11-26)
+
+- Found 2026-11-26: the full pytest run at 0.20.1 (all 392 test files, not only
+  the gate's) gave 96 failures and 6 errors. None came from a product fault:
+  - **Tests disturbed each other** (about 20, among them every native test and
+    285b and 285d): importing GUIHandler loads the developer's `.env` into the
+    process environment, so in one long session later tests saw the real SQL and
+    metadata settings, and CSV runs reported an SQL identity. `tests/conftest.py`
+    now takes the environment before any test module is imported and restores it
+    before each test. The server still reads `.env` as before.
+  - **Old tests had fallen behind the code** (81, outside the gate, 79 of them
+    already failing at 300p):
+    - test stand-ins without `get_categorical_limit` (Config has it since
+      293a2) or `_keep_predictions_in_run_folder` (since 296b), and a test
+      namespace without the model-artifact helpers the load uses now;
+    - tests patching `cross_validate` and `prepare_runtime_cv` in `JBGHandler`,
+      while they are called in `JBGCrossValidationExecution` since its
+      extraction;
+    - a check for the save call, which goes through
+      `save_checked_model_artifact` now;
+    - two tests behind this session's deliberate changes: the undersampling
+      presets (301a) and the README's headings (300x). The README points to
+      `constraints-tested.txt` instead of a `docs/` path, as its test requires;
+    - 12 Dark Numbers tests in `test_handler.py` describe the method before
+      JBG 1.1. They are retired with a reason (skipped), since JBG 1.3 and its
+      tests (299o, 300e, 300k-300n, 300v, 300y) replaced that method.
+- In the container every repaired file passes alone and together, and the
+  natives pass in one session after a GUIHandler test. One timing test needs two
+  processor cores and fails only in the one-core container.
+- Tests: `tests/test_revision_301m_regression_repair.py`.
+
 ## Version 0.20.1 – the web GUI (2026-11-26)
 
 - The release after 0.19.1 (2026-10-30), revisions 280a to 301k: the web GUI

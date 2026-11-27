@@ -12,6 +12,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 import JBGHandler as handler_module
+import JBGCrossValidationExecution as cv_module   # 301m
 from JBGHandler import ModelHandler, _SpotCheckState
 from JBGMeta import Oversampling, Undersampling
 from JBGTrainingTiming import (
@@ -122,7 +123,7 @@ def test_cv_pool_never_exceeds_fold_tasks(configured_cap, cores, folds, expected
         observed.append(n_jobs)
         return {'test_score': np.ones(folds), 'fit_time': np.ones(folds), 'score_time': np.zeros(folds)}
     monkeypatch.setattr(handler_module.psutil, 'cpu_count', lambda logical=True: cores)
-    monkeypatch.setattr(handler_module, 'cross_validate', cv_operation)
+    monkeypatch.setattr(cv_module, 'cross_validate', cv_operation)   # 301m: where it is called
     X = pd.DataFrame(np.ones((40, 2)))
     actual = handler.get_cross_val_score(
         LogisticRegression(), SimpleNamespace(X_train=X, Y_train=pd.Series([0, 1] * 20)),
@@ -142,7 +143,7 @@ def test_cv_resource_retry_reduces_bounded_pool_and_records_success(monkeypatch)
             raise MemoryError('worker pressure')
         return {'test_score': np.ones(10), 'fit_time': np.ones(10), 'score_time': np.zeros(10)}
     monkeypatch.setattr(handler_module.psutil, 'cpu_count', lambda logical=True: 24)
-    monkeypatch.setattr(handler_module, 'cross_validate', cv_operation)
+    monkeypatch.setattr(cv_module, 'cross_validate', cv_operation)   # 301m: where it is called
     handler.get_cross_val_score(
         LogisticRegression(), SimpleNamespace(X_train=pd.DataFrame(np.ones((40, 2))),
                                               Y_train=pd.Series([0, 1] * 20)),
