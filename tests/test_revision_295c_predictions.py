@@ -63,22 +63,23 @@ def test_a_prediction_run_registers_no_model(tmp_path):
     assert register_trained_model(None, record, run_config) is False
 
 
-def test_translations_reload_when_the_catalogue_changes():
+def test_translations_reload_when_the_catalogue_changes(monkeypatch, tmp_path):
+    # 301n: on a copy of the catalogue. The test wrote to the real sv.po, and an
+    # interrupted run could leave its text in it.
     import JBGWebUI
-    po = JBGWebUI.WEB / "i18n" / "sv.po"
-    backup = Path(tempfile.mkdtemp()) / "sv.po"
-    shutil.copy2(po, backup)
-    try:
-        assert JBGWebUI.translator("sv")("A text added after start") == "A text added after start"
-        with po.open("a", encoding="utf-8") as stream:
-            stream.write('\nmsgid "A text added after start"\nmsgstr "En text tillagd efter start"\n')
-        later = time.time() + 5
-        os.utime(po, (later, later))
-        assert JBGWebUI.translator("sv")("A text added after start") == "En text tillagd efter start"
-    finally:
-        shutil.copy2(backup, po)
-        os.utime(po, (time.time() + 10, time.time() + 10))
-        JBGWebUI.translator("sv")
+    web = tmp_path / "web"
+    (web / "i18n").mkdir(parents=True)
+    po = web / "i18n" / "sv.po"
+    shutil.copy2(JBGWebUI.WEB / "i18n" / "sv.po", po)
+    monkeypatch.setattr(JBGWebUI, "WEB", web)
+    monkeypatch.setitem(JBGWebUI._CATALOG_TIMES, "sv", None)
+    monkeypatch.setitem(JBGWebUI._CATALOGS, "sv", JBGWebUI._CATALOGS["sv"])
+    assert JBGWebUI.translator("sv")("A text added after start") == "A text added after start"
+    with po.open("a", encoding="utf-8") as stream:
+        stream.write('\nmsgid "A text added after start"\nmsgstr "En text tillagd efter start"\n')
+    later = time.time() + 5
+    os.utime(po, (later, later))
+    assert JBGWebUI.translator("sv")("A text added after start") == "En text tillagd efter start"
 
 
 # --- Prediction runs through the API ----------------------------------------------------------------

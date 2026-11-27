@@ -73,6 +73,7 @@ class DatasetService:
         self._repository = repository
         self._projects = projects
         self._csv_root = Path(csv_root)
+        self.sweep_excel()                     # 301n: everyone's old workbooks, at start
         # 293a: check(principal, project_id, candidate) for prediction datasets.
         self._compatibility = compatibility
 
@@ -137,6 +138,16 @@ class DatasetService:
             if delimiter is None:
                 with path.open("rb") as reader:
                     delimiter = detect_delimiter(reader.read(64 * 1024), encoding)
+            id_added = False
+            if role is DatasetRole.PREDICTION and \
+                    self._training_id_column(owner, project_id) == self.ID_COLUMN:
+                # 301n: a model trained with JBG_RadId (301i) needs the column in the
+                # file to predict; a prediction file without it gets it, numbered 1,
+                # 2, 3 ... the same way.
+                raw = path.read_bytes()
+                if self.ID_COLUMN not in _csv_header(raw, delimiter, encoding):
+                    path.write_bytes(_with_id_column(raw, self.ID_COLUMN, delimiter, encoding))
+                    id_added = True
             upload = register_csv_upload(repository, scope, path, delimiter=delimiter,
                                          encoding=encoding, original_name=filename)
         try:
@@ -156,12 +167,50 @@ class DatasetService:
             if isinstance(error, DuplicateDatasetName):
                 raise DatasetConflict("dataset name already exists") from None
             raise
-        return dataset_response(dataset, upload=upload)
+        response = dataset_response(dataset, upload=upload)
+        response["upload"]["id_added"] = id_added                              # 301n
+        return response
+
+    def _training_id_column(self, owner: str, project_id: str) -> str | None:
+        """301n: the ID column of the project's active training dataset."""
+        try:
+            active = next((d for d in self._repository.list_for_project(owner, project_id,
+                                                                        limit=500)
+                           if d.active_training), None)
+            roles = self._repository.get_roles(owner, project_id, active.dataset_id) \
+                if active is not None else None
+            return roles.id_column if roles is not None else None
+        except Exception:
+            return None
 
     # --- 301k: Excel workbooks, one CSV dataset per chosen sheet -------------------
 
     EXCEL_ROOT = Path(tempfile.gettempdir()) / "jbg_excel"
     EXCEL_KEEP_SECONDS = 24 * 3600
+
+    def sweep_excel(self, now: float | None = None) -> int:
+        """301n: remove every user's kept workbooks older than a day (read_excel
+        only cleared the uploading user's own). Returns how many files went."""
+        import time
+        now = time.time() if now is None else now
+        removed = 0
+        try:
+            folders = [f for f in self.EXCEL_ROOT.iterdir() if f.is_dir()]
+        except OSError:
+            return 0
+        for folder in folders:
+            for old in folder.iterdir():
+                try:
+                    if now - old.stat().st_mtime > self.EXCEL_KEEP_SECONDS:
+                        old.unlink()
+                        removed += 1
+                except OSError:
+                    pass
+            try:
+                folder.rmdir()                  # only when empty
+            except OSError:
+                pass
+        return removed
 
     def _excel_folder(self, owner: str) -> Path:
         import hashlib
@@ -250,7 +299,8 @@ class DatasetService:
                                                   principal=principal)
                 results.append(dict(entry, dataset_id=created["dataset_id"],
                                     rows=created["upload"]["rows"],
-                                    id_candidates=created["upload"]["id_candidates"]))
+                                    id_candidates=created["upload"]["id_candidates"],
+                                    id_added=created["upload"].get("id_added", False)))
             except ExcelRefused as refused:
                 results.append(dict(entry, error=str(refused)))
             except DatasetConflict:
@@ -300,21 +350,10 @@ class DatasetService:
                 raise IdColumnRefused("exists")
             if schema.unique_id_candidates:
                 raise IdColumnRefused("has_id_candidate")
-            text = source.read_bytes().decode(form["encoding"])
-            rows = list(csv.reader(io.StringIO(text, newline=""), delimiter=form["delimiter"],
-                                   quotechar=form["quotechar"]))
-            numbered = [[self.ID_COLUMN] + rows[0]]
-            number = 0
-            for row in rows[1:]:
-                if not any(cell.strip() for cell in row):
-                    continue                       # blank lines are not rows
-                number += 1
-                numbered.append([str(number)] + row)
-            out = io.StringIO(newline="")
-            csv.writer(out, delimiter=form["delimiter"], quotechar=form["quotechar"],
-                       lineterminator="\r\n").writerows(numbered)
             target = Path(folder) / "with_id.csv"
-            target.write_bytes(out.getvalue().encode(form["encoding"]))
+            target.write_bytes(_with_id_column(source.read_bytes(), self.ID_COLUMN,
+                                               form["delimiter"], form["encoding"],
+                                               form["quotechar"]))
             upload = register_csv_upload(repository, scope, target, delimiter=form["delimiter"],
                                          encoding=form["encoding"],
                                          original_name=csv_file_name_for(dataset.name))
@@ -376,6 +415,34 @@ class ExcelUnavailable(LookupError):
 
 class IdColumnRefused(ValueError):
     """301i: an ID column cannot be added (the reason is a code)."""
+
+
+def _csv_header(raw: bytes, delimiter: str, encoding: str) -> list:
+    import csv
+    import io
+    text = raw.decode(encoding, errors="replace")
+    return next(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter), [])
+
+
+def _with_id_column(raw: bytes, name: str, delimiter: str, encoding: str,
+                    quotechar: str = '"') -> bytes:
+    """301i, 301n: the file with an ID column first, numbered 1, 2, 3 ...
+    Blank lines are not rows. Written in the file's own encoding and delimiter."""
+    import csv
+    import io
+    rows = list(csv.reader(io.StringIO(raw.decode(encoding), newline=""), delimiter=delimiter,
+                           quotechar=quotechar))
+    numbered = [[name] + rows[0]] if rows else [[name]]
+    number = 0
+    for row in rows[1:]:
+        if not any(cell.strip() for cell in row):
+            continue
+        number += 1
+        numbered.append([str(number)] + row)
+    out = io.StringIO(newline="")
+    csv.writer(out, delimiter=delimiter, quotechar=quotechar,
+               lineterminator="\r\n").writerows(numbered)
+    return out.getvalue().encode(encoding)
 
 
 def _copy_limited(source: BinaryIO, target: BinaryIO, limit: int) -> int:

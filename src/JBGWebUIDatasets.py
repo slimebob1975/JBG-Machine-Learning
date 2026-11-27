@@ -35,6 +35,9 @@ MESSAGES = {
     "added_no_id": ("ok", "Dataset added. No column can be the ID column (filled in and unique "
                           "on every row). An ID column can be added under Column roles."),
     "id_added": ("ok", "The ID column JBG_RadId was added, numbered from 1. Save the column roles."),
+    # 301n: a prediction file for a model trained with JBG_RadId.
+    "added_with_id": ("ok", "Dataset added. JBG_RadId was added, numbered from 1, since the "
+                            "training dataset's ID column is JBG_RadId."),
     "id_not_needed": ("error", "A column can already be the ID column."),
     "id_exists": ("error", "The dataset already has a JBG_RadId column."),
     "id_failed": ("error", "The ID column could not be added."),
@@ -365,9 +368,11 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
             return redirect("/ui/dataset", message="bad_csv")
         finally:
             file.file.close()
-        no_id = not (created.get("upload") or {}).get("id_candidates", ["?"])      # 301i
-        return redirect("/ui/dataset", dataset=created["dataset_id"],
-                        message="added_no_id" if no_id else "added")
+        upload = created.get("upload") or {}
+        no_id = not upload.get("id_candidates", ["?"])                                # 301i
+        message = "added_with_id" if upload.get("id_added") else (                  # 301n
+            "added_no_id" if no_id else "added")
+        return redirect("/ui/dataset", dataset=created["dataset_id"], message=message)
 
     @app.post("/ui/dataset/sql", include_in_schema=False)
     def register_sql(request: Request, name: str = Form(""), role: str = Form("training"),

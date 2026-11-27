@@ -12,6 +12,16 @@ python -m pip install -r requirements.txt -r requirements-fastapi.txt -c constra
 A constraints file only fixes versions. It installs nothing that the
 requirements files do not ask for.
 
+## Version 0.20.1 (301m, 2026-11-26)
+
+The same Windows environment (Python 3.13.7). With 301m the full pytest run
+(every test file, not only the gate's) passed without failures, and the gate
+passed with all 17 groups. Since 300u, three packages were added to
+`constraints-tested.txt` at the versions already installed there: contourpy
+1.3.3 (301g, the dataset picture's cluster lines), openpyxl 3.1.5 and et_xmlfile
+2.0.0 (301k, Excel workbooks). Before a release, run the full regression:
+`python -m pytest -q -p no:cacheprovider`.
+
 ## The tested environment (300u, 2026-11-24)
 
 The user's Windows environment, in which the gate passed at 300t (`-Quick`,

@@ -143,7 +143,9 @@ filled in and unique on every row.
 If a CSV dataset has no such column, the upload says so, and Column roles
 offers **Add an ID column**. It adds the column JBG_RadId, numbered 1, 2, 3
 and so on, first in the file, as a new version of the file. Earlier versions
-are kept. JBG_RadId is then suggested as the ID column. SQL tables are never
+are kept. JBG_RadId is then suggested as the ID column. A prediction file
+without JBG_RadId gets the column when it is uploaded, numbered the same way, if
+the training dataset's ID column is JBG_RadId. SQL tables are never
 changed, so there the ID column must be in the table.
 
 A date column can have the role **Date feature**. It then becomes the year
@@ -519,7 +521,7 @@ read.
 ## Run History
 
 The tab lists every run in the project: training runs, prediction runs and
-feature investigations. The list can be filtered on kind, status, dataset and
+feature investigations, the latest 1000. If there are more, the tab says so. The list can be filtered on kind, status, dataset and
 configuration.
 
 A selected run shows what ran, its duration and its results: the winning

@@ -31,6 +31,7 @@ KINDS = (("training", "Training run"), ("prediction", "Prediction run"),
 STATUSES = (("succeeded", "Succeeded"), ("failed", "Failed"), ("cancelled", "Cancelled"),
             ("interrupted", "Interrupted"), ("running", "Running"), ("queued", "Queued"))
 RERUNNABLE = ("training", "investigation")
+HISTORY_LIMIT = 1000     # 301n (decided 2026-11-26): was 200, and the tab now says so
 
 # The column roles, as a run recorded them and as the dataset holds them now.
 ROLES = (("id_column", "ID column"), ("class_column", "Class column"),
@@ -270,10 +271,14 @@ def add_history_tab(app, *, principal_dependency, render, redirect, active_proje
             return render(request, principal, "history.html", "history", **context)
         pid = project["project_id"]
         try:
-            items = with_dataset_names(runs.list_project_runs(owner, pid, limit=200), datasets,
-                                       owner, pid, configurations=configurations)
+            items = with_dataset_names(
+                runs.list_project_runs(owner, pid, limit=HISTORY_LIMIT + 1, scan=None),
+                datasets, owner, pid, configurations=configurations)
         except Exception:
             items = []
+        context["more_runs"] = len(items) > HISTORY_LIMIT              # 301n
+        items = items[:HISTORY_LIMIT]
+        context["history_limit"] = HISTORY_LIMIT
         for item in items:
             item.setdefault("kind", "training")
             item["duration"] = duration_text(item, language)
@@ -320,7 +325,8 @@ def add_history_tab(app, *, principal_dependency, render, redirect, active_proje
             return redirect("/ui/history")
         pid = project["project_id"]
         try:
-            item = next(i for i in runs.list_project_runs(owner, pid, limit=200)
+            item = next(i for i in runs.list_project_runs(owner, pid, limit=HISTORY_LIMIT,
+                                                          scan=None)
                         if i["run_id"] == run_id)
         except (StopIteration, Exception):
             return redirect("/ui/history", message="unavailable")

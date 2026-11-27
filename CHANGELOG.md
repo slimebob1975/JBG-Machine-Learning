@@ -1,3 +1,26 @@
+## Revision 301n - Follow-ups after 0.20.1 (2026-11-26)
+
+- Found with 301i: a prediction CSV for a model trained with JBG_RadId was
+  refused, since it lacked that training column. The upload now adds JBG_RadId,
+  numbered 1, 2, 3 ... as 301i does, when the role is prediction, the active
+  training dataset's ID column is JBG_RadId and the file has none. The page says
+  so ("JBG_RadId lades till ..."), also for Excel sheets. Mixed datasets have
+  roles of their own and are not touched. The numbering is shared with 301i.
+- Run History lists up to 1000 runs of a project (was 200, decided 2026-11-26),
+  looking through all the owner's run records, and says when there are more.
+- Kept Excel workbooks older than a day are removed for every user when the
+  server starts (301k only cleared the uploading user's own).
+- The 295c test changes a copy of `sv.po`, not the real file, so an interrupted
+  run can no longer leave a test text in it.
+- BACKLOG: the 29 ticked items of 300r to 301m moved out (the rule from 300q),
+  and the known limitation that the Dark Numbers correction test's own sampling
+  choices do not follow the share sliders (301a) recorded.
+- `docs/dependencies.md`: version 0.20.1, the full regression clean with 301m,
+  and the packages added since 300u.
+- User guides: the Column roles and Run History sections.
+- Tests: `tests/test_revision_301n_follow_ups.py`. The 286b test expects the new
+  `id_added` field.
+
 ## Revision 301m - The full regression repaired (2026-11-26)
 
 - Found 2026-11-26: the full pytest run at 0.20.1 (all 392 test files, not only

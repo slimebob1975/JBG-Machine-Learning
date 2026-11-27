@@ -174,13 +174,15 @@ class DurableRunService:
         return self._snapshot(self._store.get(run))
 
     def list_project_runs(self, principal: str, project_id: str,
-                          limit: int = 20) -> list[dict[str, Any]]:
-        """294a: the owner's runs of one project (newest first), for the Run tab."""
+                          limit: int = 20, scan: int | None = 200) -> list[dict[str, Any]]:
+        """294a: the owner's runs of one project (newest first), for the Run tab.
+        301n: ``scan`` is how many of the owner's latest records are looked
+        through (all projects); None looks through all of them (Run History)."""
         if not isinstance(principal, str) or not principal.strip():
             raise PermissionError("authentication required")
         runs = []
         records = []
-        for record in self._store.list_for_owner(principal, 200):
+        for record in self._store.list_for_owner(principal, scan):
             meta = record.spec.get("project_run") if isinstance(record.spec, dict) else None
             if isinstance(meta, dict) and meta.get("project_id") == project_id:
                 records.append((record, meta))

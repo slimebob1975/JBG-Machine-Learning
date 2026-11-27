@@ -2897,3 +2897,17 @@ msgstr "Arbetsbok (.xlsx)"
 
 msgid "no column can be the ID column, see Column roles"
 msgstr "ingen kolumn kan vara ID-kolumn, se Kolumnroller"
+
+# 301n: JBG_RadId added to a prediction file.
+msgid "Dataset added. JBG_RadId was added, numbered from 1, since the training dataset's ID column is JBG_RadId."
+msgstr "Datasetet lades till. JBG_RadId lades till, numrerad från 1, eftersom träningsdatasetets ID-kolumn är JBG_RadId."
+
+msgid "JBG_RadId added"
+msgstr "JBG_RadId tillagd"
+
+# 301n: Run History lists at most 1000 runs.
+msgid "Only the latest"
+msgstr "Bara de senaste"
+
+msgid "runs of the project are listed. Older runs are kept but not shown here."
+msgstr "körningarna i projektet visas. Äldre körningar finns kvar men visas inte här."

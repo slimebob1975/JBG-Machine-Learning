@@ -152,7 +152,7 @@
       {% if excel.results %}
       <ul class="excel-results">
         {% for r in excel.results %}<li>{% if r.error %}<span class="badge b-fail">{{ _("Not added") }}</span> {{ r.sheet }}: {{ _(excel_errors.get(r.error, "The sheet could not be added.")) }}
-          {% else %}<span class="badge b-ok">{{ _("Added") }}</span> <a href="/ui/dataset?dataset={{ r.dataset_id }}">{{ r.name }}</a> ({{ r.rows }} {{ _("rows") }}){% if not r.id_candidates %} · {{ _("no column can be the ID column, see Column roles") }}{% endif %}{% endif %}</li>{% endfor %}
+          {% else %}<span class="badge b-ok">{{ _("Added") }}</span> <a href="/ui/dataset?dataset={{ r.dataset_id }}">{{ r.name }}</a> ({{ r.rows }} {{ _("rows") }}){% if r.id_added %} · {{ _("JBG_RadId added") }}{% elif not r.id_candidates %} · {{ _("no column can be the ID column, see Column roles") }}{% endif %}{% endif %}</li>{% endfor %}
       </ul>
       {% endif %}
       {% if excel.available %}

@@ -7,6 +7,9 @@ in `docs/backlog_archive_300p.md`. Each item says where it was asked or found.
 A revision ticks the items it does (`[x]` with its revision number), and ticked
 items leave this file at the next cleanup.
 
+Ticked items of revisions 300r to 301m were moved out in 301n (the rule
+above). `CHANGELOG.md` keeps what each did.
+
 ## Current priorities (decided 2026-11-18, reviewed 2026-11-23)
 
 Stabilise before any new development: loose threads and bugs reported in use
@@ -16,60 +19,12 @@ decision.
 ### Now: stabilisation
 
 - [ ] Bugs reported in use: added here as they are found.
-- [x] 301e (asked 2026-11-24): paged left-panel lists and a wider Models list.
-- [x] 301f (asked 2026-11-24): the dataset picture's point size, and a shape of its
-  own for rows without a class.
-- [x] 301g (asked 2026-11-24): outliers and lines between the clusters in the
-  dataset picture, and the About text filling its panel.
-- [x] 301h (reported 2026-11-26): CSV uploads in Windows-1252 (Excel's CSV) were
-  refused. The encoding is detected now.
-- [x] 301i (asked 2026-11-26): a JBG_RadId ID column added to a CSV dataset where
-  no column can be the ID.
-- [x] 301j (asked 2026-11-26): the dataset picture shows free text on hover, is
-  remembered between views, and its point size starts in the middle.
-- [x] 301k (asked 2026-11-26): Excel workbooks, one dataset per chosen sheet.
-- [x] 301l (asked 2026-11-26): version 0.20.1. The user tags the commit
-  (v0.20.1).
-- [x] 301m (found 2026-11-26): the full pytest regression repaired (tests
-  disturbing each other, old tests behind the code). Run it before each release.
-- [ ] Found with 301i: a prediction CSV for a model trained with JBG_RadId must
+- [x] 301n. Found with 301i: a prediction CSV for a model trained with JBG_RadId must
   contain JBG_RadId too, and the upload refuses a prediction file that lacks a
   training column. Add JBG_RadId to such a prediction file at upload, numbered
   the same way, when the training dataset's ID column is JBG_RadId.
-- [x] 300v (asked 2026-11-24): default limits for c, 20 for the upper bound and
-  10 for the warning level.
-- [x] 300s (asked 2026-11-23): the Run tab showed nothing during the final
-  training of the winning pipeline (the spot check's bar stayed full). It now
-  has a bar of its own, moving with the time against the grid search's
-  estimate.
-- [x] 300s (asked 2026-11-23): a new dataset's name starts as the file's or
-  table's name.
-- [x] 300t (found 2026-11-24): two outdated or unclear passages in the
-  user guides' Dark Numbers section.
-- [x] 300u: the gate count. The Windows table (2026-11-24, 300t) and the
-  container agree: 64 + 154 + 1186 = 1404 with `-Quick`, 1425 with the native
-  group. The 1381 expected after 300p was a miscount (it was 1379).
-- [x] 300u: the tested versions (agreed 2026-11-24): `constraints-tested.txt`
-  and `docs/dependencies.md`. The requirements files stay unpinned.
-- [x] 300w: the exact Python version, 3.13.7, in `docs/dependencies.md`.
-- [x] 300s: Precision and Recall (micro, macro, weighted) failed on text
-  classes with scikit-learn 1.9 (found 2026-11-23).
-- [x] 300w: Average Precision scores probabilities and works with text
-  classes. With two classes the positive class is the Dark Numbers target, or
-  else the smallest class.
-- [x] 300s: `.coverage` is no longer tracked, and `.gitignore` keeps it out.
-- [x] 300x (decided 2026-11-24): the full rename to "JBG Machine Learning",
-  in English in the masthead in both languages. The production repository is
-  renamed by the user.
 - [ ] The README still describes the Voilà GUI in most sections (found with
   300x). Rewrite it for the web GUI when Voilà's retirement is planned.
-- [x] 300u: the gate's warnings and skips. The NumPy `RuntimeWarning` in the
-  300k test came from a real fault: an infinite upper bound of c read 1, and
-  the quality "reliable" (fixed). The skip is container-only: `dill` is
-  installed on Windows, where the gate skips nothing.
-- [x] 301b: a pandas `FutureWarning` in `PredictionsHandler._update_dark_numbers`
-  (found with 300y): joining an estimate's rows when some columns are empty or
-  undefined. Harmless with pandas 2.3. Exclude the empty columns before joining.
 - [ ] The interim configuration catalog (285d, design gap 10): project runs
   use the configuration repository since 288a, but the API still serves
   Voilà's saved configurations (`GET /api/configurations`,
@@ -86,8 +41,6 @@ decision.
 
 ### Pending decision
 
-- [x] 300w (decided 2026-11-24): `D` is presented as an estimate, not a
-  statistically proven share, on the Mörkertal view and in both guides.
 - [ ] DN-06's decision on which estimators go on (300c, 300l). The user
   decides when.
 
@@ -95,10 +48,6 @@ decision.
 
 **Runs and results**
 
-- [x] 301c: run history (Körhistorik, tab 8 of the design in
-  `docs/gui/JBG_web_gui_design.md`). Kept (decided 2026-11-24) for what the
-  Training and Results tabs do not have: rerun any run, compare two runs side
-  by side, and the settings a run used against the current configuration.
 - [ ] Pausing and resuming a feature investigation (299i; the engine keeps a
   snapshot), if Standard and Extended searches prove long.
 - [ ] The group-disjoint holdout for more than two classes (noted with 298g):
@@ -113,7 +62,6 @@ decision.
 **Configurations and datasets**
 
 - [ ] If wanted: copy a configuration to another project (noted with 297d).
-- [x] 300r (asked 2026-11-23): rename datasets and configurations.
 - [ ] If wanted: switch a dataset to or from the prediction role (noted with
   298f; compatibility and column roles to settle).
 - [ ] If wanted: in the roles form, choosing a second class or ID column
@@ -128,17 +76,11 @@ decision.
 - [ ] If wanted (from the Voilà P3 list): the row limit also as a percentage
   or a fraction. The web form takes a whole number, and empty reads all rows.
 
-- [x] 301d (asked 2026-11-24): a Visualisation view on the Dataset tab (PCA,
-  t-SNE, MDS, K-means) for a sample of the dataset.
-
 **Operation**
 
 - [ ] Per-project retention (design decision 3): model files (288a), per-run
   result folders (295a) and the CSV file versions from corrections (299b) are
   kept until deleted (299e, 299f).
-- [x] 300w (decided 2026-11-24): keeping SQL sign-ins across server restarts
-  is not needed. The browser keeps the credentials, so signing in again is one
-  click.
 - [ ] The language choice stored per user on the server (design decision 6).
   Today it is a browser cookie (`jbg_lang`).
 - [ ] A live pipeline picture (listed 2026-11-18, to be described when it
@@ -149,24 +91,12 @@ decision.
 - [ ] A production-like synthetic dataset for the validation study, generated
   from aggregated profiles (2026-11-19). The generator and summary received
   then stay outside the repository.
-- [x] 301a: sampling sliders (asked 2026-11-16, specified 2026-11-24), one in the
-  Oversampling and one in the Undersampling section, for the ordinary pipeline
-  and the correction test. The slider sets the target class's share after
-  sampling. It starts at the class's current share (minority or majority) and
-  moves only towards 50 %: oversampling from below, undersampling from above,
-  never past 50 % or back past the current share. With more than two classes
-  the sliders are tied to the smallest or the largest class. One value applies
-  to every chosen sampler that can use it. A sampler that cannot uses its
-  default, and the user is told. The undersampling presets (R20, R10, R05,
-  R02) are removed.
+- [ ] Known limitation (301a): the Dark Numbers correction test's own sampling
+  choices (SMOTE, SMOTE from rows not relabelled, Undersampling 1 : 1) keep
+  their fixed ratios and do not follow the share sliders. The default, "Som
+  pipelinen", follows them. Make the own choices use the shares, if wanted.
 - [ ] DN-05: mixture-proportion estimation (PU-SCAR, calibrated
   probabilities), tested with the study before any engine work (300c).
-- [x] 300y (specified 2026-11-24): logistic regression in place of the
-  pipeline's algorithm (only the algorithm is replaced) for the whole Dark
-  Numbers computation when `c` is above the upper bound or cannot be estimated.
-  On by default, with a checkbox in the Mörkertal section, always reported.
-  Not wanted (2026-11-24): `c` for each pipeline in the model comparison. The
-  test-data performance is enough for choosing a pipeline.
 - [ ] If wanted: the memorisation rule as settings. It is still fixed in
   `JBGDarkNumbers.py` (fit 0.95 and a gap of 5 percentage points, 0.99 without
   an unseen accuracy).

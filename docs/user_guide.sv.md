@@ -145,6 +145,8 @@ Har ett CSV-dataset ingen sådan kolumn säger uppladdningen det, och
 Kolumnroller erbjuder **Lägg till en ID-kolumn**. Den lägger till kolumnen
 JBG_RadId, numrerad 1, 2, 3 och så vidare, först i filen, som en ny version av
 filen. Tidigare versioner finns kvar. JBG_RadId föreslås sedan som ID-kolumn.
+En prediktionsfil som saknar JBG_RadId får kolumnen när den laddas upp, numrerad
+på samma sätt, om träningsdatasetets ID-kolumn är JBG_RadId.
 SQL-tabeller ändras aldrig, så där måste ID-kolumnen finnas i tabellen.
 
 En datumkolumn kan få rollen **Datumvariabel**. Den blir då år (som tal),
@@ -523,7 +525,8 @@ prediktionen läste.
 ## Körhistorik
 
 Fliken visar alla körningar i projektet i en lista: träningskörningar,
-prediktionskörningar och variabelundersökningar. Listan kan filtreras på typ,
+prediktionskörningar och variabelundersökningar, de senaste 1000. Finns fler
+säger fliken det. Listan kan filtreras på typ,
 status, dataset och konfiguration.
 
 En vald körning visar vad som kördes, dess tid och dess resultat: den vinnande
