@@ -93,6 +93,15 @@ Prediktion. Prediktionsdataset kan inte byta roll.
 Under datasetet finns vyerna Förhandsgranskning, Profil, Klasser,
 Kolumnroller och Visualisering.
 
+I vyn Profil ger **Exportera specifikation för fejkdata (JSON)** en beskrivning
+av datasetet som en generator kan skapa liknande data från, utan riktiga rader:
+fördelningen för varje kolumn och för varje klass, och korrelationerna mellan
+de numeriska kolumnerna. Värden som finns på färre än 0,1 % av raderna slås
+ihop till Övrigt, tal anges som kvantiler från 0,1 till 99,9 % i stället för
+exakta min och max, och fritext beskrivs bara med längder. Typen tas från
+kolumnrollerna om de finns. Stora SQL-tabeller beskrivs från ett slumpvis
+urval på 100 000 rader.
+
 **Visualisering** ritar ett urval av datasetets rader i två dimensioner. Välj
 metod (PCA, t-SNE eller MDS), antal kluster för K-means (eller inga), antal
 rader i urvalet (100 till 3000, 1000 som standard, MDS högst 2000) och hur

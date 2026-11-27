@@ -106,7 +106,11 @@ def test_old_workbooks_are_swept_for_everyone(tmp_path):
 def test_housekeeping():
     backlog = (ROOT / "BACKLOG.md").read_text(encoding="utf-8")
     head = backlog.split("## Standing rules")[0]
-    assert head.count("- [x] ") == 1 and "- [x] 301n. Found with 301i" in head
+    import re
+    # 301o: later revisions tick their own items; none of 300r to 301m is left.
+    ticked = re.findall(r"^- \[x\] (30\d[a-z]|301[a-z])", head, flags=re.M)
+    assert not [r for r in ticked if "300r" <= r <= "301m"]
+    assert "- [x] 301n. Found with 301i" in head
     assert "Ticked items of revisions 300r to 301m were moved out in 301n" in head
     assert "Known limitation (301a)" in head
     deps = (ROOT / "docs" / "dependencies.md").read_text(encoding="utf-8")

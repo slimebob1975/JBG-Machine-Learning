@@ -1,3 +1,21 @@
+## Revision 301o - A specification for fake data (2026-11-26)
+
+- Asked 2026-11-26: in the Dataset tab's Profile view, **Exportera specifikation
+  för fejkdata (JSON)** downloads a description of the dataset from which a
+  generator can make similar data, without any real row (decided 2026-11-26):
+  - per column: role, type (from the column roles, or inferred from the values),
+    missing share and distribution: numbers as quantiles from 0.1 to 99.9 %
+    with mean, spread and whether whole numbers, categories as shares, dates as
+    quantiles, free text only as lengths and word counts, never its content;
+  - the same per class, so fake data keeps the differences between the classes;
+  - Pearson correlations between the numeric columns;
+  - values seen on fewer than 0.1 % of the rows are merged into "Övrigt".
+  CSV files are read whole, SQL tables through a random sample of at most
+  100,000 rows (the specification says so). New module `JBGFakeDataSpec`, routes
+  `GET /ui/dataset/{id}/fake-data-spec` and `GET .../datasets/{id}/fake-data-spec`.
+- User guides: the Dataset section.
+- Tests: `tests/test_revision_301o_fake_data_spec.py`.
+
 ## Revision 301n - Follow-ups after 0.20.1 (2026-11-26)
 
 - Found with 301i: a prediction CSV for a model trained with JBG_RadId was

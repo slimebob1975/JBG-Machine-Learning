@@ -92,6 +92,15 @@ rows with a class, and a mixed dataset can also be predicted on the
 Prediction tab. Prediction datasets cannot switch role. Below the dataset are the views Preview, Profile, Classes, Column
 roles and Visualisation.
 
+In the Profile view, **Export a specification for fake data (JSON)** gives a
+description of the dataset from which a generator can make similar data,
+without any real row: the distribution of every column and of every class, and
+the correlations between the numeric columns. Values found on fewer than 0.1 %
+of the rows are merged into Övrigt, numbers are given as quantiles from 0.1 to
+99.9 % instead of exact minimum and maximum, and free text is described only by
+its lengths. The type comes from the column roles when they are set. Large SQL
+tables are described from a random sample of 100,000 rows.
+
 **Visualisation** draws a sample of the dataset's rows in two dimensions.
 Choose the method (PCA, t-SNE or MDS), the number of clusters for K-means (or
 none), the rows in the sample (100 to 3000, 1000 by default, MDS at most 2000)

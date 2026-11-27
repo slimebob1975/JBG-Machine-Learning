@@ -19,6 +19,10 @@ decision.
 ### Now: stabilisation
 
 - [ ] Bugs reported in use: added here as they are found.
+- [x] 301o (asked 2026-11-26): a JSON specification for fake data, from the
+  Profile view.
+- [ ] Asked 2026-11-26 (301p): export of the table data of every view and
+  subview to CSV and Excel, all of the Dark Numbers calculations in particular.
 - [x] 301n. Found with 301i: a prediction CSV for a model trained with JBG_RadId must
   contain JBG_RadId too, and the upload refuses a prediction file that lacks a
   training column. Add JBG_RadId to such a prediction file at upload, numbered

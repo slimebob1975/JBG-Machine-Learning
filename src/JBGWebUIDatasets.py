@@ -49,6 +49,7 @@ MESSAGES = {
     "excel_none_chosen": ("error", "Choose at least one sheet."),
     "excel_added": ("ok", "The chosen sheets were added as datasets."),
     "excel_partly": ("error", "Some sheets were not added. The list says why."),
+    "spec_failed": ("error", "The specification could not be made."),             # 301o
     "activated": ("ok", "Dataset activated for training."),
     "signed_in": ("ok", "Signed in to SQL Server."),
     "signed_out": ("ok", "Signed out of SQL Server."),
@@ -408,6 +409,33 @@ def add_dataset_tab(app, *, principal_dependency, render, redirect, active_proje
         except (ValueError, TypeError):
             return redirect("/ui/dataset", dataset=dataset_id, message="cannot_activate")
         return redirect("/ui/dataset", dataset=dataset_id, message="activated")
+
+    @app.get("/ui/dataset/{dataset_id}/fake-data-spec", include_in_schema=False)
+    def download_fake_data_spec(request: Request, dataset_id: str,
+                                principal=Depends(principal_dependency)):
+        """301o (asked 2026-11-26): the dataset's specification for fake data, as JSON."""
+        import json
+        from urllib.parse import quote
+        from fastapi.responses import Response
+        pid = project_id(request, principal)
+        if pid is None:
+            return redirect("/ui/dataset")
+        try:
+            spec = inspection.fake_data_spec(principal, pid, dataset_id)
+        except (DatasetUnavailable, ProjectUnavailable, LookupError):
+            return redirect("/ui/dataset", message="unavailable")
+        except PermissionError:
+            return redirect("/ui/dataset", dataset=dataset_id, view="profile",
+                            message="signin_needed")
+        except (ValueError, OSError):
+            return redirect("/ui/dataset", dataset=dataset_id, view="profile",
+                            message="spec_failed")
+        name = f"{spec['dataset']} - specifikation.json"
+        plain = "".join(c if c.isascii() and (c.isalnum() or c in "._- ") else "_" for c in name)
+        return Response(json.dumps(spec, ensure_ascii=False, indent=2).encode("utf-8"),
+                        media_type="application/json", headers={
+                            "Content-Disposition": f'attachment; filename="{plain}"; '
+                                                   f"filename*=UTF-8''{quote(name)}"})
 
     @app.get("/ui/dataset/{dataset_id}/download", include_in_schema=False)
     def download_csv(request: Request, dataset_id: str, principal=Depends(principal_dependency)):

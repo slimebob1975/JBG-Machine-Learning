@@ -2911,3 +2911,13 @@ msgstr "Bara de senaste"
 
 msgid "runs of the project are listed. Older runs are kept but not shown here."
 msgstr "körningarna i projektet visas. Äldre körningar finns kvar men visas inte här."
+
+# 301o: the specification for fake data.
+msgid "Export a specification for fake data (JSON)"
+msgstr "Exportera specifikation för fejkdata (JSON)"
+
+msgid "Distributions per column and per class, and correlations between the numeric columns. No real rows: values under 0.1 % of the rows are merged into Övrigt, numbers are given as quantiles from 0.1 to 99.9 %, and free text only as lengths."
+msgstr "Fördelningar per kolumn och per klass, och korrelationer mellan de numeriska kolumnerna. Inga riktiga rader: värden under 0,1 % av raderna slås ihop till Övrigt, tal anges som kvantiler från 0,1 till 99,9 % och fritext bara som längder."
+
+msgid "The specification could not be made."
+msgstr "Specifikationen kunde inte skapas."

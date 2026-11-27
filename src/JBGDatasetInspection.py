@@ -624,6 +624,29 @@ class DatasetInspectionService:
             column["missing_share"] = round(column["missing"] / used, 6) if used else None
         return {"dataset_id": dataset_id, "basis": basis, "columns": columns}
 
+    def fake_data_spec(self, principal, project_id: str, dataset_id: str) -> dict[str, Any]:
+        """301o (asked 2026-11-26): a JSON specification for generating fake data
+        (JBGFakeDataSpec). CSV files are read whole, SQL tables through a random
+        sample of at most SAMPLE_TARGET rows, as the profile does for large ones."""
+        from JBGFakeDataSpec import build_spec
+        owner = principal.principal_key
+        project, dataset = self._dataset(owner, project_id, dataset_id)
+        roles = self._datasets.get_roles(owner, project_id, dataset_id)
+        mapping = roles.as_mapping() if roles is not None else {}
+        class_column = roles.class_column if roles is not None else None
+        limit = getattr(roles, "categorical_limit", None) or 30
+
+        def read(facts):
+            columns = list(facts.columns)
+            if isinstance(facts, _CSVFacts):
+                return facts.sample_frame(columns, max(1, facts.rows), "first", None), facts.rows
+            return (_sql_sample(facts, columns, min(SAMPLE_TARGET, max(1, facts.rows)),
+                                "random", None), facts.rows)
+        frame, total = self._with_facts(principal, project, dataset, read)
+        return build_spec(frame, roles=mapping, class_column=class_column or None,
+                          dataset_name=dataset.name, source=dataset.source.value,
+                          rows_total=total, categorical_limit=int(limit))
+
     def visualisation(self, principal, project_id: str, dataset_id: str, *, method: str,
                       clusters: int, sample_size: int, sampling: str, outliers: str = "none",
                       outlier_share: float = 2.0, boundaries: bool = False) -> dict[str, Any]:

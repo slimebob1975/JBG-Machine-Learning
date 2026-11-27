@@ -628,6 +628,12 @@ def _add_dataset_inspection_endpoints(app, principal_dependency, inspection):
                         principal: AuthenticatedPrincipal = Depends(principal_dependency)):
         return call(inspection.profile, principal, project_id, dataset_id)
 
+    @app.get(base + "/fake-data-spec")
+    def dataset_fake_data_spec(project_id: str, dataset_id: str,
+                               principal: AuthenticatedPrincipal = Depends(principal_dependency)):
+        """301o: a JSON specification of the dataset for generating fake data."""
+        return call(inspection.fake_data_spec, principal, project_id, dataset_id)
+
     @app.get(base + "/visualisation")
     def dataset_visualisation(project_id: str, dataset_id: str, method: str = "pca",
                               clusters: int = 3, sample_size: int = 1000,
