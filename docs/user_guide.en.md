@@ -35,6 +35,13 @@ pages, the page's main button is at both the top and the bottom. Long lists in
 the left panel show seven rows at a time (Run History ten), the latest first,
 with **Previous** and **Next** at the bottom right.
 
+Every tab and view has **Export CSV** and **Export Excel**. They give the view's
+tables with all rows, also those shown a page at a time: in Excel a sheet per
+table, in CSV the tables one after another under their titles (semicolons and
+decimal commas, as Swedish Excel reads them). The Dark Numbers view gives the
+whole calculation: settings, estimates, growth, the calculation table and the
+confusion matrices.
+
 ## Overview
 
 At the top, all your projects: training runs, rows processed, models

@@ -1,3 +1,27 @@
+## Revision 301p - Every view's tables as CSV or Excel (2026-11-26)
+
+- Asked 2026-11-26: **Exportera CSV** and **Exportera Excel** on every tab and
+  view (Projects, Overview, Dataset with Preview, Profile, Classes and Column
+  roles, Configuration with its settings, Training, Results with every view,
+  Models, Prediction, Run History with a run or two runs compared). Decided
+  2026-11-26:
+  - one export per view or subview, with all rows, also those shown a page at a
+    time (`JBGRunResults.detail(..., all_rows=True)`, used only by exports);
+  - Excel: one sheet per table (names cut at Excel's 31 characters), bold
+    headings, numbers as numbers;
+  - CSV: the tables one after another, each under its title with an empty row
+    between, semicolons, UTF-8 with a byte-order mark and decimal commas;
+  - the Dark Numbers view gives the whole calculation: settings and method,
+    estimates, growth with its counts, the calculation table and the confusion
+    matrices.
+- How: the export link is the view's own address with `export=csv` or
+  `export=xlsx`; the tab builds the page's content as usual and `render` hands
+  it to the template's exporter (`JBGWebUIExport`) instead of drawing the page,
+  so filters, the chosen run and the view carry over. The buttons are one shared
+  template, `_export.html`.
+- User guides: the introduction.
+- Tests: `tests/test_revision_301p_table_exports.py`.
+
 ## Revision 301o - A specification for fake data (2026-11-26)
 
 - Asked 2026-11-26: in the Dataset tab's Profile view, **Exportera specifikation

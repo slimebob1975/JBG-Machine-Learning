@@ -11,6 +11,7 @@
     {% if not no_project %}<span class="figure-sub">{{ _("of which in the open project") }}: {{ opened | count(language) }}</span>{% endif %}</div>
 {%- endmacro %}
 {% block main %}
+{% include "_export.html" %}
 {# 299k (agreed 2026-11-13): all projects first, then the open project. #}
 {% if all %}
 <section class="overview-all">

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% set title = "Prediction" %}
 {% block main %}
+{% include "_export.html" %}
 {% if no_project %}
   <div class="card"><p class="empty">{{ _("Open a project in the Projects tab first.") }}
     <a href="/ui/projects">{{ _("Projects") }}</a></p></div>

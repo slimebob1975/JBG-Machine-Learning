@@ -36,6 +36,13 @@ sidor finns sidans huvudknapp både överst och längst ned. Långa listor i
 vänsterpanelen visar sju rader åt gången (Körhistorik tio), de senaste först,
 med **Föregående** och **Nästa** nere till höger.
 
+Varje flik och vy har **Exportera CSV** och **Exportera Excel**. De ger vyns
+tabeller med alla rader, även de som visas en sida i taget: i Excel en flik per
+tabell, i CSV tabellerna efter varandra med sina rubriker (semikolon och
+decimalkomma, som svenska Excel läser). Vyn Mörkertal ger hela beräkningen:
+inställningar, skattningar, tillväxt, beräkningstabellen och
+förväxlingsmatriserna.
+
 ## Översikt
 
 Överst alla dina projekt: träningskörningar, bearbetade rader, jämförda

@@ -112,8 +112,9 @@ def add_prediction_tab(app, *, principal_dependency, render, redirect, active_pr
                 if results is not None and context["overview"] and \
                         context["overview"]["status"] == "succeeded":
                     try:
-                        context["predictions"] = results.detail(owner, chosen, "predictions",
-                                                                page=page)
+                        context["predictions"] = results.detail(
+                            owner, chosen, "predictions", page=page,
+                            all_rows=request.query_params.get("export") in ("csv", "xlsx"))  # 301p
                         # 299c: headings in the interface's language (299a2).
                         from JBGWebUI import request_language, translator
                         from JBGWebUIResults import headings

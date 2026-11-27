@@ -1,0 +1,5 @@
+{# 301p (asked 2026-11-26): export this view's tables, with all rows. #}
+<p class="export-links">
+  <a class="btn sub" href="{{ request.url.include_query_params(export='csv') }}" download>{{ _("Export CSV") }}</a>
+  <a class="btn sub" href="{{ request.url.include_query_params(export='xlsx') }}" download>{{ _("Export Excel") }}</a>
+</p>

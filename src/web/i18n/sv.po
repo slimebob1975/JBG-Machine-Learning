@@ -2921,3 +2921,49 @@ msgstr "Fördelningar per kolumn och per klass, och korrelationer mellan de nume
 
 msgid "The specification could not be made."
 msgstr "Specifikationen kunde inte skapas."
+
+# 301p: exports of the views' tables.
+msgid "Export CSV"
+msgstr "Exportera CSV"
+
+msgid "Export Excel"
+msgstr "Exportera Excel"
+
+msgid "Estimates"
+msgstr "Skattningar"
+
+msgid "Evaluation on test data"
+msgstr "Utvärdering på testdata"
+
+msgid "Factor"
+msgstr "Faktor"
+
+msgid "Growth"
+msgstr "Tillväxt"
+
+msgid "Hidden"
+msgstr "Dolda"
+
+msgid "Measure"
+msgstr "Mått"
+
+msgid "Missing from the register"
+msgstr "Saknas i registret"
+
+msgid "Reason"
+msgstr "Orsak"
+
+msgid "Registered as another class"
+msgstr "Registrerade som annan klass"
+
+msgid "Registered in the target class"
+msgstr "Registrerade i målklassen"
+
+msgid "Settings"
+msgstr "Inställningar"
+
+msgid "Summary"
+msgstr "Sammanfattning"
+
+msgid "Value"
+msgstr "Värde"

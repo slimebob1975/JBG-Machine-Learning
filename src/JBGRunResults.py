@@ -117,8 +117,9 @@ class RunResultsService:
         return min(matches, key=lambda p: (len(p.name), p.name)) if matches else None
 
     def detail(self, owner: str, run_id: str, kind: str, *, page: int = 1,
-               page_size: int = PAGE_SIZE) -> dict:
-        """One page of a detail table: columns, rows (numbers as numbers), totals."""
+               page_size: int = PAGE_SIZE, all_rows: bool = False) -> dict:
+        """One page of a detail table: columns, rows (numbers as numbers), totals.
+        301p: ``all_rows`` gives every row, for exports."""
         if kind not in DETAILS:
             raise RunResultsUnavailable("detail unavailable")
         page = max(int(page), 1)
@@ -133,6 +134,8 @@ class RunResultsService:
         # The engine's index column has an empty header; it is not data.
         drop_index = bool(header) and header[0].strip() == "" and kind not in KEEP_FIRST_COLUMN
         columns = header[1:] if drop_index else header
+        if all_rows:
+            page, page_size = 1, max(len(rows), 1)
         start = (page - 1) * page_size
         selected = [row[1:] if drop_index else row for row in rows[start:start + page_size]]
         return {"run_id": run_id, "kind": kind, "columns": columns,

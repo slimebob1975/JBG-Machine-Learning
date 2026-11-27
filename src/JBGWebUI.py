@@ -311,6 +311,11 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
                 "can_delete": deletion is not None and runs is not None,   # 299e
                 "can_stop": bool(getattr(runs, "can_stop", False))}        # 299g
         base.update(context)
+        if request.query_params.get("export"):                         # 301p
+            from JBGWebUIExport import export_response
+            exported = export_response(request, template, base)
+            if exported is not None:
+                return exported
         return templates.TemplateResponse(request, template, base, status_code=status_code)
 
     if datasets is not None:

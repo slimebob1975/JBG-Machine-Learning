@@ -475,7 +475,9 @@ def add_results_tab(app, *, principal_dependency, render, active_project, runs, 
                     context["labels"] = results.class_labels(owner, chosen)
                     context["available"] = results.available(owner, chosen)
                     if view != "overview":
-                        context["detail"] = results.detail(owner, chosen, view, page=page)
+                        context["detail"] = results.detail(
+                            owner, chosen, view, page=page,
+                            all_rows=request.query_params.get("export") in ("csv", "xlsx"))  # 301p
                         translate = translator(request_language(request))
                         detail = context["detail"]
                         detail["headings"] = headings(

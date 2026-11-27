@@ -65,6 +65,7 @@
         <a href="/ui/results?run={{ selected_run }}&view={{ key }}" class="{{ 'on' if view == key }}">{{ _(label) }}</a>
       {% endfor %}
     </nav>
+    {% include "_export.html" %}
     {% set results = overview.results %}
     {% if view == "overview" %}
       {% set ev = results.evaluation if results else none %}

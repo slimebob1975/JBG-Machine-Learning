@@ -5,6 +5,7 @@
 {# CSV column kinds are words; SQL type names (nvarchar, ...) stay as they are. #}
 {% set type_labels = {"number": "Number", "text": "Text"} %}
 {% block main %}
+{% include "_export.html" %}
 {% if incompatible %}
   <div class="message error" role="alert">{{ _("The dataset is not compatible with the training dataset.") }}
     {% if incompatible.missing %}<br>{{ _("Missing columns") }}: {{ incompatible.missing | join(", ") }}{% endif %}
