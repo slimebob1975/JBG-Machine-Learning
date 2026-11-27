@@ -60,6 +60,20 @@
         </dl>
         <button class="btn sub">{{ _("Save") }}</button>
       </form>
+      {% if can_delete and active_project and active_project.project_id == selected.project_id %}
+      {# 301q (decided 2026-11-26): gallring, only when asked for, after a preview. #}
+      <form method="get" action="/ui/projects/prune" class="panel prune">
+        <fieldset>
+          <legend>{{ _("Prune runs") }}</legend>
+          <label for="keep-latest">{{ _("Keep the latest runs") }}</label>
+          <input id="keep-latest" name="keep_latest" type="number" min="0" step="1" value="20" inputmode="numeric">
+          <label for="keep-days">{{ _("and every run younger than (days)") }}</label>
+          <input id="keep-days" name="keep_days" type="number" min="0" step="1" value="30" inputmode="numeric">
+          <p class="hint">{{ _("A run goes only if it breaks both rules, and goes entirely, also from Run History. Runs that trained a model in the Models tab stay. You see the list before anything is removed.") }}</p>
+          <button class="btn sub">{{ _("Show what would be pruned") }}</button>
+        </fieldset>
+      </form>
+      {% endif %}
     {% else %}
       <p class="empty">{{ _("Select a project in the list.") }}</p>
     {% endif %}

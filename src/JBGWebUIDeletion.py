@@ -91,6 +91,36 @@ def add_deletion_pages(app, *, principal_dependency, render, redirect, active_pr
         done = carry_out(principal, plan, back, "run_deleted")
         return done or redirect(f"/ui/runs/{run_id}/delete", back=back)
 
+    # --- 301q: gallring (decided 2026-11-26) -------------------------------------------
+
+    def prune_plan(request, principal, keep_latest, keep_days):
+        pid = project_id(request, principal)
+        if pid is None:
+            raise DeletionUnavailable("no project")
+        return deletion.plan_prune(principal.principal_key, pid, keep_latest, keep_days)
+
+    @app.get("/ui/projects/prune", response_class=HTMLResponse, include_in_schema=False)
+    def confirm_prune(request: Request, keep_latest: int = 20, keep_days: int = 30,
+                      principal=Depends(principal_dependency)):
+        """What "Gallra nu" would remove, before anything goes."""
+        try:
+            plan = prune_plan(request, principal, max(0, keep_latest), max(0, keep_days))
+        except DeletionUnavailable:
+            return redirect("/ui/projects", message="delete_unavailable")
+        return page(request, principal, plan, tab="projects", action="/ui/projects/prune",
+                    back="/ui/projects")
+
+    @app.post("/ui/projects/prune", include_in_schema=False)
+    def prune(request: Request, keep_latest: int = Form(20), keep_days: int = Form(30),
+              principal=Depends(principal_dependency)):
+        try:
+            plan = prune_plan(request, principal, max(0, keep_latest), max(0, keep_days))
+        except DeletionUnavailable:
+            return redirect("/ui/projects", message="delete_unavailable")
+        done = carry_out(principal, plan, "/ui/projects", "pruned")
+        return done or redirect("/ui/projects/prune", keep_latest=keep_latest,
+                                keep_days=keep_days)
+
     # --- Models ---------------------------------------------------------------------
 
     def model_plan(request, principal, model_id):

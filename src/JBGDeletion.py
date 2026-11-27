@@ -70,6 +70,10 @@ class DeletionPlan:
     unused_groups: list = field(default_factory=list)   # other CSV file versions no one uses
     target_id: str = ""                                 # the item's own ID
     source: str = ""                                    # "csv" or "sql" (299f pages)
+    keep_latest: int = 0                                # 301q: gallring, the rule
+    keep_days: int = 0
+    kept_for_models: int = 0                            # 301q: runs a model needs
+    kept_busy: int = 0                                  # 301q: queued or running
 
     @property
     def file_versions(self) -> int:
@@ -176,6 +180,40 @@ class DeletionService:
         else:
             plan.runs.append(record)
         plan.refused = self._refusal([record])
+        return plan
+
+    def plan_prune(self, owner: str, project_id: str, keep_latest: int, keep_days: int,
+                   now=None) -> DeletionPlan:
+        """301q (decided 2026-11-26): gallring. A run goes only if it is neither
+        among the project's ``keep_latest`` latest runs nor younger than
+        ``keep_days`` days, and goes entirely, its record too. Training runs whose
+        model is in the catalog stay (the model predicts with their settings), as
+        do queued and running runs. Done only when the user asks for it."""
+        from datetime import datetime, timedelta, timezone
+        if int(keep_latest) < 0 or int(keep_days) < 0:
+            raise ValueError("keep values must not be negative")
+        now = now or datetime.now(timezone.utc)
+        plan = DeletionPlan("prune", "", project_id, keep_latest=int(keep_latest),
+                            keep_days=int(keep_days))
+        # The runs Run History lists: hidden records (runs deleted while their
+        # model stays) are not runs any more and are left alone.
+        listed = [r for r in self._store.list_for_owner(owner, None)
+                  if _meta(r).get("project_id") == project_id]
+        listed.sort(key=lambda r: r.created_at, reverse=True)
+        used = {m.run_id for m in self._models(owner, project_id)}
+        busy = {r.key for r in self._active_runs()}
+        limit = now - timedelta(days=int(keep_days))
+        for index, record in enumerate(listed):
+            created = record.created_at if record.created_at.tzinfo else \
+                record.created_at.replace(tzinfo=timezone.utc)
+            if index < int(keep_latest) or created >= limit:
+                continue
+            if record.status not in TERMINAL_STATES or record.run.key in busy:
+                plan.kept_busy += 1
+            elif record.run.key in used:
+                plan.kept_for_models += 1
+            else:
+                plan.runs.append(record)
         return plan
 
     def plan_model(self, owner: str, project_id: str, model_id: str) -> DeletionPlan:
@@ -297,7 +335,9 @@ class DeletionService:
                  "configuration": lambda: self.plan_configuration(
                      owner, plan.project_id, plan.configuration.configuration_id),
                  "dataset": lambda: self.plan_dataset(owner, plan.project_id, plan.target_id),
-                 "project": lambda: self.plan_project(owner, plan.project_id)}[plan.kind]()
+                 "project": lambda: self.plan_project(owner, plan.project_id),
+                 "prune": lambda: self.plan_prune(owner, plan.project_id, plan.keep_latest,
+                                                  plan.keep_days)}[plan.kind]()
         if fresh.refused:
             raise DeletionRefused(fresh.refused)
         self._remove_files(fresh)

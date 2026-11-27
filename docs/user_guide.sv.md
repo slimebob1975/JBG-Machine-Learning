@@ -70,6 +70,14 @@ konfigurationer, körningar med resultat och prediktioner, och modeller. Skriv
 projektets namn för att bekräfta. Knappen **Ta bort** blir orange när namnet
 stämmer. Tabeller i SQL Server berörs inte.
 
+**Gallra körningar** finns för det öppna projektet. Ange hur många av de
+senaste körningarna som ska behållas och hur gamla körningar som alltid får
+stå kvar (20 körningar och 30 dagar som förslag). En körning tas bara bort om
+den bryter mot båda reglerna, och tas då bort helt: logg, resultat och posten i
+Körhistorik. Körningar som tränade en modell i fliken Modeller finns kvar,
+liksom köade och pågående körningar. **Visa vad som skulle gallras** visar
+listan, och inget tas bort förrän du väljer **Gallra nu**.
+
 ## Dataset
 
 Ett projekt kan ha flera dataset. Varje dataset har en roll: Träning,

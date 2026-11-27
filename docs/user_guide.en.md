@@ -69,6 +69,13 @@ datasets, configurations, runs with their results and predictions, and
 models. Type the project's name to confirm; the **Delete** button turns
 orange when the name is right. Tables in SQL Server are not touched.
 
+**Prune runs** is offered for the open project. Give how many of the latest
+runs to keep and how old runs may always stay (20 runs and 30 days are
+suggested). A run goes only if it breaks both rules, and then goes entirely:
+its log, its results and its entry in Run History. Runs that trained a model in
+the Models tab stay, as do queued and running runs. **Show what would be
+pruned** shows the list, and nothing goes until you choose **Prune now**.
+
 ## Dataset
 
 A project can have several datasets. Each dataset has a role: Training,

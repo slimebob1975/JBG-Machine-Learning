@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% set title = {"run": "Delete run", "model": "Delete model", "configuration": "Delete configuration",
-                "dataset": "Delete dataset", "project": "Delete project"}[plan.kind] %}
+                "dataset": "Delete dataset", "project": "Delete project",
+                "prune": "Prune runs"}[plan.kind] %}
 {# 299e/299f: what a deletion removes and what stays, before it is confirmed. #}
 {% macro run_line(r, names) %}{% set m = r.spec.project_run or {} %}{% set name = names.get(r.run.key) or m.configuration_name %}
   <li>{{ _("Prediction run") if m.kind == "prediction" else _("Training run") }}
@@ -9,7 +10,12 @@
 {% set all_runs = plan.runs + plan.hidden_runs %}
 {% block main %}
 <div class="card delete-card">
-  <h2>{{ _(title) }}{% if plan.kind != "run" %}: <b>{{ plan.name }}</b>{% endif %}</h2>
+  <h2>{{ _(title) }}{% if plan.kind not in ("run", "prune") %}: <b>{{ plan.name }}</b>{% endif %}</h2>
+  {% if plan.kind == "prune" %}
+    {# 301q (decided 2026-11-26): a run goes only if it breaks both rules. #}
+    <p>{{ _("Kept: the latest") }} <b>{{ plan.keep_latest }}</b> {{ _("runs of the project, and every run younger than") }}
+      <b>{{ plan.keep_days }}</b> {{ _("days. Runs outside both go entirely, also from Run History.") }}</p>
+  {% endif %}
   {% if plan.refused %}<p class="message error">{{ _(refusals.get(plan.refused, refusals.running)) }}</p>{% endif %}
 
   <h3>{{ _("This is deleted") }}</h3>
@@ -24,6 +30,7 @@
     {% for r in all_runs[:20] %}{{ run_line(r, run_names or {}) }}{% endfor %}
     {% if all_runs | length > 20 %}<li>{{ _("and more runs") }}: {{ all_runs | length - 20 }}</li>{% endif %}
     {% if all_runs %}<li>{{ _("For each run: its log and all its result files (results, predictions, correction log).") }}</li>{% endif %}
+    {% if plan.kind == "prune" and not all_runs %}<li>{{ _("Nothing: no run breaks both rules.") }}</li>{% endif %}
     {% if plan.kind == "run" and plan.training_runs and not plan.hidden_runs %}<li>{{ _("The run's model file, if one was kept (no model is registered for this run).") }}</li>{% endif %}
   </ul>
 
@@ -32,6 +39,12 @@
     {% if plan.hidden_runs %}<li>{{ _("The model trained by this run stays and can still predict") }}: {% for m in plan.kept_models %}<b>{{ m.name }}</b>{{ ", " if not loop.last }}{% endfor %}.
       {{ _("Only the run's settings are kept for it, hidden from every list.") }}</li>{% endif %}
     {% if plan.kind == "model" and not plan.training_runs %}<li>{{ _("The training run and its results (Results tab).") }}</li>{% endif %}
+    {% if plan.kind == "prune" %}
+      <li>{{ _("The runs within the rules, and every model with its model file.") }}</li>
+      {% if plan.kept_for_models %}<li>{{ _("Runs outside the rules that trained a model in the Models tab (the model needs them)") }}: {{ plan.kept_for_models }}</li>{% endif %}
+      {% if plan.kept_busy %}<li>{{ _("Runs outside the rules that are queued or running") }}: {{ plan.kept_busy }}</li>{% endif %}
+      <li>{{ _("Datasets and configurations.") }}</li>
+    {% endif %}
     {% if plan.kind == "dataset" %}<li>{{ _("Configurations: they are not tied to a dataset.") }}</li>{% endif %}
     {% if plan.kind in ("dataset", "project") %}{% if plan.source == "sql" %}<li>{{ _("Everything in SQL Server: source tables, and predictions and corrections already written.") }}</li>{% elif plan.kind == "project" %}<li>{{ _("Nothing outside the program: the CSV files on your own computer are not touched.") }}</li>{% endif %}
     {% else %}<li>{{ _("Datasets, and everything in SQL Server: predictions and corrections already written stay in their tables.") if source == "sql" else _("Datasets, including the file versions with corrections already saved.") }}</li>{% endif %}
@@ -56,6 +69,14 @@
   {% elif plan.kind == "project" %}
     <button class="btn act warning" form="delete-form" data-wait="match" data-wait-fields="#confirm-name"
       data-wait-match="{{ plan.name }}" data-wait-reason="{{ _('Type the project name first.') }}">{{ _("Delete") }}</button>
+  {% elif plan.kind == "prune" and not all_runs %}
+    <button class="btn act blocked" disabled>{{ _("Prune now") }}</button>
+  {% elif plan.kind == "prune" %}
+    <form method="post" action="{{ action }}">
+      <input type="hidden" name="keep_latest" value="{{ plan.keep_latest }}">
+      <input type="hidden" name="keep_days" value="{{ plan.keep_days }}">
+      <button class="btn act warning">{{ _("Prune now") }}: {{ all_runs | length }}</button>
+    </form>
   {% else %}
     <form method="post" action="{{ action }}">
       {% if plan.kind == "run" %}<input type="hidden" name="back" value="{{ back }}">{% endif %}

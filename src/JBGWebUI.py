@@ -57,6 +57,7 @@ MESSAGES = {
     "unavailable": ("error", "The project is no longer available."),
     # 299e: deleting (shown on the tab the deletion returns to).
     "run_deleted": ("ok", "The run is deleted."),
+    "pruned": ("ok", "The runs are pruned."),                               # 301q
     "model_deleted": ("ok", "The model is deleted."),
     "configuration_deleted": ("ok", "The configuration is deleted."),
     "delete_unavailable": ("error", "It is no longer available."),

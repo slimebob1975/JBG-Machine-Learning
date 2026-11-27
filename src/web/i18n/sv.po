@@ -2967,3 +2967,49 @@ msgstr "Sammanfattning"
 
 msgid "Value"
 msgstr "Värde"
+
+# 301q: gallring of runs.
+msgid "Prune runs"
+msgstr "Gallra körningar"
+
+msgid "Keep the latest runs"
+msgstr "Behåll de senaste körningarna"
+
+msgid "and every run younger than (days)"
+msgstr "och alla körningar yngre än (dagar)"
+
+msgid "A run goes only if it breaks both rules, and goes entirely, also from Run History. Runs that trained a model in the Models tab stay. You see the list before anything is removed."
+msgstr "En körning tas bara bort om den bryter mot båda reglerna, och tas då bort helt, även ur Körhistorik. Körningar som tränade en modell i fliken Modeller finns kvar. Du ser listan innan något tas bort."
+
+msgid "Show what would be pruned"
+msgstr "Visa vad som skulle gallras"
+
+msgid "Kept: the latest"
+msgstr "Behålls: de senaste"
+
+msgid "runs of the project, and every run younger than"
+msgstr "körningarna i projektet, och alla körningar yngre än"
+
+msgid "days. Runs outside both go entirely, also from Run History."
+msgstr "dagar. Körningar utanför båda tas bort helt, även ur Körhistorik."
+
+msgid "Nothing: no run breaks both rules."
+msgstr "Ingenting: ingen körning bryter mot båda reglerna."
+
+msgid "The runs within the rules, and every model with its model file."
+msgstr "Körningarna inom reglerna, och alla modeller med sina modellfiler."
+
+msgid "Runs outside the rules that trained a model in the Models tab (the model needs them)"
+msgstr "Körningar utanför reglerna som tränade en modell i fliken Modeller (modellen behöver dem)"
+
+msgid "Runs outside the rules that are queued or running"
+msgstr "Körningar utanför reglerna som är köade eller pågår"
+
+msgid "Datasets and configurations."
+msgstr "Dataset och konfigurationer."
+
+msgid "Prune now"
+msgstr "Gallra nu"
+
+msgid "The runs are pruned."
+msgstr "Körningarna är gallrade."

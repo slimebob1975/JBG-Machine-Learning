@@ -1,3 +1,21 @@
+## Revision 301q - Gallring of runs (2026-11-26)
+
+- Asked as "per-project retention" (BACKLOG), decided 2026-11-26: the Projects
+  tab offers **Gallra körningar** for the open project. The user gives how many
+  of the latest runs to keep and how old runs may always stay (20 and 30 days
+  are suggested). A run goes only if it breaks both rules, and goes entirely:
+  its log, its results and its record, so it leaves Run History too. Runs that
+  trained a model in the catalog stay (the model predicts with their settings),
+  as do queued and running runs. Done only when asked: **Visa vad som skulle
+  gallras** shows the confirmation page with the list and what stays, and
+  nothing goes until **Gallra nu**. Model files go only with their models, as
+  before.
+- `DeletionService.plan_prune`, carried out through the deletion of 299e, which
+  plans again just before deleting and removes files before records. Routes
+  `GET /ui/projects/prune` (the preview) and `POST /ui/projects/prune`.
+- User guides: the Projects section.
+- Tests: `tests/test_revision_301q_prune_runs.py`.
+
 ## Revision 301p - Every view's tables as CSV or Excel (2026-11-26)
 
 - Asked 2026-11-26: **Exportera CSV** and **Exportera Excel** on every tab and

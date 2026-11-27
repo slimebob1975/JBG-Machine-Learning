@@ -82,7 +82,7 @@ decision.
 
 **Operation**
 
-- [ ] Per-project retention (design decision 3): model files (288a), per-run
+- [x] 301q (gallring, decided 2026-11-26). Per-project retention (design decision 3): model files (288a), per-run
   result folders (295a) and the CSV file versions from corrections (299b) are
   kept until deleted (299e, 299f).
 - [ ] The language choice stored per user on the server (design decision 6).
