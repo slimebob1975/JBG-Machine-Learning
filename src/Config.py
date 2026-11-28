@@ -888,6 +888,8 @@ class Config:
             # 296b: predictions kept in a run's own folder (API runs only).
             "predictions": {"suffix": "csv", "prefix": "predictions_"},
             "feature_importance_details": {"suffix": "csv", "prefix": "feature_importance_details_"},
+            # 301v: the final model's pipeline with its parameters.
+            "final_pipeline": {"suffix": "json", "prefix": "final_pipeline_"},
             "config": {
                 "suffix": "json",
                 "prefix": self.CONFIG_FILENAME_START

@@ -24,6 +24,7 @@ import pandas as pd
 SCHEMA = "jbg-fake-data-spec"
 VERSION = 1
 RARE_SHARE = 0.001                      # 0.1 % of the rows (decided 2026-11-26)
+RARE_MIN_ROWS = 5                       # 301v: and at least 5 rows, for small datasets
 OTHER = "Övrigt"
 QUANTILES = (0.001, 0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99, 0.999)
 CATEGORY_TYPES = ("categorical", "class")
@@ -93,13 +94,13 @@ def _text_summary(series: pd.Series) -> dict:
 
 
 def _category_summary(series: pd.Series, all_rows: int) -> dict:
-    """Shares of the values; values seen in fewer than 0.1 % of all the rows
-    are merged into OTHER."""
+    """Shares of the values; values seen in fewer than 0.1 % of all the rows,
+    or on fewer than 5 rows (301v), are merged into OTHER."""
     present = _present(series).astype(str)
     if present.empty:
         return {"count": 0, "values": []}
     counts = present.value_counts()
-    floor = RARE_SHARE * all_rows
+    floor = max(RARE_SHARE * all_rows, RARE_MIN_ROWS)
     kept = counts[counts >= floor]
     other = int(counts[counts < floor].sum())
     values = [{"value": str(v), "share": _number(c / len(present))} for v, c in kept.items()]
@@ -181,7 +182,7 @@ def build_spec(frame: pd.DataFrame, *, roles: dict, class_column: str | None,
             "dataset": dataset_name, "source": source,
             "rows": int(rows_total), "rows_used": int(all_rows),
             "sampled": bool(all_rows < rows_total),
-            "rare_share": RARE_SHARE, "other": OTHER,
+            "rare_share": RARE_SHARE, "rare_min_rows": RARE_MIN_ROWS, "other": OTHER,
             "quantiles": [f"{q:g}" for q in QUANTILES],
             "class_column": class_column, "classes": class_shares,
             "columns": columns, "correlations": correlations}

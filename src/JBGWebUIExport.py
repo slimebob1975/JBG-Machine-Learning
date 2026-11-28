@@ -110,8 +110,12 @@ def export_response(request, template: str, context: dict):
     name, tables = found
     info = context.get("export_info") or {}
     if info.get("rows"):
-        tables = [table(_("Information"), [_("About the export")] + info["headings"],
-                        info["rows"])] + list(tables)
+        first = [table(_("Information"), [_("About the export")] + info["headings"],
+                       info["rows"])]
+        if info.get("pipeline"):                                         # 301v
+            first.append(table(_("Pipeline"), [_("Run"), _("Step"), _("Class"), _("Parameter"),
+                                               _("Value")], info["pipeline"]))
+        tables = first + list(tables)
     if info.get("dataset") and info["dataset"] not in name:
         name = f"{name} - {info['dataset']}"
     return _response(tables, form, name)
@@ -193,7 +197,17 @@ def export_information(context: dict, template: str, *, owner: str, project: dic
                                                    all_rows=True)) if source else ""
         except Exception:
             return ""
+    def final(item):
+        """301v: the final model's pipeline with its parameters (None before 301v)."""
+        source = item
+        if item.get("kind") == "prediction":
+            source = trained_by.get(item.get("model_id")) or {}
+        try:
+            return results.final_pipeline(owner, source["run_id"]) if source else None
+        except Exception:
+            return None
     found = [by_id.get(r, {"run_id": r}) for r in run_ids]
+    finals = [final(i) for i in found]
     headings = [_("Value")] if len(found) == 1 else [f"{_('Run')} {i + 1}"
                                                     for i in range(len(found))]
     kinds = {"training": _("Training run"), "prediction": _("Prediction run"),
@@ -204,12 +218,23 @@ def export_information(context: dict, template: str, *, owner: str, project: dic
         [_("Configuration")] + [f"{i.get('configuration_name') or ''} v{i.get('configuration_version')}"
                                 if i.get("configuration_name") else "" for i in found],
         [_("Winning pipeline")] + [pipeline(i) for i in found],
+        [_("Final pipeline")] + [_summary(f) if f else _("not recorded (runs before 301v)")
+                                 for f in finals],
         [_("Kind")] + [kinds.get(i.get("kind", "training"), i.get("kind", "")) for i in found],
         [_("Run")] + [i.get("run_id", "") for i in found],
         [_("Started")] + [i.get("created_at", "") for i in found],
     ]
     names = sorted({i.get("dataset_name") for i in found if i.get("dataset_name")})
-    return {"dataset": " + ".join(names), "headings": headings, "rows": rows}
+    steps = [[f"{i + 1}" if len(found) > 1 else "", s["step"], s["class"], key, value]
+             for i, f in enumerate(finals) for s in (f or [])
+             for key, value in s.get("params", {}).items()]
+    return {"dataset": " + ".join(names), "headings": headings, "rows": rows,
+            "pipeline": steps}
+
+
+def _summary(steps):
+    from JBGPipelineDescription import summary
+    return summary(steps)
 
 
 def table(title: str, columns: list, rows: list) -> dict:

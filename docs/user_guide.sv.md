@@ -39,8 +39,9 @@ med **Föregående** och **Nästa** nere till höger.
 En vy med data, konfigurationsinställningar eller resultat har knappen
 **Exportera** under tabellerna, till höger. Listorna i vänsterpanelen
 exporteras inte. Varje export börjar med tabellen Information: projektet,
-datasetet som användes och, för resultat, körningen, konfigurationen med version
-och den vinnande pipelinen. Datasetets namn står också i filnamnet. Knappen ger
+datasetet som användes och, för resultat, körningen, konfigurationen med version,
+den vinnande pipelinen och den slutliga pipelinen med alla parametrar (från
+körningar med 301v och senare). Datasetets namn står också i filnamnet. Knappen ger
 vyns tabeller med alla rader, även de som visas en sida i taget, i formatet som
 väljs under Inställningar: Excel med en flik per tabell, eller CSV med
 tabellerna efter varandra under sina rubriker (semikolon och decimalkomma, som
@@ -115,7 +116,7 @@ Kolumnroller och Visualisering.
 I vyn Profil ger **Exportera specifikation för fejkdata (JSON)** en beskrivning
 av datasetet som en generator kan skapa liknande data från, utan riktiga rader:
 fördelningen för varje kolumn och för varje klass, och korrelationerna mellan
-de numeriska kolumnerna. Värden som finns på färre än 0,1 % av raderna slås
+de numeriska kolumnerna. Värden som finns på färre än 0,1 % av raderna, eller på färre än fem rader, slås
 ihop till Övrigt, tal anges som kvantiler från 0,1 till 99,9 % i stället för
 exakta min och max, och fritext beskrivs bara med längder. Typen tas från
 kolumnrollerna om de finns. Stora SQL-tabeller beskrivs från ett slumpvis
@@ -287,6 +288,9 @@ dina val direkt, och alpha ”Separated” går bara att välja med metoden
   konfigurationen ett nytt namn utan att skapa en ny version. Körningarna som
   gjorts med den visar det nya namnet, och den hamnar först i listan.
   Modellerna behåller namnet de fick när de tränades.
+- Panelen **Kopiera till ett annat projekt** gör de senaste inställningarna
+  till en ny konfiguration i ett annat av dina projekt med samma källa (CSV
+  eller SQL), med egen historik. Originalet ändras inte.
 - **Välj för körning** gör konfigurationen till den som används vid
   träning. Den är röd när konfigurationen redan är vald.
 - **Ta bort konfigurationen…** tar bort den med alla versioner, de

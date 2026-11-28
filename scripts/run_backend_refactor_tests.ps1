@@ -1,5 +1,5 @@
 
-# Backend-only refactoring gate for JBG Machine Learning 0.20.1+.
+# Backend-only refactoring gate for JBG Machine Learning 0.20.2+.
 # Place this file under scripts/ in the repository.
 #
 # Revision 288a2: tests that train a real model (marked "native" automatically in

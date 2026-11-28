@@ -3043,3 +3043,35 @@ msgstr "Information"
 # 301u: the dataset picture as a PNG.
 msgid "Save as PNG"
 msgstr "Spara som PNG"
+
+# 301v: the final pipeline in exports.
+msgid "Final pipeline"
+msgstr "Slutlig pipeline"
+
+msgid "not recorded (runs before 301v)"
+msgstr "inte sparad (körningar före 301v)"
+
+msgid "Step"
+msgstr "Steg"
+
+msgid "Parameter"
+msgstr "Parameter"
+
+# 301v: copying a configuration to another project.
+msgid "Copy to another project"
+msgstr "Kopiera till ett annat projekt"
+
+msgid "Copy"
+msgstr "Kopiera"
+
+msgid "The latest settings become a new configuration there, with a history of its own. Projects of the same source (CSV or SQL) are offered."
+msgstr "De senaste inställningarna blir en ny konfiguration där, med egen historik. Projekt med samma källa (CSV eller SQL) visas."
+
+msgid "The configuration is copied. Open the other project to see it."
+msgstr "Konfigurationen är kopierad. Öppna det andra projektet för att se den."
+
+msgid "The other project has a configuration with that name. Choose another name."
+msgstr "Det andra projektet har en konfiguration med det namnet. Välj ett annat namn."
+
+msgid "The configuration could not be copied there."
+msgstr "Konfigurationen kunde inte kopieras dit."

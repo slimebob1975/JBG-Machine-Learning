@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def test_the_version():
     from JBGVersion import APP_VERSION, BuildIdentity
-    assert APP_VERSION == "0.20.1" and BuildIdentity().app_version == "0.20.1"
+    assert APP_VERSION == "0.20.2" and BuildIdentity().app_version == "0.20.2"   # 301v
 
 
 def test_the_changelog_has_the_release():
@@ -25,4 +25,4 @@ def test_the_masthead_shows_it(tmp_path):
     from test_revision_288a_project_runs import _client
     with _client(tmp_path) as client:
         page = client.get("/ui/projects").text
-    assert "v0.20.1" in page
+    assert "v0.20.2" in page                                  # 301v

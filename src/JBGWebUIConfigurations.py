@@ -22,6 +22,10 @@ MESSAGES = {
     "created": ("ok", "Configuration created."),
     "saved": ("ok", "Configuration saved."),
     "selected": ("ok", "Configuration selected."),
+    # 301v: copied to another project.
+    "copied": ("ok", "The configuration is copied. Open the other project to see it."),
+    "copy_duplicate": ("error", "The other project has a configuration with that name. Choose another name."),
+    "copy_refused": ("error", "The configuration could not be copied there."),
     "renamed": ("ok", "Configuration renamed."),                             # 300r
     "duplicate": ("error", "A configuration with that name already exists."),
     "bad_name": ("error", "The name was not accepted (1-200 characters)."),
@@ -231,6 +235,10 @@ def add_configuration_tab(app, *, principal_dependency, render, redirect, active
             selected = next((c for c in items if c["configuration_id"] == configuration), None)
             context["selected"] = selected
             if selected is not None:
+                try:                                                       # 301v
+                    context["copy_targets"] = configurations.copy_targets(owner, pid)
+                except Exception:
+                    context["copy_targets"] = []
                 language = request_language(request)
                 context["schema"] = configuration_schema(project["source"], translator(language),
                                                          _server_template())
@@ -346,6 +354,26 @@ def add_configuration_tab(app, *, principal_dependency, render, redirect, active
             return redirect("/ui/configuration", message="unavailable")
         return remember(redirect("/ui/configuration", configuration=configuration_id,
                                  message="selected"), configuration_id)
+
+    @app.post("/ui/configuration/{configuration_id}/copy", include_in_schema=False)
+    def copy(request: Request, configuration_id: str, target_project_id: str = Form(""),
+             name: str = Form(""), principal=Depends(principal_dependency)):
+        """301v: the latest settings as a new configuration in another project."""
+        pid = project_id(request, principal)
+        if pid is None:
+            return redirect("/ui/configuration")
+        try:
+            configurations.copy_to(principal.principal_key, pid, configuration_id,
+                                   target_project_id=target_project_id, name=name)
+        except ConfigurationNameConflict:
+            return redirect("/ui/configuration", configuration=configuration_id,
+                            message="copy_duplicate")
+        except (ConfigurationUnavailable, ProjectUnavailable):
+            return redirect("/ui/configuration", message="unavailable")
+        except (ValueError, TypeError):
+            return redirect("/ui/configuration", configuration=configuration_id,
+                            message="copy_refused")
+        return redirect("/ui/configuration", configuration=configuration_id, message="copied")
 
     @app.post("/ui/configuration/{configuration_id}/rename", include_in_schema=False)
     def rename(request: Request, configuration_id: str, name: str = Form(""),

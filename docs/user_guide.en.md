@@ -38,8 +38,9 @@ with **Previous** and **Next** at the bottom right.
 A view with data, configuration settings or results has an **Export**
 button below its tables, on the right. The lists of the left panel are not
 exported. Every export starts with an Information table: the project, the
-dataset used and, for results, the run, the configuration with its version and
-the winning pipeline. The dataset's name is in the file name too. The button
+dataset used and, for results, the run, the configuration with its version,
+the winning pipeline and the final pipeline with all its parameters (from runs
+with 301v and later). The dataset's name is in the file name too. The button
 gives the view's tables with all rows, also those shown a page at a time, in the format chosen
 under Settings: Excel with a sheet per table, or CSV with the tables one after
 another under their titles (semicolons and decimal commas, as Swedish Excel
@@ -114,7 +115,7 @@ In the Profile view, **Export a specification for fake data (JSON)** gives a
 description of the dataset from which a generator can make similar data,
 without any real row: the distribution of every column and of every class, and
 the correlations between the numeric columns. Values found on fewer than 0.1 %
-of the rows are merged into Övrigt, numbers are given as quantiles from 0.1 to
+of the rows, or on fewer than five rows, are merged into Övrigt, numbers are given as quantiles from 0.1 to
 99.9 % instead of exact minimum and maximum, and free text is described only by
 its lengths. The type comes from the column roles when they are set. Large SQL
 tables are described from a random sample of 100,000 rows.
@@ -283,6 +284,9 @@ only be chosen with the method "Linear".
   configuration a new name without creating a new version. The runs made with
   it show the new name, and it moves to the top of the list. Models keep the
   name they were given when they were trained.
+- The **Copy to another project** panel makes the latest settings a new
+  configuration in another of your projects with the same source (CSV or SQL),
+  with a history of its own. The original is not changed.
 - **Choose for runs** makes the configuration the one used for training.
   It is red when the configuration is already chosen.
 - **Delete the configuration…** deletes it with every version, the training

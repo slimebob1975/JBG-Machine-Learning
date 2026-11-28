@@ -144,6 +144,19 @@ class RunResultsService:
                 "total_rows": len(rows), "page": page, "page_size": page_size}
 
 
+    def final_pipeline(self, owner: str, run_id: str) -> list | None:
+        """301v: the final model's pipeline (steps, classes, parameters), or None
+        for runs before 301v."""
+        import json
+        folder = self._folder(owner, run_id) / "output" / "csvs"
+        found = sorted(folder.glob("final_pipeline_*.json")) if folder.is_dir() else []
+        if not found:
+            return None
+        try:
+            return json.loads(found[0].read_text(encoding="utf-8")).get("steps")
+        except (OSError, ValueError):
+            return None
+
     def dark_number_record(self, owner: str, run_id: str):
         """299x: the run's Dark Number result record (method, version, parameters,
         estimates), or None when it was computed with an earlier version."""

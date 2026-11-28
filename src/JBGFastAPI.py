@@ -462,6 +462,16 @@ def _add_configuration_endpoints(app, principal_dependency, configurations):
                     configuration_id, settings=request.settings,
                     expected_version=request.expected_version)
 
+    @app.post("/api/projects/{project_id}/configurations/{configuration_id}/copy",
+              status_code=201)
+    def copy_configuration(project_id: str, configuration_id: str, request: dict = Body(...),
+                           principal: AuthenticatedPrincipal = Depends(principal_dependency)):
+        """301v: {"target_project_id", "name"}: the latest settings as a new
+        configuration in another project of the same source."""
+        return call(configurations.copy_to, principal.principal_key, project_id, configuration_id,
+                    target_project_id=str(request.get("target_project_id", "")),
+                    name=str(request.get("name", "")))
+
     @app.patch(base + "/{configuration_id}")
     def rename_configuration(project_id: str, configuration_id: str,
                              request: ConfigurationRename = Body(...),

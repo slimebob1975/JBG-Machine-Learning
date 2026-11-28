@@ -326,6 +326,8 @@ class TaskRunner:
             self.logger.print_code("Cross validation results filepath", \
                                    Helpers.create_download_link(output_filename, title = ""))
             self.mh.save_model_to_file(self.mh.handler.config.get_model_filename())
+            from JBGPipelineDescription import write as write_pipeline          # 301v
+            write_pipeline(self.config, self.mh.model.pipeline)
             summary = getattr(self.mh, "_last_spot_check_summary", None)
             if summary:
                 # Repeat after final training/save; the original table may have been lost
@@ -374,6 +376,8 @@ class TaskRunner:
         self.mh.model.pipeline = trained_model
             
         self.mh.save_model_to_file(self.config.get_model_filename())
+        from JBGPipelineDescription import write as write_pipeline              # 301v
+        write_pipeline(self.config, trained_model)
 
         return {"cross_trained_model": cross_trained_model, "trained_model": trained_model}
 

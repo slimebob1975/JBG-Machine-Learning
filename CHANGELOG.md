@@ -1,3 +1,39 @@
+## Version 0.20.2 – exports, Excel, gallring (2026-11-27)
+
+- The release after 0.20.1, revisions 301m to 301v: the full regression
+  repaired (301m), JBG_RadId for prediction files (301n), a JSON
+  specification for fake data (301o), every view's data, settings and results exported as Excel or CSV with
+  the dataset and pipeline named (301p, 301s, 301t, 301v), a Settings tab for
+  language and export format (301r), gallring of runs (301q), the dataset
+  picture as a PNG (301u) and copying a configuration to another project
+  (301v).
+- Run the full regression (`python -m pytest -q -p no:cacheprovider`) before
+  tagging v0.20.2.
+
+## Revision 301v - Final pipeline in exports, a floor for rare values, copying configurations, 0.20.2 (2026-11-27)
+
+- Asked 2026-11-27 (one sweep):
+  - **The final pipeline with its tuned parameters.** Training now saves the
+    final model's pipeline next to the run's results
+    (`final_pipeline_...json`: each step's class and parameters,
+    `JBGPipelineDescription`), after both model saves. Result exports add a
+    "Slutlig pipeline" line to Information and a **Pipeline** table (step,
+    class, parameter, value). Runs before 301v say "inte sparad".
+  - **A floor for rare values** in the fake-data specification: a value is
+    merged into "Övrigt" under 0.1 % of the rows or on fewer than 5 rows, so
+    single values are hidden in small datasets too (`rare_min_rows` in the file).
+  - **Copy a configuration to another project** (noted with 297d): a panel under
+    Rename on the Configuration tab, and `POST .../configurations/{id}/copy`.
+    The latest settings become a new configuration (version 0, a history of its
+    own) in another of the owner's projects with the same source; a name already
+    there is refused.
+  - **Housekeeping and release:** the BACKLOG's ticked items 301n to 301u moved
+    out, the fake-data generator recorded as postponed, version 0.20.2.
+- User guides: the Configuration section, the export paragraph, the
+  specification's rule.
+- Tests: `tests/test_revision_301v_sweep.py`. The tests of 175, 301l and 301n
+  expect version 0.20.2 and the new cleanup.
+
 ## Revision 301u - The dataset picture as a PNG (2026-11-27)
 
 - Asked 2026-11-27: **Spara som PNG** below the Visualisation view's picture,

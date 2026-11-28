@@ -15,7 +15,7 @@ from typing import Optional
 
 
 APP_NAME = "JBG Machine Learning"          # 300x: was JBG AutoClassification
-APP_VERSION = "0.20.1"          # 301l (2026-11-26): was 0.19.1
+APP_VERSION = "0.20.2"          # 301v (2026-11-27); 301l: 0.20.1
 
 
 @dataclass(frozen=True)

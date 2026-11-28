@@ -7,8 +7,8 @@ in `docs/backlog_archive_300p.md`. Each item says where it was asked or found.
 A revision ticks the items it does (`[x]` with its revision number), and ticked
 items leave this file at the next cleanup.
 
-Ticked items of revisions 300r to 301m were moved out in 301n (the rule
-above). `CHANGELOG.md` keeps what each did.
+Ticked items of revisions 300r to 301u were moved out in 301n and 301v (the
+rule above). `CHANGELOG.md` keeps what each did.
 
 ## Current priorities (decided 2026-11-18, reviewed 2026-11-23)
 
@@ -19,21 +19,6 @@ decision.
 ### Now: stabilisation
 
 - [ ] Bugs reported in use: added here as they are found.
-- [x] 301o (asked 2026-11-26): a JSON specification for fake data, from the
-  Profile view.
-- [x] 301u (asked 2026-11-27): the dataset picture saved as a PNG.
-- [x] 301t (asked 2026-11-27): exports name the dataset and, for results, the
-  pipeline; the specification button on the Export row.
-- [x] 301s (asked 2026-11-27): exports of data, settings and results only, the
-  button below the tables.
-- [x] 301r (asked 2026-11-27): a Settings tab (language, export format) and one
-  Export button per view.
-- [x] 301p (asked 2026-11-26): export of the table data of every view and
-  subview to CSV and Excel, all of the Dark Numbers calculations in particular.
-- [x] 301n. Found with 301i: a prediction CSV for a model trained with JBG_RadId must
-  contain JBG_RadId too, and the upload refuses a prediction file that lacks a
-  training column. Add JBG_RadId to such a prediction file at upload, numbered
-  the same way, when the training dataset's ID column is JBG_RadId.
 - [ ] The README still describes the Voilà GUI in most sections (found with
   300x). Rewrite it for the web GUI when Voilà's retirement is planned.
 - [ ] The interim configuration catalog (285d, design gap 10): project runs
@@ -72,7 +57,7 @@ decision.
 
 **Configurations and datasets**
 
-- [ ] If wanted: copy a configuration to another project (noted with 297d).
+- [x] 301v: copy a configuration to another project (noted with 297d).
 - [ ] If wanted: switch a dataset to or from the prediction role (noted with
   298f; compatibility and column roles to settle).
 - [ ] If wanted: in the roles form, choosing a second class or ID column
@@ -89,9 +74,6 @@ decision.
 
 **Operation**
 
-- [x] 301q (gallring, decided 2026-11-26). Per-project retention (design decision 3): model files (288a), per-run
-  result folders (295a) and the CSV file versions from corrections (299b) are
-  kept until deleted (299e, 299f).
 - [ ] The language choice stored per user on the server (design decision 6).
   Today it is a browser cookie (`jbg_lang`).
 - [ ] A live pipeline picture (listed 2026-11-18, to be described when it
@@ -99,6 +81,9 @@ decision.
 
 **Dark Numbers** (the plan `docs/dark_numbers/JBG_Dark_Number_Analysis_2_0_Implementeringsplan.md`, the contract `DN-01_method_contract.md`)
 
+- [ ] Postponed 2026-11-27: a fake-data generator that reads the JSON
+  specification of 301o and writes a synthetic dataset (in the GUI or as a
+  script). The export is enough for now.
 - [ ] A production-like synthetic dataset for the validation study, generated
   from aggregated profiles (2026-11-19). The generator and summary received
   then stay outside the repository.

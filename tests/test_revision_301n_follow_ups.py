@@ -110,8 +110,8 @@ def test_housekeeping():
     # 301o: later revisions tick their own items; none of 300r to 301m is left.
     ticked = re.findall(r"^- \[x\] (30\d[a-z]|301[a-z])", head, flags=re.M)
     assert not [r for r in ticked if "300r" <= r <= "301m"]
-    assert "- [x] 301n. Found with 301i" in head
-    assert "Ticked items of revisions 300r to 301m were moved out in 301n" in head
+    # 301v: the next cleanup moved 301n's own tick out too.
+    assert "Ticked items of revisions 300r to 301u were moved out in 301n and 301v" in head
     assert "Known limitation (301a)" in head
     deps = (ROOT / "docs" / "dependencies.md").read_text(encoding="utf-8")
     assert "## Version 0.20.1 (301m, 2026-11-26)" in deps

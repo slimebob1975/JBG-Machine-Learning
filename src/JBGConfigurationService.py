@@ -233,6 +233,26 @@ class ConfigurationService:
             raise ConfigurationNameConflict("configuration name already exists") from None
         return configuration_response(created)
 
+    def copy_targets(self, owner: str, project_id: str) -> list[dict[str, Any]]:
+        """301v: the owner's other projects a configuration can be copied to:
+        those with the same source (CSV or SQL), since some settings depend on it."""
+        source = self._projects.require(owner, project_id).source.value
+        return [p for p in self._projects.list(owner, limit=500)
+                if p["project_id"] != project_id and p.get("source") == source]
+
+    def copy_to(self, owner: str, project_id: str, configuration_id: str, *,
+                target_project_id: str, name: str) -> dict[str, Any]:
+        """301v (asked as "copy a configuration to another project"): the
+        configuration's latest settings as a new configuration in another of
+        the owner's projects of the same source. The copy starts at version 0
+        with its own history; the original is not changed."""
+        source = self._projects.require(owner, project_id).source
+        target = self._projects.require(owner, target_project_id)
+        if target.project_id == project_id or target.source is not source:
+            raise InvalidConfiguration("the target project must be another project of the same source")
+        settings = with_later_defaults(self.stored_settings(owner, project_id, configuration_id))
+        return self.create(owner, target_project_id, name=name, settings=settings)
+
     def save(self, owner: str, project_id: str, configuration_id: str, *,
              settings: dict, expected_version: int) -> dict[str, Any]:
         project = self._projects.require(owner, project_id)

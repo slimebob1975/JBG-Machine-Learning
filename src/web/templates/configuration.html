@@ -132,6 +132,22 @@
           data-wait-reason="{{ _('Enter a name first.') }}">{{ _("Rename") }}</button>
       </fieldset>
     </form>
+    {% if copy_targets %}
+    {# 301v: the latest settings as a new configuration in another project. #}
+    <form method="post" action="/ui/configuration/{{ selected.configuration_id }}/copy" class="panel copy">
+      <fieldset>
+        <legend>{{ _("Copy to another project") }}</legend>
+        <label for="copy-target">{{ _("Project") }}</label>
+        <select id="copy-target" name="target_project_id">
+          {% for p in copy_targets %}<option value="{{ p.project_id }}">{{ p.name }}</option>{% endfor %}
+        </select>
+        <label for="copy-name">{{ _("Name") }}</label>
+        <input id="copy-name" name="name" required maxlength="200" value="{{ selected.name }}">
+        <p class="hint">{{ _("The latest settings become a new configuration there, with a history of its own. Projects of the same source (CSV or SQL) are offered.") }}</p>
+        <button class="btn sub">{{ _("Copy") }}</button>
+      </fieldset>
+    </form>
+    {% endif %}
     {% endif %}
     <form method="post" action="/ui/configuration" class="panel">
       <fieldset>
