@@ -240,10 +240,10 @@
             <tbody>{% for row in data.rows %}<tr>{% for value in row %}<td>{{ value if value is not none else "" }}</td>{% endfor %}</tr>{% endfor %}</tbody>
           </table></div>
         {% elif view == "profile" and data %}
-          {# 301o (asked 2026-11-26): a specification for generating fake data. #}
-          <p class="spec-export"><a class="btn sub" href="/ui/dataset/{{ selected.dataset_id }}/fake-data-spec"
-            download>{{ _("Export a specification for fake data (JSON)") }}</a>
-            <span class="hint">{{ _("Distributions per column and per class, and correlations between the numeric columns. No real rows: values under 0.1 % of the rows are merged into Övrigt, numbers are given as quantiles from 0.1 to 99.9 %, and free text only as lengths.") }}</span></p>
+          {# 301o: a specification for generating fake data. 301t (asked 2026-11-27):
+             its button stands bottom left, on the row of the Export button, and
+             the explanation is in the guide (About). #}
+          {% set spec_link = "/ui/dataset/" ~ selected.dataset_id ~ "/fake-data-spec" %}
           <p class="hint">{% if data.basis.method == "exact" %}{{ _("Exact, all rows.") }}{% else %}{{ _("Estimated from a sample of") }} {{ data.basis.rows_used }} {{ _("rows") }}.{% endif %}</p>
           <div class="scroll"><table class="grid">
             <thead><tr><th>{{ _("Column") }}</th><th>{{ _("Type") }}</th><th>{{ _("Missing") }}</th><th>{{ _("Distinct values") }}</th></tr></thead>

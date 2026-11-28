@@ -108,6 +108,12 @@ def export_response(request, template: str, context: dict):
     if found is None:
         return None
     name, tables = found
+    info = context.get("export_info") or {}
+    if info.get("rows"):
+        tables = [table(_("Information"), [_("About the export")] + info["headings"],
+                        info["rows"])] + list(tables)
+    if info.get("dataset") and info["dataset"] not in name:
+        name = f"{name} - {info['dataset']}"
     return _response(tables, form, name)
 
 
@@ -122,6 +128,88 @@ def exportable(template: str, context: dict) -> bool:
     except Exception:
         return False
     return bool(found) and any(t.get("rows") for t in found[1])
+
+
+def export_information(context: dict, template: str, *, owner: str, project: dict | None,
+                       runs=None, results=None, datasets=None, configurations=None,
+                       language: str = "sv") -> dict:
+    """301t (asked 2026-11-27): what every export says about itself: the
+    dataset used (also in the file name), and for results of computations the
+    run, its configuration and the pipeline. The pipeline is the model
+    comparison's best row (as on Run History); a prediction run's is its
+    model's training run's."""
+    _ = context.get("_") or (lambda text: text)
+    from datetime import datetime
+    stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    pid = (project or {}).get("project_id")
+    base = [[_("Project"), (project or {}).get("name", "")], [_("Exported"), stamp]]
+    if template == "dataset.html":
+        name = (context.get("selected") or {}).get("name") or ""
+        return {"dataset": name, "headings": [_("Value")],
+                "rows": base + [[_("Dataset"), name]]}
+    if template == "configuration.html":
+        active = ""
+        try:
+            active = next((d["name"] for d in datasets.list(owner, pid)
+                           if d.get("active_training")), "") if datasets and pid else ""
+        except Exception:
+            active = ""
+        chosen = context.get("selected") or {}
+        configuration = f"{chosen.get('name', '')} v{chosen.get('version', '')}".strip()
+        return {"dataset": active, "headings": [_("Value")],
+                "rows": base + [[_("Configuration"), configuration],
+                                [_("Active training dataset"), active]]}
+    run_ids = []
+    if template in ("results.html", "run.html", "prediction.html"):
+        run_ids = [context.get("selected_run")]
+    elif template == "models.html":
+        run_ids = [(context.get("selected") or {}).get("run_id")]
+    elif template == "history.html":
+        compared, selected = context.get("compared"), context.get("selected")
+        if compared:
+            run_ids = [compared["left"]["item"]["run_id"], compared["right"]["item"]["run_id"]]
+        elif selected:
+            run_ids = [selected["item"]["run_id"]]
+    run_ids = [r for r in run_ids if r]
+    if not run_ids or runs is None or not pid:
+        return {}
+    try:
+        from JBGWebUIRun import with_dataset_names
+        listed = with_dataset_names(runs.list_project_runs(owner, pid, limit=1000, scan=None),
+                                    datasets, owner, pid, configurations=configurations)
+    except Exception:
+        listed = []
+    by_id = {item["run_id"]: item for item in listed}
+    trained_by = {item.get("model_id"): item for item in listed
+                  if item.get("kind", "training") != "prediction" and item.get("model_id")}
+
+    def pipeline(item):
+        from JBGWebUIHistory import winning_pipeline
+        source = item
+        if item.get("kind") == "prediction":
+            source = trained_by.get(item.get("model_id")) or {}
+        try:
+            return winning_pipeline(results.detail(owner, source["run_id"], "leaderboard",
+                                                   all_rows=True)) if source else ""
+        except Exception:
+            return ""
+    found = [by_id.get(r, {"run_id": r}) for r in run_ids]
+    headings = [_("Value")] if len(found) == 1 else [f"{_('Run')} {i + 1}"
+                                                    for i in range(len(found))]
+    kinds = {"training": _("Training run"), "prediction": _("Prediction run"),
+             "investigation": _("Feature investigation")}
+    rows = [[label] + [first] + [""] * (len(found) - 1) for label, first in base]
+    rows += [
+        [_("Dataset")] + [i.get("dataset_name") or "" for i in found],
+        [_("Configuration")] + [f"{i.get('configuration_name') or ''} v{i.get('configuration_version')}"
+                                if i.get("configuration_name") else "" for i in found],
+        [_("Winning pipeline")] + [pipeline(i) for i in found],
+        [_("Kind")] + [kinds.get(i.get("kind", "training"), i.get("kind", "")) for i in found],
+        [_("Run")] + [i.get("run_id", "") for i in found],
+        [_("Started")] + [i.get("created_at", "") for i in found],
+    ]
+    names = sorted({i.get("dataset_name") for i in found if i.get("dataset_name")})
+    return {"dataset": " + ".join(names), "headings": headings, "rows": rows}
 
 
 def table(title: str, columns: list, rows: list) -> dict:

@@ -319,6 +319,11 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
         base.update(context)
         from JBGWebUIExport import export_response, exportable
         if request.query_params.get("export"):                         # 301p
+            from JBGWebUIExport import export_information                # 301t
+            owner = principal.principal_key
+            base["export_info"] = export_information(
+                base, template, owner=owner, project=active_project(request, owner),
+                runs=runs, results=results, datasets=datasets, configurations=configurations)
             exported = export_response(request, template, base)
             if exported is not None:
                 return exported

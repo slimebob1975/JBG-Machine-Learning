@@ -51,11 +51,12 @@ def test_the_tabs_export(tmp_path):
     # 301r: one Export button, in the format chosen under Settings (Excel by default).
     assert "Exportera (Excel)" in page and "export=xlsx" in page
     sheets = load_workbook(io.BytesIO(profile.content)).sheetnames
-    assert sheets == ["Profil"]                                     # 301s: not the list
+    assert sheets == ["Information", "Profil"]                      # 301s, 301t
     assert "Profil" in profile.headers["content-disposition"] or "Profil" in \
         profile.headers["content-disposition"].encode().decode("unicode_escape")
     text = history.content.decode("utf-8-sig")
-    assert text.startswith("Körning 1\r\n") and "Inställningar som skiljer sig" in text
+    assert text.startswith("Information\r\n")                      # 301t: first
+    assert "\r\n\r\nKörning 1\r\n" in text and "Inställningar som skiljer sig" in text
     assert "Körningar\r\n" not in text                            # 301s: not the list
     rows = load_workbook(io.BytesIO(settings.content))["Inställningar"]
     assert rows.max_row > 20
@@ -82,10 +83,10 @@ def test_dark_numbers_and_all_rows(tmp_path):
         page = client.get(f"/ui/results?run={s.run}&view=mispredictions").text
         allrows = client.get(f"/ui/results?run={s.run}&view=mispredictions&export=xlsx")
     sheets = load_workbook(io.BytesIO(dark.content)).sheetnames
-    assert sheets[:3] == ["Inställningar", "Skattningar", "Beräkningar"]
+    assert sheets[:4] == ["Information", "Inställningar", "Skattningar", "Beräkningar"]   # 301t
     assert "Mörkertal" in dark.headers["content-disposition"].encode("latin-1").decode("utf-8") \
         or "rkertal" in dark.headers["content-disposition"]
-    assert overview.content.decode("utf-8-sig").startswith("Utvärdering på testdata")
+    assert "\r\n\r\nUtvärdering på testdata\r\n" in overview.content.decode("utf-8-sig")
     book = load_workbook(io.BytesIO(allrows.content))
     assert book["Felklassificeringar"].max_row == 701                 # header + every row
     assert "700" in page or "Föregående" in page or "Nästa" in page   # the page shows less

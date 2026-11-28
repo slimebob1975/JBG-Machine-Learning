@@ -21,6 +21,8 @@ decision.
 - [ ] Bugs reported in use: added here as they are found.
 - [x] 301o (asked 2026-11-26): a JSON specification for fake data, from the
   Profile view.
+- [x] 301t (asked 2026-11-27): exports name the dataset and, for results, the
+  pipeline; the specification button on the Export row.
 - [x] 301s (asked 2026-11-27): exports of data, settings and results only, the
   button below the tables.
 - [x] 301r (asked 2026-11-27): a Settings tab (language, export format) and one

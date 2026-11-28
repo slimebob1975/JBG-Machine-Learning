@@ -2916,9 +2916,6 @@ msgstr "körningarna i projektet visas. Äldre körningar finns kvar men visas i
 msgid "Export a specification for fake data (JSON)"
 msgstr "Exportera specifikation för fejkdata (JSON)"
 
-msgid "Distributions per column and per class, and correlations between the numeric columns. No real rows: values under 0.1 % of the rows are merged into Övrigt, numbers are given as quantiles from 0.1 to 99.9 %, and free text only as lengths."
-msgstr "Fördelningar per kolumn och per klass, och korrelationer mellan de numeriska kolumnerna. Inga riktiga rader: värden under 0,1 % av raderna slås ihop till Övrigt, tal anges som kvantiler från 0,1 till 99,9 % och fritext bara som längder."
-
 msgid "The specification could not be made."
 msgstr "Specifikationen kunde inte skapas."
 
@@ -3026,3 +3023,19 @@ msgstr "Inställningarna sparas i den här webbläsaren."
 
 msgid "The settings are saved."
 msgstr "Inställningarna är sparade."
+
+# 301t: the information in every export, and the specification's tooltip.
+msgid "A description of the dataset for generating fake data, without real rows. See About."
+msgstr "En beskrivning av datasetet för att skapa fejkdata, utan riktiga rader. Se Om."
+
+msgid "About the export"
+msgstr "Om exporten"
+
+msgid "Exported"
+msgstr "Exporterad"
+
+msgid "Active training dataset"
+msgstr "Aktivt träningsdataset"
+
+msgid "Information"
+msgstr "Information"

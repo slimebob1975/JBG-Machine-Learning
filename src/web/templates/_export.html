@@ -1,8 +1,11 @@
-{# 301p, 301r (asked 2026-11-27): one Export button, in the format chosen under
-   Settings, and only where the view has a table with rows. #}
-{% if can_export %}
+{# 301p, 301r, 301s: one Export button, in the format chosen under Settings,
+   below the tables on the right, only where the view has a table with rows.
+   301t: a view may put a link of its own on the same row, on the left. #}
+{% if can_export or spec_link %}
 <p class="export-links">
-  <a class="btn sub" href="{{ request.url.include_query_params(export=export_format) }}" download
-    title="{{ _('All the tables of this view, with all rows. The format is chosen under Settings.') }}">{{ _("Export") }} ({{ "Excel" if export_format == "xlsx" else "CSV" }})</a>
+  {% if spec_link %}<a class="btn sub left" href="{{ spec_link }}" download
+    title="{{ _('A description of the dataset for generating fake data, without real rows. See About.') }}">{{ _("Export a specification for fake data (JSON)") }}</a>{% endif %}
+  {% if can_export %}<a class="btn sub" href="{{ request.url.include_query_params(export=export_format) }}" download
+    title="{{ _('All the tables of this view, with all rows. The format is chosen under Settings.') }}">{{ _("Export") }} ({{ "Excel" if export_format == "xlsx" else "CSV" }})</a>{% endif %}
 </p>
 {% endif %}

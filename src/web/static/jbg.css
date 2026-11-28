@@ -382,3 +382,5 @@ div.layout-two.run-layout.models-layout { grid-template-columns: minmax(320px, 1
 nav.tabs a.right { margin-left: auto; }
 .settings-card fieldset { border: 1px solid var(--line, #d5dde6); border-radius: 8px; padding: 10px 14px; margin: 0 0 12px; }
 .settings-card label.check { display: inline-flex; align-items: center; gap: 6px; margin-right: 18px; }
+/* 301t: a view's own link, bottom left on the Export row */
+.export-links .btn.left { margin-right: auto; }

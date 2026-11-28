@@ -1,3 +1,23 @@
+## Revision 301t - Exports say which dataset and pipeline (2026-11-27)
+
+- Asked 2026-11-27:
+  - The Profile view's **Exportera specifikation för fejkdata (JSON)** stands
+    bottom left, on the row of the Export button, and its explanation is in the
+    guide (About) only, with a short tooltip on the button.
+  - Every export names the dataset used, in the file name and in a first
+    **Information** table (a sheet in Excel, the first table in CSV): the
+    project, the time of the export and the dataset. A configuration's export
+    names the active training dataset.
+  - Exports of results (Results, Training, Models, Prediction, Run History) also
+    name the run, its kind and start, its configuration with version and the
+    winning pipeline: the model comparison's best row, as on Run History, and
+    for a prediction run its model's training run's. Two compared runs get a
+    column each.
+- `JBGWebUIExport.export_information`, called by `render` only for exports.
+- User guides: the export paragraph.
+- Tests: `tests/test_revision_301t_export_information.py`. The 301p test expects
+  the Information sheet first.
+
 ## Revision 301s - Exports: data and results only, the button below the tables (2026-11-27)
 
 - Asked 2026-11-27:

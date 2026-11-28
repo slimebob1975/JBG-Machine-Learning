@@ -38,7 +38,10 @@ med **Föregående** och **Nästa** nere till höger.
 
 En vy med data, konfigurationsinställningar eller resultat har knappen
 **Exportera** under tabellerna, till höger. Listorna i vänsterpanelen
-exporteras inte. Knappen ger vyns tabeller med alla rader, även de som visas en sida i taget, i formatet som
+exporteras inte. Varje export börjar med tabellen Information: projektet,
+datasetet som användes och, för resultat, körningen, konfigurationen med version
+och den vinnande pipelinen. Datasetets namn står också i filnamnet. Knappen ger
+vyns tabeller med alla rader, även de som visas en sida i taget, i formatet som
 väljs under Inställningar: Excel med en flik per tabell, eller CSV med
 tabellerna efter varandra under sina rubriker (semikolon och decimalkomma, som
 svenska Excel läser). Vyn Mörkertal ger hela beräkningen: inställningar,
