@@ -1,3 +1,18 @@
+## Revision 301s - Exports: data and results only, the button below the tables (2026-11-27)
+
+- Asked 2026-11-27:
+  - Only data, configuration settings and results are exported: a dataset's
+    views, a configuration's settings, the Results views, a run's evaluation
+    (Training, Models), the predictions and Run History's run details or
+    comparison. The lists of the left panels (projects, datasets,
+    configurations, runs, models, prediction runs) are not, so Projects and
+    Overview have no Export button.
+  - The Export button stands below the tables, on the right, at the end of the
+    right-hand card, instead of at the top of the page.
+- User guides: the export paragraph.
+- Tests: `tests/test_revision_301s_export_placement.py`. The 301p test expects
+  no list sheets.
+
 ## Revision 301r - A Settings tab and one Export button (2026-11-27)
 
 - Asked 2026-11-27: simpler exports and a place for settings.

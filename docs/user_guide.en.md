@@ -35,8 +35,9 @@ pages, the page's main button is at both the top and the bottom. Long lists in
 the left panel show seven rows at a time (Run History ten), the latest first,
 with **Previous** and **Next** at the bottom right.
 
-A tab or view with tables has an **Export** button. It gives the view's
-tables with all rows, also those shown a page at a time, in the format chosen
+A view with data, configuration settings or results has an **Export**
+button below its tables, on the right. The lists of the left panel are not
+exported. The button gives the view's tables with all rows, also those shown a page at a time, in the format chosen
 under Settings: Excel with a sheet per table, or CSV with the tables one after
 another under their titles (semicolons and decimal commas, as Swedish Excel
 reads them). The Dark Numbers view gives the whole calculation: settings,

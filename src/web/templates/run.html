@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% set title = "Training" %}
 {% block main %}
-{% include "_export.html" %}
 {% if no_project %}
   <div class="card"><p class="empty">{{ _("Open a project in the Projects tab first.") }}
     <a href="/ui/projects">{{ _("Projects") }}</a></p></div>
@@ -89,6 +88,7 @@
   {% else %}
     <p class="empty">{{ _("Start a run, or select one in the list.") }}</p>
   {% endif %}
+    {% include "_export.html" %}  {# 301s: below the tables, right-aligned #}
   </aside>
 </div>
 {% endif %}

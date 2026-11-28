@@ -224,12 +224,6 @@ def _records(title: str, items, fields: list, _) -> dict:
                    for key, _heading in fields] for item in items])
 
 
-RUN_FIELDS = [("created_at", "Started"), ("finished_at", "Finished"), ("kind", "Kind"),
-              ("status", "Status"), ("dataset_name", "Dataset"),
-              ("configuration_name", "Configuration"), ("configuration_version", "Version"),
-              ("run_id", "Run")]
-
-
 def _evaluation_rows(ev: dict, _) -> list:
     return [[_("Accuracy"), ev.get("accuracy")], [_("Balanced accuracy"), ev.get("balanced_accuracy")],
             ["MCC", ev.get("mcc")], ["F1 (macro)", ev.get("f1_macro")],
@@ -237,12 +231,10 @@ def _evaluation_rows(ev: dict, _) -> list:
 
 
 def _dataset(context: dict, _):
+    """301s: the selected dataset's data views only, not the list of datasets."""
     selected = context.get("selected") or {}
     view = context.get("view") or "preview"
-    tables = [_records(_("Datasets"), context.get("datasets"), [
-        ("name", "Name"), ("role", "Role"), ("source", "Source"),
-        ("validation_state", "Validation"), ("active_training", "Active for training"),
-        ("created_at", "Created"), ("updated_at", "Changed")], _)]
+    tables = []
     data = context.get("data") or {}
     if selected and data:
         if view == "preview" and data.get("rows") is not None:
@@ -269,7 +261,8 @@ def _dataset(context: dict, _):
 
 
 def _run(context: dict, _):
-    tables = [_records(_("Runs"), context.get("recent"), RUN_FIELDS, _)]
+    """301s: the selected run's evaluation, not the list of runs."""
+    tables = []
     overview = context.get("overview") or {}
     ev = (overview.get("results") or {}).get("evaluation") or {}
     if ev:
@@ -279,30 +272,25 @@ def _run(context: dict, _):
 
 
 def _models(context: dict, _):
-    tables = [_records(_("Models"), context.get("models"), [
-        ("name", "Name"), ("state", "Status"), ("created_at", "Created"),
-        ("configuration_name", "Configuration"), ("model_id", "Model")], _)]
+    """301s: the selected model's evaluation, not the lists of models or runs."""
     card = context.get("card") or {}
     ev = card.get("evaluation") or {}
+    tables = []
     if ev:
         tables.append(table(_("Evaluation on test data"), [_("Measure"), _("Value")],
                             _evaluation_rows(ev, _)))
-    if card.get("predictions"):
-        tables.append(_records(_("Prediction runs"), card["predictions"], RUN_FIELDS, _))
-    return _("Models"), tables
+    return f"{_('Models')} {card.get('name') or ''}".strip(), tables
 
 
 def _prediction(context: dict, _):
-    tables = []
+    """301s: the predictions, not the list of prediction runs."""
     predictions = context.get("predictions")
-    if predictions:
-        tables.append(_detail_table(_("Predictions"), predictions))
-    tables.append(_records(_("Prediction runs"), context.get("recent"), RUN_FIELDS, _))
-    return _("Prediction"), tables
+    return _("Prediction"), [_detail_table(_("Predictions"), predictions)] if predictions else []
 
 
 def _history(context: dict, _):
-    tables = [_records(_("Runs"), context.get("shown"), RUN_FIELDS + [("duration", "Duration")], _)]
+    """301s: a run's or two runs' details and settings, not the list of runs."""
+    tables = []
     selected, compared = context.get("selected"), context.get("compared")
 
     def details(title, d):
@@ -329,17 +317,9 @@ def _history(context: dict, _):
     return _("Run History"), tables
 
 
-def _overview(context: dict, _):
-    stats = ((context.get("all") or {}).get("stats") or {})
-    return _("Overview"), [_records(_("Latest runs"), stats.get("latest"), [
-        ("created_at", "Started"), ("status", "Status"), ("configuration_name", "Configuration"),
-        ("configuration_version", "Version"), ("run_id", "Run")], _)]
-
-
 def _configuration(context: dict, _):
-    tables = [_records(_("Configurations"), context.get("items"), [
-        ("name", "Name"), ("version", "Version"), ("updated_at", "Changed"),
-        ("configuration_id", "Configuration")], _)]
+    """301s: the selected configuration's settings, not the list of configurations."""
+    tables = []
     values = context.get("values") or {}
     fields = (context.get("schema") or {}).get("fields") or []
     if values and fields:
@@ -357,13 +337,9 @@ def _configuration(context: dict, _):
     return _("Configuration"), tables
 
 
-def _projects(context: dict, _):
-    return _("Projects"), [_records(_("Projects"), context.get("projects"), [
-        ("name", "Name"), ("source", "Source"), ("created_at", "Created"),
-        ("project_id", "Project")], _)]
-
-
+# 301s (asked 2026-11-27): data, configuration settings and results only; the
+# lists of the left panels (projects, datasets, configurations, runs, models)
+# are not exported, so Projects and Overview have no Export button.
 EXPORTERS = {"results.html": _results, "dataset.html": _dataset, "run.html": _run,
              "models.html": _models, "prediction.html": _prediction,
-             "history.html": _history, "overview.html": _overview,
-             "configuration.html": _configuration, "projects.html": _projects}
+             "history.html": _history, "configuration.html": _configuration}

@@ -30,9 +30,9 @@ def test_the_formats():
 
 
 def test_every_tab_has_an_exporter_and_the_buttons():
+    # 301s: no exporters for the left-panel lists (Projects, Overview).
     assert set(EXPORTERS) == {"results.html", "dataset.html", "run.html", "models.html",
-                              "prediction.html", "history.html", "overview.html",
-                              "configuration.html", "projects.html"}
+                              "prediction.html", "history.html", "configuration.html"}
     for name in EXPORTERS:
         assert '{% include "_export.html" %}' in (ROOT / "src/web/templates" / name).read_text(
             encoding="utf-8"), name
@@ -51,11 +51,12 @@ def test_the_tabs_export(tmp_path):
     # 301r: one Export button, in the format chosen under Settings (Excel by default).
     assert "Exportera (Excel)" in page and "export=xlsx" in page
     sheets = load_workbook(io.BytesIO(profile.content)).sheetnames
-    assert sheets == ["Dataset", "Profil"]
+    assert sheets == ["Profil"]                                     # 301s: not the list
     assert "Profil" in profile.headers["content-disposition"] or "Profil" in \
         profile.headers["content-disposition"].encode().decode("unicode_escape")
     text = history.content.decode("utf-8-sig")
-    assert text.startswith("Körningar\r\n") and "Inställningar som skiljer sig" in text
+    assert text.startswith("Körning 1\r\n") and "Inställningar som skiljer sig" in text
+    assert "Körningar\r\n" not in text                            # 301s: not the list
     rows = load_workbook(io.BytesIO(settings.content))["Inställningar"]
     assert rows.max_row > 20
 
@@ -92,4 +93,4 @@ def test_dark_numbers_and_all_rows(tmp_path):
 
 def test_the_guides():
     sv = " ".join((ROOT / "docs" / "user_guide.sv.md").read_text(encoding="utf-8").split())
-    assert "En flik eller vy med tabeller har knappen **Exportera**." in sv          # 301r
+    assert "har knappen **Exportera** under tabellerna, till höger." in sv          # 301s

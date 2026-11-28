@@ -65,7 +65,6 @@
         <a href="/ui/results?run={{ selected_run }}&view={{ key }}" class="{{ 'on' if view == key }}">{{ _(label) }}</a>
       {% endfor %}
     </nav>
-    {% include "_export.html" %}
     {% set results = overview.results %}
     {% if view == "overview" %}
       {% set ev = results.evaluation if results else none %}
@@ -258,6 +257,7 @@
   {% else %}
     <p class="empty">{{ _("Select a finished run in the list.") }}</p>
   {% endif %}
+    {% include "_export.html" %}  {# 301s: below the tables, right-aligned #}
   </aside>
 </div>
 {% endif %}
