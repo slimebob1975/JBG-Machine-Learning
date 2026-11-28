@@ -61,7 +61,9 @@ Nedanför det öppna projektet: aktivt träningsdataset, vald konfiguration,
 senaste körningar och projektets modeller, med länkar till flikarna där de
 ändras. Modellkvalitet per träningskörning (konfigurationens mått) med medel
 av de tre senaste, bearbetade rader per vecka och de senaste körningarna med
-länkar till deras resultat. Utan öppet projekt visas bara den övre delen.
+länkar till deras resultat. **Processer och minne för de senaste körningarna**
+visar varje körnings högsta minne, flest processer och tid. Utan öppet projekt
+visas bara den övre delen.
 
 ## Projekt
 
@@ -345,7 +347,11 @@ saknar sådana rader, tränar körningen bara och hoppar över prediktionen.
 Loggen säger det.
 
 När körningen är klar visas utvärderingen på testdata, förväxlingsmatrisen
-och de viktigaste variablerna.
+och de viktigaste variablerna. Innan dess visar **Processer och minne** ett
+diagram över hur många processer körningen använder (arbetsprocessen och de
+processer den startar) och hur mycket minne de tar, mätt var femte sekund.
+Minnet är summan av processernas residenta minne, så delat minne räknas mer än
+en gång.
 
 ## Resultat
 

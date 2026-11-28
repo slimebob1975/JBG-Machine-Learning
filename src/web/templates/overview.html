@@ -141,6 +141,29 @@
     </table>
     {% else %}<p class="empty">{{ _("No runs yet.") }}</p>{% endif %}
   </div>
+  {# 301w (asked 2026-11-27): the recent runs' processes, memory and time. #}
+  {% if resources %}
+  <div class="card">
+    <h3>{{ _("Processes and memory of recent runs") }}</h3>
+    <div class="scroll"><table class="grid">
+      <thead><tr><th>{{ _("Started") }}</th><th>{{ _("Kind") }}</th><th>{{ _("Dataset") }}</th><th>{{ _("Status") }}</th>
+        <th class="num">{{ _("Peak memory (MB)") }}</th><th class="num">{{ _("Peak processes") }}</th><th class="num">{{ _("Duration") }}</th></tr></thead>
+      <tbody>
+      {% for r in resources %}
+        {% set res = r.resources %}
+        <tr><td class="num"><a href="/ui/run?run={{ r.run_id }}">{{ r.created_at | localtime }}</a></td>
+          <td>{{ _("Prediction") if r.kind == "prediction" else (_("Feature investigation") if r.kind == "investigation" else _("Training")) }}</td>
+          <td>{{ r.dataset_name or "–" }}</td>
+          <td>{{ status_badge(r.status) }}</td>
+          <td class="num">{{ ("%.0f" | format(res.peak_memory_mb)) if res else "–" }}</td>
+          <td class="num">{{ res.peak_processes if res else "–" }}</td>
+          <td class="num">{% if res %}{% set m = (res.duration_s // 60) | int %}{% set s = (res.duration_s % 60) | round | int %}{{ m ~ " min " if m else "" }}{{ s }} s{% else %}–{% endif %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    <p class="hint">{{ _("Runs before this was added have no samples (–). Memory is the sum of the run's processes' resident memory.") }}</p>
+  </div>
+  {% endif %}
 </section>
 {% endif %}
 {% endif %}

@@ -59,8 +59,9 @@ Below, the open project: the active training dataset, the chosen
 configuration, the latest runs and the project's models, each linking to the
 tab where it is changed; model quality per training run (the configuration's
 metric) with the average of the last three; rows processed per week; and the
-latest runs, linking to their results. Without an open project only the top
-part is shown.
+latest runs, linking to their results. **Processes and memory of recent runs**
+shows each run's peak memory, peak processes and duration. Without an open
+project only the top part is shown.
 
 ## Projects
 
@@ -341,7 +342,11 @@ dataset has no such rows, the run only trains and skips the prediction; the
 log says so.
 
 When the run has finished, the evaluation on the holdout data, the
-confusion matrix and the most important features are shown.
+confusion matrix and the most important features are shown. Before that,
+**Processes and memory** draws how many processes the run uses (the worker and
+the processes it starts) and how much memory they take, sampled every five
+seconds. Memory is the sum of the processes' resident memory, so shared memory
+counts more than once.
 
 ## Results
 

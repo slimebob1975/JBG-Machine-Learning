@@ -18,7 +18,8 @@ from fastapi.responses import HTMLResponse
 
 
 def add_overview_tab(app, *, principal_dependency, render, active_project, datasets=None,
-                     configurations=None, runs=None, models=None, projects=None) -> None:
+                     configurations=None, runs=None, models=None, projects=None,
+                     results=None) -> None:
     from JBGApplicationContracts import RunReference
     from JBGWebUIRun import STAGES
 
@@ -105,6 +106,24 @@ def add_overview_tab(app, *, principal_dependency, render, active_project, datas
                 week_label=week_label, language=language)
         return {"stats": stats, "charts": charts, "metric_label": metric_label}
 
+    def run_resources(owner, pid, count=10):
+        """301w: the open project's latest runs with their peak memory, peak
+        processes and duration (runs before 301w have no samples)."""
+        if runs is None or results is None:
+            return []
+        from JBGWebUIRun import with_dataset_names
+        try:
+            items = with_dataset_names(runs.list_project_runs(owner, pid, limit=count),
+                                       datasets, owner, pid)
+        except Exception:
+            return []
+        for item in items:
+            try:
+                item["resources"] = results.resources(owner, item["run_id"])["summary"]
+            except Exception:
+                item["resources"] = None
+        return items
+
     @app.get("/ui/overview", response_class=HTMLResponse, include_in_schema=False)
     def overview_tab(request: Request, principal=Depends(principal_dependency)):
         owner = principal.principal_key
@@ -118,6 +137,7 @@ def add_overview_tab(app, *, principal_dependency, render, active_project, datas
                    "has_datasets": datasets is not None}
         if project is not None:
             pid = project["project_id"]
+            context["resources"] = run_resources(owner, pid)                   # 301w
             context["dataset_count"] = len(listed(datasets, owner, pid))
             context["configuration_count"] = len(listed(configurations, owner, pid))
             (context["latest_training"], context["latest_prediction"],

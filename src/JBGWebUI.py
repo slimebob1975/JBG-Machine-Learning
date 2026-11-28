@@ -388,7 +388,7 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
     add_overview_tab(app, principal_dependency=principal_dependency, render=render,
                      active_project=active_project, datasets=datasets,
                      configurations=configurations, runs=runs, models=models,
-                     projects=projects)
+                     projects=projects, results=results)
     if deletion is not None and runs is not None:                 # 299e
         from JBGWebUIDeletion import add_deletion_pages
         add_deletion_pages(app, principal_dependency=principal_dependency, render=render,
@@ -478,6 +478,22 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
         response.delete_cookie(CONFIGURATION_COOKIE, path="/ui")
         response.delete_cookie(MODEL_COOKIE, path="/ui")
         return response
+
+    if results is not None and runs is not None:
+        @app.get("/ui/runs/{run_id}/resources", include_in_schema=False)
+        def run_resources(run_id: str, principal=Depends(principal_dependency)):
+            """301w: the run's process and memory samples (its owner only), and
+            its status, so the Training tab knows when to stop asking."""
+            from fastapi.responses import JSONResponse
+            from JBGApplicationContracts import RunReference
+            from JBGRunResults import RunResultsUnavailable
+            owner = principal.principal_key
+            try:
+                found = results.resources(owner, run_id)
+                status = (runs.overview(owner, RunReference(run_id)) or {}).get("status")
+            except (RunResultsUnavailable, KeyError, ValueError, PermissionError):
+                return JSONResponse({"detail": "run unavailable"}, status_code=404)
+            return dict(found, status=status)
 
     @app.get("/ui/settings", response_class=HTMLResponse, include_in_schema=False)
     def settings_tab(request: Request, principal=Depends(principal_dependency)):

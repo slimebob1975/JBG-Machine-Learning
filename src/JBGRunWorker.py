@@ -461,6 +461,15 @@ def _investigate(record, config, observed, logger, own_logger, credentials, arti
     return run_investigation(record, config, observed, credentials, artifacts, folder)
 
 
+def _run_folder(record, results_root, run):
+    """301w: the run's own folder (295a), where its resource samples go; None
+    for runs outside a project."""
+    project_run = record.spec.get("project_run") if isinstance(record.spec, dict) else None
+    if results_root is None or not isinstance(project_run, dict):
+        return None
+    return Path(results_root) / str(project_run["project_id"]) / run.key
+
+
 def run_job(store: RunJobStore, run: RunReference, worker_id: str, *, logger=None,
             credentials=None, artifacts: Path | None = None, script_path: Path | None = None,
             log_dir: Path | None = None, heartbeat_seconds: float = 30.0,
@@ -471,7 +480,9 @@ def run_job(store: RunJobStore, run: RunReference, worker_id: str, *, logger=Non
         return EXIT_NO_CREDENTIALS
     if not store.claim(run, worker_id):
         return EXIT_NOT_CLAIMED
-    with _Heartbeat(store, run, worker_id, heartbeat_seconds) as heartbeat:
+    from JBGRunResources import ResourceSampler                          # 301w
+    with _Heartbeat(store, run, worker_id, heartbeat_seconds) as heartbeat, \
+            ResourceSampler(_run_folder(record, results_root, run)):
         try:
             config = _config_from_spec(record.spec, script_path)
             own_logger = logger is None

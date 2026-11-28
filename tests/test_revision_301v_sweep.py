@@ -109,7 +109,7 @@ def test_housekeeping_and_version():
     from JBGVersion import APP_VERSION
     assert APP_VERSION == "0.20.2"
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert changelog.startswith("## Version 0.20.2")
+    assert changelog.index("## Version 0.20.2") < changelog.index("## Version 0.20.1")   # 301w
     backlog = (ROOT / "BACKLOG.md").read_text(encoding="utf-8").split("## Standing rules")[0]
     assert "Ticked items of revisions 300r to 301u were moved out" in backlog
     assert "Postponed 2026-11-27: a fake-data generator" in backlog

@@ -384,3 +384,10 @@ nav.tabs a.right { margin-left: auto; }
 .settings-card label.check { display: inline-flex; align-items: center; gap: 6px; margin-right: 18px; }
 /* 301t: a view's own link, bottom left on the Export row */
 .export-links .btn.left { margin-right: auto; }
+/* 301w: the run's processes and memory */
+.resource-chart { max-width: 680px; }
+.resource-chart svg { width: 100%; height: auto; display: block; }
+.resource-keys { font-size: 12px; color: var(--ink3, #5b6b7c); margin: 4px 0 0; }
+.resource-keys { display: flex; gap: 18px; flex-wrap: wrap; }
+.resource-key { display: inline-block; width: 18px; height: 0; border-top: 2px solid; margin-right: 6px; vertical-align: middle; }
+.resource-key.dashed { border-top-style: dashed; }

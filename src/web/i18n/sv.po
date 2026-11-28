@@ -3075,3 +3075,34 @@ msgstr "Det andra projektet har en konfiguration med det namnet. Välj ett annat
 
 msgid "The configuration could not be copied there."
 msgstr "Konfigurationen kunde inte kopieras dit."
+
+# 301w: processes and memory of runs.
+msgid "Processes and memory"
+msgstr "Processer och minne"
+
+msgid "Processes"
+msgstr "Processer"
+
+msgid "Memory (MB)"
+msgstr "Minne (MB)"
+
+msgid "Peak"
+msgstr "Topp"
+
+msgid "Waiting for the first sample ..."
+msgstr "Väntar på det första mätvärdet ..."
+
+msgid "The run's own processes (the worker and the processes it starts), sampled every five seconds. Memory is the sum of their resident memory."
+msgstr "Körningens egna processer (arbetsprocessen och de processer den startar), mätta var femte sekund. Minnet är summan av deras residenta minne."
+
+msgid "Processes and memory of recent runs"
+msgstr "Processer och minne för de senaste körningarna"
+
+msgid "Peak memory (MB)"
+msgstr "Toppminne (MB)"
+
+msgid "Peak processes"
+msgstr "Flest processer"
+
+msgid "Runs before this was added have no samples (–). Memory is the sum of the run's processes' resident memory."
+msgstr "Körningar från innan detta lades till har inga mätvärden (–). Minnet är summan av körningens processers residenta minne."

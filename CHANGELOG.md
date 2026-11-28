@@ -1,3 +1,23 @@
+## Revision 301w - Processes and memory of runs (2026-11-27)
+
+- Asked 2026-11-27, decided the same day:
+  - The run's worker samples its own process tree (itself and the processes it
+    starts, such as parallel cross-validation workers) every five seconds and
+    writes one JSON line per sample to `resources.jsonl` in the run's folder
+    (`JBGRunResources.ResourceSampler`, around the whole run, also feature
+    investigations; a failure never reaches the run). Memory is the sum of the
+    processes' resident memory.
+  - Training tab: **Processer och minne**, a live chart of processes and memory
+    (two lines, two scales), redrawn every five seconds while the run has no
+    results, and kept for runs that finished without them.
+  - Overview: **Processer och minne för de senaste körningarna**, the open
+    project's ten latest runs with peak memory, peak processes and duration.
+    Runs before 301w show "–".
+  - `GET /ui/runs/{id}/resources` (the owner's runs only): the samples, their
+    peaks and the run's status.
+- User guides: the Overview and Training sections.
+- Tests: `tests/test_revision_301w_run_resources.py`.
+
 ## Version 0.20.2 – exports, Excel, gallring (2026-11-27)
 
 - The release after 0.20.1, revisions 301m to 301v: the full regression

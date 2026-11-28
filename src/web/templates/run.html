@@ -46,6 +46,15 @@
     {% include "_run_panel.html" %}
     {% set finished = overview.status in terminal %}
     {% set results = overview.results %}
+    {% if not (finished and results and results.available) %}
+      {# 301w (asked 2026-11-27): the run's processes and memory while there are no results. #}
+      <h3>{{ _("Processes and memory") }}</h3>
+      <div class="resource-chart" data-resources="/ui/runs/{{ selected_run }}/resources"
+        data-processes="{{ _('Processes') }}" data-memory="{{ _('Memory (MB)') }}"
+        data-now="{{ _('Now') }}" data-peak="{{ _('Peak') }}" data-waiting="{{ _('Waiting for the first sample ...') }}"
+        data-decimal="{{ ',' if language == 'sv' else '.' }}"></div>
+      <p class="hint">{{ _("The run's own processes (the worker and the processes it starts), sampled every five seconds. Memory is the sum of their resident memory.") }}</p>
+    {% endif %}
     {% if finished and results and results.available %}
       {% set ev = results.evaluation %}
       {% if ev %}

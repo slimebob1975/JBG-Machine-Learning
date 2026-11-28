@@ -689,6 +689,84 @@
     show();
   }
 
+  /* 301w (asked 2026-11-27): the run's processes and memory, drawn from the
+     worker's samples every five seconds until the run has finished. */
+  var RUN_DONE = ["succeeded", "failed", "cancelled", "interrupted"];
+  function drawResources(box, samples) {
+    var comma = box.getAttribute("data-decimal") === ",";
+    function n(value, digits) { var t = value.toFixed(digits); return comma ? t.replace(".", ",") : t; }
+    box.textContent = "";
+    if (!samples.length) {
+      var wait = document.createElement("p"); wait.className = "hint";
+      wait.textContent = box.getAttribute("data-waiting"); box.appendChild(wait); return;
+    }
+    var width = 640, height = 220, left = 44, right = 56, top = 14, bottom = 28;
+    var span = Math.max(samples[samples.length - 1].s || 0, 5);
+    var maxP = Math.max(1, Math.max.apply(null, samples.map(function (s) { return s.processes; })));
+    var maxM = Math.max(1, Math.max.apply(null, samples.map(function (s) { return s.memory_mb; })));
+    function x(s) { return left + (s / span) * (width - left - right); }
+    function yP(v) { return height - bottom - (v / maxP) * (height - top - bottom); }
+    function yM(v) { return height - bottom - (v / maxM) * (height - top - bottom); }
+    var svg = document.createElementNS(SVG, "svg");
+    svg.setAttribute("viewBox", "0 0 " + width + " " + height);
+    svg.setAttribute("role", "img");
+    function line(points, colour, dash) {
+      var path = document.createElementNS(SVG, "path");
+      path.setAttribute("d", points.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" "));
+      path.setAttribute("fill", "none"); path.setAttribute("stroke", colour); path.setAttribute("stroke-width", "2");
+      if (dash) { path.setAttribute("stroke-dasharray", dash); }
+      svg.appendChild(path);
+    }
+    function label(text, px, py, anchor, colour) {
+      var el = document.createElementNS(SVG, "text");
+      el.setAttribute("x", px); el.setAttribute("y", py); el.setAttribute("font-size", "11");
+      el.setAttribute("text-anchor", anchor); el.setAttribute("fill", colour || "#5b6b7c");
+      el.textContent = text; svg.appendChild(el);
+    }
+    var frame = document.createElementNS(SVG, "rect");
+    frame.setAttribute("x", left); frame.setAttribute("y", top);
+    frame.setAttribute("width", width - left - right); frame.setAttribute("height", height - top - bottom);
+    frame.setAttribute("fill", "none"); frame.setAttribute("stroke", "#d5dde6"); svg.appendChild(frame);
+    line(samples.map(function (s) { return [x(s.s || 0), yP(s.processes)]; }), "#005293");
+    line(samples.map(function (s) { return [x(s.s || 0), yM(s.memory_mb)]; }), "#e07b24", "6 3");
+    label(String(maxP), left - 6, top + 10, "end", "#005293");
+    label("0", left - 6, height - bottom, "end", "#005293");
+    label(n(maxM, 0), width - right + 6, top + 10, "start", "#e07b24");
+    label("0", width - right + 6, height - bottom, "start", "#e07b24");
+    var minutes = span / 60;
+    label(minutes >= 1 ? n(minutes, 1) + " min" : Math.round(span) + " s", width - right, height - 8, "end");
+    label("0", left, height - 8, "start");
+    box.appendChild(svg);
+    var last = samples[samples.length - 1];
+    var keys = document.createElement("p"); keys.className = "resource-keys";
+    function key(colour, dashed, text) {
+      var span = document.createElement("span");
+      var mark = document.createElement("i");
+      mark.className = "resource-key" + (dashed ? " dashed" : "");
+      mark.style.borderColor = colour;
+      span.appendChild(mark); span.appendChild(document.createTextNode(text)); keys.appendChild(span);
+    }
+    key("#005293", false, box.getAttribute("data-processes") + ": " + box.getAttribute("data-now") + " " +
+        last.processes + ", " + box.getAttribute("data-peak") + " " + maxP);
+    key("#e07b24", true, box.getAttribute("data-memory") + ": " + box.getAttribute("data-now") + " " +
+        n(last.memory_mb, 0) + ", " + box.getAttribute("data-peak") + " " + n(maxM, 0));
+    box.appendChild(keys);
+  }
+  function wireResources(box) {
+    var url = box.getAttribute("data-resources");
+    function poll() {
+      fetch(url, { credentials: "same-origin" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (found) {
+          if (!found) { return; }
+          drawResources(box, found.samples || []);
+          if (RUN_DONE.indexOf(found.status) < 0) { setTimeout(poll, 5000); }
+        })
+        .catch(function () { setTimeout(poll, 10000); });
+    }
+    poll();
+  }
+
   /* 298c: every section starts closed; the ones open when the form is saved
      open again on the page that follows (also after a refused save). */
   function keepOpenSections(form) {
@@ -876,6 +954,7 @@
     document.querySelectorAll("[data-share-slider]").forEach(wireShareSlider);     /* 301a */
     document.querySelectorAll("form[data-viz-form]").forEach(wireVisualisation);   /* 301d */
     document.querySelectorAll("table[data-pager]").forEach(wirePager);             /* 301e */
+    document.querySelectorAll("[data-resources]").forEach(wireResources);         /* 301w */
     wireSectionLinks();
     document.querySelectorAll("[data-top-actions]").forEach(wireTopActions);
     document.querySelectorAll("input[data-name-from]").forEach(wireDefaultName);   /* 300s */

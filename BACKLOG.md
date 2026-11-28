@@ -58,6 +58,8 @@ decision.
 **Configurations and datasets**
 
 - [x] 301v: copy a configuration to another project (noted with 297d).
+- [x] 301w (asked 2026-11-27): processes and memory of runs, live on Training and
+  per run on the Overview.
 - [ ] If wanted: switch a dataset to or from the prediction role (noted with
   298f; compatibility and column roles to settle).
 - [ ] If wanted: in the roles form, choosing a second class or ID column

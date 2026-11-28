@@ -144,6 +144,12 @@ class RunResultsService:
                 "total_rows": len(rows), "page": page, "page_size": page_size}
 
 
+    def resources(self, owner: str, run_id: str) -> dict:
+        """301w: the run's process and memory samples, and their peaks."""
+        from JBGRunResources import read, summary
+        samples = read(self._folder(owner, run_id))
+        return {"samples": samples, "summary": summary(samples)}
+
     def final_pipeline(self, owner: str, run_id: str) -> list | None:
         """301v: the final model's pipeline (steps, classes, parameters), or None
         for runs before 301v."""
