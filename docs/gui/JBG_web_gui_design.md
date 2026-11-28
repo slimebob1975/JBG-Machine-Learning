@@ -563,6 +563,7 @@ The map above is the target. What exists after revision 285m3:
 | `/ui/dataset?view=profile`, `GET .../datasets/{id}/fake-data-spec` | 301o | A JSON specification for fake data: distributions per column and class, numeric correlations, rare values merged |
 | every tab (`?export=csv`, `?export=xlsx`) | 301p | Every view's tables as CSV or Excel, all rows; Dark Numbers in full |
 | `/ui/projects`, `/ui/projects/prune` | 301q | Gallra körningar: outside both the latest N and the last M days, after a preview |
+| `/ui/settings`, every tab | 301r | Settings tab (language, export format) at the right end; one Export button where a view has rows |
 | `GET`, `PUT .../datasets/{dataset}/roles`; `GET /api/sql/catalogs`, `GET /api/sql/tables` | 293a | Column roles and the categorical limit (293a2) belong to the training dataset (one role per column); prediction datasets must be compatible; catalog and table lists for the user's login |
 | `POST /api/projects/{id}/runs` | 288a, 288b | Run from a project configuration (latest or pinned version) and dataset (default: active training dataset); one model file per run; CSV (288a) and SQL (288b, needs the SQL sign-in) |
 | `GET /api/projects/{id}/models`, `GET .../models/{model}` | 288c | Models registered by project runs (name, state, run, dataset); no paths |

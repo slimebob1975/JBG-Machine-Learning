@@ -34,6 +34,9 @@ LOGO = Path(__file__).resolve().parent / "GUI" / "assets" / "logo.png"
 LANGUAGES = ("sv", "en")
 DEFAULT_LANGUAGE = "sv"
 LANGUAGE_COOKIE = "jbg_lang"
+# 301r (asked 2026-11-27): the export format, chosen under Settings.
+EXPORT_COOKIE = "jbg_export"
+EXPORT_FORMATS = ("xlsx", "csv")
 PROJECT_COOKIE = "jbg_project"
 CONFIGURATION_COOKIE = "jbg_configuration"          # set on the Configuration tab
 MODEL_COOKIE = "jbg_model"                          # set on the Models tab (295b)
@@ -46,7 +49,8 @@ TABS = (("overview", "Overview", True), ("projects", "Projects", True),
         ("dataset", "Dataset", False), ("configuration", "Configuration", False),
         ("run", "Training", False), ("results", "Results", False),
         ("models", "Models", False), ("prediction", "Prediction", False),
-        ("history", "Run History", True), ("about", "About", True))          # 301c
+        ("history", "Run History", True), ("about", "About", True),          # 301c
+        ("settings", "Settings", True))                                      # 301r
 
 MESSAGES = {
     "created": ("ok", "Project created."), "saved": ("ok", "Changes saved."),
@@ -57,6 +61,7 @@ MESSAGES = {
     "unavailable": ("error", "The project is no longer available."),
     # 299e: deleting (shown on the tab the deletion returns to).
     "run_deleted": ("ok", "The run is deleted."),
+    "settings_saved": ("ok", "The settings are saved."),                     # 301r
     "pruned": ("ok", "The runs are pruned."),                               # 301q
     "model_deleted": ("ok", "The model is deleted."),
     "configuration_deleted": ("ok", "The configuration is deleted."),
@@ -239,7 +244,7 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
         except ProjectUnavailable:
             return None
 
-    available = ({"overview", "projects", "about"} | ({"dataset"} if datasets is not None else set())
+    available = ({"overview", "projects", "about", "settings"} | ({"dataset"} if datasets is not None else set())
                  | ({"configuration"} if configurations is not None and datasets is not None
                     else set())
                  | ({"run"} if project_runs is not None and runs is not None else set())
@@ -312,11 +317,16 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
                 "can_delete": deletion is not None and runs is not None,   # 299e
                 "can_stop": bool(getattr(runs, "can_stop", False))}        # 299g
         base.update(context)
+        from JBGWebUIExport import export_response, exportable
         if request.query_params.get("export"):                         # 301p
-            from JBGWebUIExport import export_response
             exported = export_response(request, template, base)
             if exported is not None:
                 return exported
+        # 301r: one Export button, in the format chosen under Settings, and
+        # only where the view has a table with rows.
+        chosen = request.cookies.get(EXPORT_COOKIE, "")
+        base["export_format"] = chosen if chosen in EXPORT_FORMATS else "xlsx"
+        base["can_export"] = exportable(template, base)
         return templates.TemplateResponse(request, template, base, status_code=status_code)
 
     if datasets is not None:
@@ -462,6 +472,26 @@ def add_web_ui(app: FastAPI, *, principal_dependency, projects, version_line: st
         response.delete_cookie(PROJECT_COOKIE, path="/ui")
         response.delete_cookie(CONFIGURATION_COOKIE, path="/ui")
         response.delete_cookie(MODEL_COOKIE, path="/ui")
+        return response
+
+    @app.get("/ui/settings", response_class=HTMLResponse, include_in_schema=False)
+    def settings_tab(request: Request, principal=Depends(principal_dependency)):
+        """301r (asked 2026-11-27): the Settings tab, for settings of this browser:
+        the language and the export format. Later settings go here too."""
+        return render(request, principal, "settings.html", "settings",
+                      languages=LANGUAGES, formats=EXPORT_FORMATS)
+
+    @app.post("/ui/settings", include_in_schema=False)
+    def save_settings(language: str = Form(""), export_format: str = Form(""),
+                      principal=Depends(principal_dependency)):
+        response = RedirectResponse("/ui/settings?message=settings_saved", status_code=303)
+        year = 365 * 24 * 3600
+        if language in LANGUAGES:
+            response.set_cookie(LANGUAGE_COOKIE, language, httponly=True, samesite="lax",
+                                path="/ui", max_age=year)
+        if export_format in EXPORT_FORMATS:
+            response.set_cookie(EXPORT_COOKIE, export_format, httponly=True, samesite="lax",
+                                path="/ui", max_age=year)
         return response
 
     @app.post("/ui/language", include_in_schema=False)

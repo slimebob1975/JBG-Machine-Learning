@@ -21,6 +21,8 @@ decision.
 - [ ] Bugs reported in use: added here as they are found.
 - [x] 301o (asked 2026-11-26): a JSON specification for fake data, from the
   Profile view.
+- [x] 301r (asked 2026-11-27): a Settings tab (language, export format) and one
+  Export button per view.
 - [x] 301p (asked 2026-11-26): export of the table data of every view and
   subview to CSV and Excel, all of the Dark Numbers calculations in particular.
 - [x] 301n. Found with 301i: a prediction CSV for a model trained with JBG_RadId must

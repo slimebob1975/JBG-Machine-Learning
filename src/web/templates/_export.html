@@ -1,5 +1,8 @@
-{# 301p (asked 2026-11-26): export this view's tables, with all rows. #}
+{# 301p, 301r (asked 2026-11-27): one Export button, in the format chosen under
+   Settings, and only where the view has a table with rows. #}
+{% if can_export %}
 <p class="export-links">
-  <a class="btn sub" href="{{ request.url.include_query_params(export='csv') }}" download>{{ _("Export CSV") }}</a>
-  <a class="btn sub" href="{{ request.url.include_query_params(export='xlsx') }}" download>{{ _("Export Excel") }}</a>
+  <a class="btn sub" href="{{ request.url.include_query_params(export=export_format) }}" download
+    title="{{ _('All the tables of this view, with all rows. The format is chosen under Settings.') }}">{{ _("Export") }} ({{ "Excel" if export_format == "xlsx" else "CSV" }})</a>
 </p>
+{% endif %}

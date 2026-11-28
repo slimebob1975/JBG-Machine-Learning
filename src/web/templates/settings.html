@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% set title = "Settings" %}
+{# 301r (asked 2026-11-27): settings of this browser. Later settings go here too. #}
+{% block main %}
+<div class="card settings-card">
+  <h2>{{ _("Settings") }}</h2>
+  <form method="post" action="/ui/settings" class="stack" id="settings-form">
+    <fieldset>
+      <legend>{{ _("Language") }}</legend>
+      <label class="check"><input type="radio" name="language" value="sv" {{ 'checked' if language == 'sv' }}> Svenska</label>
+      <label class="check"><input type="radio" name="language" value="en" {{ 'checked' if language == 'en' }}> English</label>
+    </fieldset>
+    <fieldset>
+      <legend>{{ _("Export format") }}</legend>
+      <label class="check"><input type="radio" name="export_format" value="xlsx" {{ 'checked' if export_format == 'xlsx' }}> Excel</label>
+      <label class="check"><input type="radio" name="export_format" value="csv" {{ 'checked' if export_format == 'csv' }}> CSV</label>
+      <p class="hint">{{ _("The Export button of each view gives all its tables in this format: Excel with a sheet per table, or CSV with the tables one after another (semicolons and decimal commas, as Swedish Excel reads them).") }}</p>
+    </fieldset>
+    <p class="hint">{{ _("The settings are kept in this browser.") }}</p>
+  </form>
+</div>
+{% endblock %}
+
+{% block actions %}
+  <button class="btn act" form="settings-form">{{ _("Save") }}</button>
+{% endblock %}

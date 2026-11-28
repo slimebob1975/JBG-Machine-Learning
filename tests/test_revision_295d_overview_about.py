@@ -74,7 +74,8 @@ def test_overview_and_about_are_linked_and_about_is_last(tmp_path):
         page = client.get("/ui/projects").text
     nav = page.split('<nav class="tabs"')[1].split("</nav>")[0]
     labels = re.findall(r'<(?:a href="/ui/[a-z]+"[^>]*|span class="off"[^>]*)>([^<]+)</(?:a|span)>', nav)
-    assert labels[0] == "Översikt" and labels[-2:] == ["Körhistorik", "Om"]
+    # 301r: Settings comes after About, at the right end.
+    assert labels[0] == "Översikt" and labels[-3:] == ["Körhistorik", "Om", "Inställningar"]
     assert '<a href="/ui/overview"' in nav and '<a href="/ui/about"' in nav
     # 301c: Run History is available now, a link like the other tabs.
     assert re.search(r'<a href="/ui/history"[^>]*>Körhistorik</a>', nav)

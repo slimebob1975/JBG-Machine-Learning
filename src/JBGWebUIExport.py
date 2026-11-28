@@ -111,6 +111,19 @@ def export_response(request, template: str, context: dict):
     return _response(tables, form, name)
 
 
+def exportable(template: str, context: dict) -> bool:
+    """301r: whether the view has a table with at least one row to export."""
+    exporter = EXPORTERS.get(template)
+    if exporter is None:
+        return False
+    _ = context.get("_") or (lambda text: text)
+    try:
+        found = exporter(context, _)
+    except Exception:
+        return False
+    return bool(found) and any(t.get("rows") for t in found[1])
+
+
 def table(title: str, columns: list, rows: list) -> dict:
     return {"title": title, "columns": list(columns), "rows": [list(r) for r in rows]}
 

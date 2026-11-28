@@ -1,3 +1,18 @@
+## Revision 301r - A Settings tab and one Export button (2026-11-27)
+
+- Asked 2026-11-27: simpler exports and a place for settings.
+  - A new main tab, **Inställningar** (Settings), at the right end of the
+    navigation after Om. It holds **Språk** (Svenska, English) and
+    **Exportformat** (Excel, CSV), kept in this browser (cookies `jbg_lang` and
+    `jbg_export`). Later settings go here too. The SV/EN buttons left the
+    masthead; `POST /ui/language` stays.
+  - One **Exportera** button per tab or subview, in the chosen format (Excel by
+    default), and only where the view has a table with at least one row
+    (`JBGWebUIExport.exportable`). The two buttons of 301p are gone.
+- User guides: a Settings section, and the export and language sentences.
+- Tests: `tests/test_revision_301r_settings_tab.py`. The tests of 295d and 296a
+  expect Settings after About; the 301p test expects the one button.
+
 ## Revision 301q - Gallring of runs (2026-11-26)
 
 - Asked as "per-project retention" (BACKLOG), decided 2026-11-26: the Projects

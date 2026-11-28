@@ -2923,12 +2923,6 @@ msgid "The specification could not be made."
 msgstr "Specifikationen kunde inte skapas."
 
 # 301p: exports of the views' tables.
-msgid "Export CSV"
-msgstr "Exportera CSV"
-
-msgid "Export Excel"
-msgstr "Exportera Excel"
-
 msgid "Estimates"
 msgstr "Skattningar"
 
@@ -3013,3 +3007,22 @@ msgstr "Gallra nu"
 
 msgid "The runs are pruned."
 msgstr "Körningarna är gallrade."
+
+# 301r: the Settings tab and one Export button.
+msgid "Export format"
+msgstr "Exportformat"
+
+msgid "Export"
+msgstr "Exportera"
+
+msgid "All the tables of this view, with all rows. The format is chosen under Settings."
+msgstr "Alla tabeller i vyn, med alla rader. Formatet väljs under Inställningar."
+
+msgid "The Export button of each view gives all its tables in this format: Excel with a sheet per table, or CSV with the tables one after another (semicolons and decimal commas, as Swedish Excel reads them)."
+msgstr "Knappen Exportera i varje vy ger alla dess tabeller i det här formatet: Excel med en flik per tabell, eller CSV med tabellerna efter varandra (semikolon och decimalkomma, som svenska Excel läser)."
+
+msgid "The settings are kept in this browser."
+msgstr "Inställningarna sparas i den här webbläsaren."
+
+msgid "The settings are saved."
+msgstr "Inställningarna är sparade."

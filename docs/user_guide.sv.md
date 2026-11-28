@@ -26,7 +26,7 @@ Raden under rubriken visar det pågående arbetet: öppet projekt, aktivt
 träningsdataset, konfigurationen som är vald för körning och vald modell.
 Programmet öppnas på fliken Översikt, och rubriken ”JBG Machine Learning”
 leder dit.
-Språket väljs med SV/EN uppe till höger.
+Språket väljs under fliken Inställningar längst till höger.
 
 Knappar som utför en åtgärd är gröna när de kan användas och röda, nedtonade,
 när det ännu inte finns något att göra, till exempel **Spara** innan något
@@ -36,12 +36,12 @@ sidor finns sidans huvudknapp både överst och längst ned. Långa listor i
 vänsterpanelen visar sju rader åt gången (Körhistorik tio), de senaste först,
 med **Föregående** och **Nästa** nere till höger.
 
-Varje flik och vy har **Exportera CSV** och **Exportera Excel**. De ger vyns
-tabeller med alla rader, även de som visas en sida i taget: i Excel en flik per
-tabell, i CSV tabellerna efter varandra med sina rubriker (semikolon och
-decimalkomma, som svenska Excel läser). Vyn Mörkertal ger hela beräkningen:
-inställningar, skattningar, tillväxt, beräkningstabellen och
-förväxlingsmatriserna.
+En flik eller vy med tabeller har knappen **Exportera**. Den ger vyns
+tabeller med alla rader, även de som visas en sida i taget, i formatet som
+väljs under Inställningar: Excel med en flik per tabell, eller CSV med
+tabellerna efter varandra under sina rubriker (semikolon och decimalkomma, som
+svenska Excel läser). Vyn Mörkertal ger hela beräkningen: inställningar,
+skattningar, tillväxt, beräkningstabellen och förväxlingsmatriserna.
 
 ## Översikt
 
@@ -568,6 +568,15 @@ annan körning pågår i projektet. Prediktionskörningar körs inte igen här.
 
 Markera två körningar och välj **Jämför** för att se dem sida vid sida:
 resultaten först, sedan varje inställning och kolumnroll där de skiljer sig.
+
+## Inställningar
+
+Fliken längst till höger har inställningar för den här webbläsaren:
+
+- **Språk**: svenska eller engelska.
+- **Exportformat**: Excel eller CSV, för knappen **Exportera** i varje vy.
+
+Välj **Spara**. Fler inställningar kommer att samlas här.
 
 ## Bra att veta
 

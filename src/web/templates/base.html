@@ -20,11 +20,7 @@
       {% if version_line %}<div class="version">{{ version_line }}</div>{% endif %}
     </div>
     <div class="masthead-right">
-      <form method="post" action="/ui/language" class="lang" aria-label="{{ _('Language') }}">
-        <input type="hidden" name="back" value="{{ request.url.path }}{% if request.url.query %}?{{ request.url.query }}{% endif %}">
-        <button name="language" value="sv" class="{{ 'on' if language == 'sv' }}" lang="sv">SV</button>
-        <button name="language" value="en" class="{{ 'on' if language == 'en' }}" lang="en">EN</button>
-      </form>
+      {# 301r: the language is chosen under Settings. #}
       <span class="user">{{ _("Signed in as") }} {{ user }}</span>
     </div>
   </header>
@@ -54,7 +50,7 @@
   <nav class="tabs" aria-label="{{ _('Main navigation') }}">
     {% for key, label, available in tabs %}
       {% if available %}
-        <a href="/ui/{{ key }}" class="{{ 'on' if key == current_tab }}"
+        <a href="/ui/{{ key }}" class="{{ 'on' if key == current_tab }}{{ ' right' if key == 'settings' }}"
            {% if key == current_tab %}aria-current="page"{% endif %}>{{ _(label) }}</a>
       {% else %}
         <span class="off" aria-disabled="true" title="{{ _('Available in a later version') }}">{{ _(label) }}</span>

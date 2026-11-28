@@ -25,7 +25,7 @@ The tabs follow the work order from left to right:
 The line below the title shows the current work: the open project, the
 active training dataset, the configuration chosen for runs and the chosen
 model. The program opens on the Overview tab, and the title "JBG Machine Learning" leads there.
-Choose the language with SV/EN at the top right.
+Choose the language under the Settings tab at the far right.
 
 Buttons that perform an action are green when they can be used and red,
 dimmed, while there is nothing to do yet, for example **Save** before
@@ -35,12 +35,12 @@ pages, the page's main button is at both the top and the bottom. Long lists in
 the left panel show seven rows at a time (Run History ten), the latest first,
 with **Previous** and **Next** at the bottom right.
 
-Every tab and view has **Export CSV** and **Export Excel**. They give the view's
-tables with all rows, also those shown a page at a time: in Excel a sheet per
-table, in CSV the tables one after another under their titles (semicolons and
-decimal commas, as Swedish Excel reads them). The Dark Numbers view gives the
-whole calculation: settings, estimates, growth, the calculation table and the
-confusion matrices.
+A tab or view with tables has an **Export** button. It gives the view's
+tables with all rows, also those shown a page at a time, in the format chosen
+under Settings: Excel with a sheet per table, or CSV with the tables one after
+another under their titles (semicolons and decimal commas, as Swedish Excel
+reads them). The Dark Numbers view gives the whole calculation: settings,
+estimates, growth, the calculation table and the confusion matrices.
 
 ## Overview
 
@@ -562,6 +562,15 @@ again here.
 
 Tick two runs and choose **Compare** to see them side by side: the results
 first, then every setting and column role where they differ.
+
+## Settings
+
+The tab at the far right holds the settings of this browser:
+
+- **Language**: Swedish or English.
+- **Export format**: Excel or CSV, for the **Export** button of each view.
+
+Choose **Save**. More settings will be gathered here.
 
 ## Good to know
 

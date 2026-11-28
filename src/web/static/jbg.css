@@ -378,3 +378,7 @@ div.layout-two.run-layout.models-layout { grid-template-columns: minmax(320px, 1
 /* 301p: export buttons */
 .export-links { display: flex; gap: 8px; justify-content: flex-end; margin: 6px 0 10px; }
 .export-links .btn { padding: 3px 10px; font-size: 13px; }
+/* 301r: the Settings tab at the right end of the navigation */
+nav.tabs a.right { margin-left: auto; }
+.settings-card fieldset { border: 1px solid var(--line, #d5dde6); border-radius: 8px; padding: 10px 14px; margin: 0 0 12px; }
+.settings-card label.check { display: inline-flex; align-items: center; gap: 6px; margin-right: 18px; }
