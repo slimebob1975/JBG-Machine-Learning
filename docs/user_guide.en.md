@@ -133,7 +133,8 @@ are grey when colour shows the class. **Point size** makes the points larger or
 smaller. Hover over a point to see the row's values, also free-text and date
 columns, which are not used in the computation. The same settings give the
 same picture. The picture and its settings stay when you switch views and come
-back, for each dataset.
+back, for each dataset. **Save as PNG** below the picture saves it as an image
+with a title (dataset, method and rows) and the legend, at double resolution.
 
 **Outliers** rings the most unusual rows in red, the share given (2 % by
 default, 0.5 to 10 %). Isolation Forest measures how easily a row is split off

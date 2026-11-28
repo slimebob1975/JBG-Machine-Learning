@@ -392,6 +392,9 @@
           <p class="hint" data-viz-status role="status"></p>
           <div class="viz-plot" data-viz-plot></div>
           <div class="viz-legend" data-viz-legend></div>
+          {# 301u (asked 2026-11-27): the picture, its title and legend as a PNG. #}
+          <p class="export-links"><button type="button" class="btn sub" data-viz-png hidden
+            data-dataset="{{ selected.name }}">{{ _("Save as PNG") }}</button></p>
           <p class="hint">{{ _("The picture uses the numeric columns (standardised) and the categorical columns (one column per value) from the column roles. K-means groups the rows on all of them, so the clusters are the same whichever method shows them. PCA keeps the largest directions of variation, t-SNE keeps neighbouring rows close, and MDS keeps the distances between rows. The same settings give the same picture.") }}</p>
           <p class="hint">{{ _("Outliers are found on all the prepared columns and ringed in red: the chosen share of the most unusual rows. The dashed lines between the clusters are drawn in the picture, not in the data, so they show where the picture's clusters meet. With t-SNE and MDS the distances in the picture are distorted, so take the lines as an illustration.") }}</p>
         {% elif view == "classes" %}

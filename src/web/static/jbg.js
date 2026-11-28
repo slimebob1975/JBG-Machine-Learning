@@ -313,6 +313,89 @@
     return el;
   }
 
+  /* 301u (asked 2026-11-27): the picture as one SVG image with its title above
+     and its legend below, styles written in (an image cannot use the page's
+     stylesheet), white behind. vizSavePng draws it at double size on a canvas
+     and saves a PNG. */
+  var VIZ_INLINE = {
+    "viz-boundary": { fill: "none", stroke: "#33404d", "stroke-opacity": "0.7",
+                      "stroke-width": "1.3", "stroke-dasharray": "5 4" },
+    "viz-outlier": { fill: "none", stroke: "#c0392b", "stroke-width": "1.6" }
+  };
+  function vizInline(node) {
+    Array.prototype.forEach.call(node.querySelectorAll("[class]"), function (el) {
+      var style = VIZ_INLINE[el.getAttribute("class")];
+      if (style) { Object.keys(style).forEach(function (k) { el.setAttribute(k, style[k]); }); }
+    });
+    return node;
+  }
+  function vizEscape(text) {
+    return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function vizImageSvg(plot, legend, title) {
+    var width = 760, plotHeight = 520, top = title ? 34 : 8;
+    var serializer = new XMLSerializer();
+    var keys = legend ? Array.prototype.slice.call(legend.querySelectorAll(".viz-key")) : [];
+    var x = 12, y = 0, rows = [], row = [];
+    keys.forEach(function (key) {
+      var text = key.textContent.trim();
+      var span = 24 + Math.ceil(text.length * 6.6) + 16;
+      if (x + span > width - 12 && row.length) { rows.push(row); row = []; x = 12; }
+      row.push({ key: key, text: text, x: x }); x += span;
+    });
+    if (row.length) { rows.push(row); }
+    var legendHeight = rows.length ? rows.length * 22 + 14 : 0;
+    var height = top + plotHeight + legendHeight;
+    var parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height +
+                 '" viewBox="0 0 ' + width + " " + height + '" font-family="Segoe UI, Arial, sans-serif">',
+                 '<rect width="100%" height="100%" fill="#ffffff"/>'];
+    if (title) {
+      parts.push('<text x="12" y="22" font-size="14" font-weight="600" fill="#1d2630">' +
+                 vizEscape(title) + "</text>");
+    }
+    var picture = vizInline(plot.cloneNode(true));
+    picture.removeAttribute("role");
+    picture.setAttribute("x", "0"); picture.setAttribute("y", String(top));
+    picture.setAttribute("width", String(width)); picture.setAttribute("height", String(plotHeight));
+    parts.push(serializer.serializeToString(picture).replace(/ xmlns="[^"]*"/, ""));
+    rows.forEach(function (line, r) {
+      var ly = top + plotHeight + 14 + r * 22;
+      line.forEach(function (entry) {
+        var icon = entry.key.querySelector("svg");
+        if (icon) {
+          var mark = vizInline(icon.cloneNode(true));
+          mark.setAttribute("x", String(entry.x)); mark.setAttribute("y", String(ly));
+          mark.setAttribute("width", "16"); mark.setAttribute("height", "16");
+          parts.push(serializer.serializeToString(mark).replace(/ xmlns="[^"]*"/, ""));
+        }
+        parts.push('<text x="' + (entry.x + 22) + '" y="' + (ly + 12) +
+                   '" font-size="12" fill="#1d2630">' + vizEscape(entry.text) + "</text>");
+      });
+    });
+    parts.push("</svg>");
+    return { svg: parts.join(""), width: width, height: height };
+  }
+  function vizSavePng(built, filename) {
+    var image = new Image();
+    image.onload = function () {
+      var scale = 2, canvas = document.createElement("canvas");
+      canvas.width = built.width * scale; canvas.height = built.height * scale;
+      var context = canvas.getContext("2d");
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.scale(scale, scale);
+      context.drawImage(image, 0, 0);
+      canvas.toBlob(function (blob) {
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+      }, "image/png");
+    };
+    image.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(built.svg);
+  }
+
   function wireVisualisation(form) {
     var box = form.parentNode;
     var plot = box.querySelector("[data-viz-plot]");
@@ -439,6 +522,8 @@
       });
       plot.textContent = "";
       plot.appendChild(svg);
+      var shown = box.querySelector("[data-viz-png]");                       /* 301u */
+      if (shown) { shown.hidden = false; }
       var tip = document.createElement("div");
       tip.className = "viz-tip";
       tip.hidden = true;
@@ -494,6 +579,7 @@
             var text = reason === "SQL sign-in required" ? form.getAttribute("data-reason-signin")
               : form.getAttribute("data-reason-" + reason);
             data = null; plot.textContent = ""; legend.textContent = "";
+            var hide = box.querySelector("[data-viz-png]"); if (hide) { hide.hidden = true; }   /* 301u */
             say(text || form.getAttribute("data-failed"));
             return;
           }
@@ -509,6 +595,21 @@
         .catch(function () { plot.removeAttribute("aria-busy"); say(form.getAttribute("data-failed")); });
     });
     colourBy.addEventListener("change", draw);
+    /* 301u: Save as PNG, once a picture is drawn. */
+    var pngButton = box.querySelector("[data-viz-png]");
+    if (pngButton) {
+      pngButton.addEventListener("click", function () {
+        var svg = plot.querySelector("svg");
+        if (!svg || !data) { return; }
+        var method = form.querySelector("[name=method]");
+        var methodText = method ? method.options[method.selectedIndex].text : "";
+        var dataset = pngButton.getAttribute("data-dataset") || "";
+        var title = [dataset, methodText, status.textContent].filter(Boolean).join(" · ");
+        var day = new Date().toISOString().slice(0, 10);
+        var name = (dataset + " - " + methodText + " " + day).replace(/[\\/:*?"<>|]+/g, "_");
+        vizSavePng(vizImageSvg(svg, legend, title), name + ".png");
+      });
+    }
     /* 301f (asked 2026-11-24): the point size, redrawn without recomputing. */
     var sizer = form.querySelector("[data-viz-size]");
     function pointSize() { return sizer ? Number(sizer.value) || 5.5 : 5.5; }

@@ -135,6 +135,8 @@ punkterna större eller mindre. Håll muspekaren över en
 punkt för att se radens värden, även fritext- och datumkolumner som inte
 används i beräkningen. Samma inställningar ger samma bild. Bilden och dess
 inställningar finns kvar när du byter vy och kommer tillbaka, för varje dataset.
+**Spara som PNG** under bilden sparar den som en bild med rubrik (dataset,
+metod och antal rader) och teckenförklaring, i dubbel upplösning.
 
 **Avvikelser** markerar de mest ovanliga raderna med en röd ring, den andel
 som anges (2 % som standard, 0,5 till 10 %). Isolation Forest mäter hur lätt

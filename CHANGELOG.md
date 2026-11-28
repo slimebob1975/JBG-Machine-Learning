@@ -1,3 +1,15 @@
+## Revision 301u - The dataset picture as a PNG (2026-11-27)
+
+- Asked 2026-11-27: **Spara som PNG** below the Visualisation view's picture,
+  shown once a picture is drawn. The image has a title (dataset, method, rows
+  and, for PCA, the variance explained), the picture and its legend, styles
+  written in (the cluster lines and outlier rings), a white background, and
+  double resolution. Made in the browser: the picture's SVG is drawn on a canvas
+  and saved; the file is named by dataset, method and date.
+- User guides: the Visualisation paragraph.
+- Tests: `tests/test_revision_301u_picture_png.py` (the image itself was checked
+  in jsdom: title, legend, inline styles, a single well-formed SVG).
+
 ## Revision 301t - Exports say which dataset and pipeline (2026-11-27)
 
 - Asked 2026-11-27:

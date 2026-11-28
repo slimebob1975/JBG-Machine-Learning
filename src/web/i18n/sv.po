@@ -3039,3 +3039,7 @@ msgstr "Aktivt träningsdataset"
 
 msgid "Information"
 msgstr "Information"
+
+# 301u: the dataset picture as a PNG.
+msgid "Save as PNG"
+msgstr "Spara som PNG"

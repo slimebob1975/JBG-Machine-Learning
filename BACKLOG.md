@@ -21,6 +21,7 @@ decision.
 - [ ] Bugs reported in use: added here as they are found.
 - [x] 301o (asked 2026-11-26): a JSON specification for fake data, from the
   Profile view.
+- [x] 301u (asked 2026-11-27): the dataset picture saved as a PNG.
 - [x] 301t (asked 2026-11-27): exports name the dataset and, for results, the
   pipeline; the specification button on the Export row.
 - [x] 301s (asked 2026-11-27): exports of data, settings and results only, the
